@@ -1,0 +1,358 @@
+
+options
+{
+  LOOKAHEAD= 3;
+
+  CHOICE_AMBIGUITY_CHECK = 2;
+  OTHER_AMBIGUITY_CHECK = 1;
+  STATIC = false;
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  JAVA_UNICODE_ESCAPE = false;
+  UNICODE_INPUT = false;
+  IGNORE_CASE = false;
+  USER_TOKEN_MANAGER = false;
+  USER_CHAR_STREAM = false;
+  BUILD_PARSER = true;
+  BUILD_TOKEN_MANAGER = true;
+  SANITY_CHECK = true;
+  FORCE_LA_CHECK = true;
+}
+
+PARSER_BEGIN(TripAPL_parser)
+import java.util.ArrayList;
+public class TripAPL_parser
+{
+ public static void main(String args[]) throws ParseException
+ {
+ TripAPL_parser parser = new TripAPL_parser(System.in);
+ }
+}
+PARSER_END(TripAPL_parser)
+SKIP :
+{
+        " "
+    |   "\r"
+    |   "\t"
+    |   "\n"
+    |   "\r\n"
+}
+TOKEN :
+{
+      <PROGRAM: "Program">
+    | <LOAD: "Load">
+    | <CAPBASE: "CapabilityBase:">
+    | <BELBASE: "BeliefBase">
+    | <GOALBASE: "GoalBase">
+    | <PLANBASE: "PlanBase">
+    | <PG_RULES: "PG-rules">
+    | <PR_RULES: "PR-rules">
+    | <COMMA: ",">
+    | <COLON: ":">
+    | <DOT: ".">
+    | <LBRACE: "{">
+    | <RBRACE: "}">
+    | <AND: "and">
+    | <OR: "or">
+    | <IF: "if">
+    | <WHILE: "while">
+    | <DO: "do">
+    | <THEN: "then">
+    | <ELSE: "else">
+    | <SEMICOL: ";">
+    | <NONE: "None">
+    | <SEND: "Send">
+    | <JAVA: "Java">
+    | <LPAR: "(">
+    | <RPAR: ")">
+    | <VBAR: "|">
+    | <QUSMARK: "?">
+    | <TRUE: "true">
+    | <NOT: "not">
+    | <IMPLY: "<-">
+    | <GIVES: ":-">
+    | <ATOM: ((["a"-"z"])+ (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*)>
+    | <IDENT: <ATOM> | ("'" (["!"-"~"])+ "'") >
+    | <ATOMG: <ATOM> "(" (<IDENT>)? ("," <IDENT>)* ")" >
+    | <ATOMV: <ATOM> "(" (<IDENT> | <VAR>)? ("," (<IDENT> | <VAR>))* ")">
+    | <VAR: (["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*>
+}
+
+
+
+
+Agent Program():
+{
+    String name = null;
+    ArrayList<Belief> bb = null;
+    ArrayList<Capability> cb = null;
+    ArrayList<Goal> gb = null;
+    ArrayList<Executable> pb = null;
+    ArrayList<PG> pg = null;
+    ArrayList<PR> pr = null;
+}
+{
+    <PROGRAM> name = ident()
+    (<LOAD> ident())?
+    <CAPBASE> <COLON> (cb = capabilities())?
+    <BELBASE> <COLON> (bb = beliefs())?
+    <GOALBASE> <COLON> (gb = goals())?
+    <PLANBASE> <COLON> (pb = plans())?
+    <PG_RULES> <COLON> (pg = g_rules())?
+    <PR_RULES> <COLON> (pr = r_rules())?
+    {return new Agent(name,bb,cb,gb,pb,pg,pr);}
+}
+
+ArrayList<Capability> capabilities():
+{
+    Capability buffer;
+    ArrayList<Capability> result = new ArrayList<Capability>();
+}
+{
+    buffer = capability() {result.add(buffer);}(<COMMA> buffer = capability(){result.add(buffer);})*
+    {return result;}
+}
+
+Capability capability():
+{
+    WFF query;
+    String atom;
+    ArrayList<Literal> literals;
+}
+{
+    <LBRACE> query = query() <RBRACE> atom = Atom() <LBRACE> literals = literals() <RBRACE>
+    {return new Capability(query, atom, literals);}
+}
+
+ArrayList<Belief> beliefs():
+{
+    ArrayList<Belief> bs = new ArrayList<Belief>();
+    Belief buffer;
+}
+{
+    buffer = belief() {bs.add(buffer);} (<COMMA> buffer = belief() {bs.add(buffer);})*
+    {return bs;}
+}
+
+Belief belief():
+{
+    String x = null;
+}
+{
+    x = atom() <DOT>     | (atom() <GIVES> literals() <DOT>)
+    {return new Belief(x);}
+}
+
+ArrayList<Goal> goals():
+{
+    Goal buffer;
+    ArrayList<Goal> result = new ArrayList<Goal>();
+}
+{
+    buffer = goal() {result.add(buffer);} (<COMMA> goal() {result.add(buffer);})*
+    {return result;}
+}
+
+Goal goal():
+{
+    String buffer;
+    ArrayList<String> component = new ArrayList<String>();
+}
+{
+    buffer = atom() {component.add(buffer);} (<AND> atom() {component.add(buffer);})*
+    {return new Goal(component);}
+}
+
+ArrayList<Executable> plans():
+{
+    Executable buffer;
+    ArrayList<Executable> result = new ArrayList<Executable>();
+}
+{
+    buffer = plan() (<COMMA> buffer = plan())*
+    {return result;}
+}
+
+Executable plan():
+{
+    Executable result;
+}
+{
+    result = basicaction()
+    | result = composedplan()
+    | result = plan2()
+    {return result;}
+}
+
+seqPlan plan2():   //For elimination of left recursion, part of composed plan
+{
+    Executable buffer1;
+    Executable buffer2;
+}
+{
+    (buffer1 = basicaction() <SEMICOL> buffer2 = plan()) | (buffer1 = composedplan() <SEMICOL> buffer2 = plan())
+    {return new seqPlan(buffer1, buffer2);}
+}
+BasicAction basicaction():
+{
+    String par1;
+    String par2;
+    String par3;
+    BasicAction result;
+}
+{
+    (<NONE> {result = new BasicAction(0,null,null,null);})
+    | (par1 = atom() {result = new BasicAction(4,par1,null,null);})
+    | (<SEND> <LPAR> par1 = iv() <COMMA> par2 = iv() <COMMA> par3 = atom() <RPAR> {result = new BasicAction(2,par1,par2,par3);})
+    | (<JAVA> <LPAR> par1 = ident() <COMMA> par2 = atom() <COMMA> par3 = var() <RPAR> {result = new BasicAction(3,par1,par2,par3);})
+    | (par1 = Atom() {result = new BasicAction(1,par1,null,null);})
+    {return result;}
+}
+
+Executable composedplan():
+{
+    WFF bufferCond;
+    Executable buffer1;
+    Executable buffer2 = null;
+    Executable result;
+}
+{
+    (<IF> bufferCond = wff() <THEN> buffer1 = plan() (<ELSE> buffer2 = plan())? {result = new condPlan(bufferCond, buffer1, buffer2);})
+    | (<WHILE> bufferCond = query() <DO> buffer1 = plan() {result = new whilePlan(bufferCond, buffer1);})
+    {return result;}
+}
+
+ArrayList<PG> g_rules():
+{
+    PG buffer;
+    ArrayList<PG> result = new ArrayList<PG>();
+}
+{
+    buffer = g_rule() {result.add(buffer);} (<COMMA> buffer = g_rule() {result.add(buffer);})*
+    {return result;}
+}
+
+PG g_rule():
+{
+    String atom = null;
+    WFF query;
+    Executable plan;
+}
+{
+    (atom = atom())? <IMPLY> query = query() <VBAR> plan = plan()
+    {return new PG(atom,query,plan);}
+}
+
+ArrayList<PR> r_rules():
+{
+    PR buffer;
+    ArrayList<PR> result = new ArrayList<PR>();
+}
+{
+    buffer = r_rule() {result.add(buffer);} (<COMMA> buffer = r_rule() {result.add(buffer);})*
+    {return result;}
+}
+
+PR r_rule():
+{
+    Executable plan1;
+    WFF query;
+    Executable plan2;
+}
+{
+    plan1 = plan() <IMPLY> query = query() <VBAR> plan2 = plan()
+    {return new PR(plan1,query,plan2);}
+}
+
+ArrayList<Literal> literals():
+{
+    Literal buffer;
+    ArrayList<Literal> result = new ArrayList<Literal>();
+}
+{
+    buffer = literal() {result.add(buffer);} (<COMMA> buffer = literal() {result.add(buffer);})*
+    {return result;}
+}
+
+Literal literal():
+{
+    Literal result;
+    String i;
+}
+{
+    (i = atom() {result = new Literal(true,i);}) | (<NOT> <LPAR> i = atom() {result = new Literal(true,i);}<RPAR>)
+    {return result;}
+}
+
+WFF wff():
+{
+    WFF result;
+    WFF i;
+}
+{
+    result = literal()
+    | (result = literal() <AND> i = wff() {result = new WFFExpression(true, result, i);})
+    | (result = literal() <OR> i = wff() {result = new WFFExpression(false, result, i);})
+    {return result;}
+}
+
+WFF query():
+{
+    WFF result;
+}
+{
+    result = wff() | (<TRUE> { result = new True();})
+    {return result;}
+}
+
+String iv():
+{
+    String t;
+}
+{
+    t = ident() | t = var()
+    {return t;}
+}
+
+String atom():
+{
+    Token t;
+    String buffer;
+    ArrayList<String> parameters = new ArrayList<>();
+}
+{
+    t = <ATOM> <LPAR> (buffer = ident() {parameters.add(buffer);})? (<COMMA> buffer = ident() {parameters.add(buffer);})* <RPAR>
+    {return t.image;}
+}
+
+String ident():
+{
+    Token t;
+}
+{
+    t = <IDENT>
+    {return t.image;}
+}
+
+String var():
+{
+    Token t;
+}
+{
+    t = <VAR>
+    {return t.image;}
+}
+
+String Atom():
+{
+    Token t;
+    String buffer;
+    ArrayList<String> parameters = new ArrayList<>();
+}
+{
+    t = <ATOM> <LPAR> (((buffer = ident()) | (buffer = var())) {parameters.add(buffer)})? (<COMMA> ((buffer = ident()) | (buffer = var())) {parameters.add(buffer)})* <RPAR>
+    {return t.image;}
+}
+
