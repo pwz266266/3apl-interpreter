@@ -101,7 +101,7 @@ Agent Program():
     <PLANBASE> <COLON> (pb = plans())?
     <GP_RULES> <COLON> (gp = g_rules())?
     <PR_RULES> <COLON> (pr = r_rules())?
-    {return new Agent.Agent(name,bb,cb,gb,pb,gp,pr);}
+    {return new Agent(name,bb,cb,gb,pb,gp,pr);}
 }
 
 ArrayList<Capability> capabilities():
