@@ -11,6 +11,7 @@ import alice.tuprolog.exceptions.NoSolutionException;
 
 
 public class Agent {
+    private String name;
     private State state;
     private BeliefBase beliefBase;
     private GoalBase goalBase;
@@ -20,12 +21,14 @@ public class Agent {
     private Prolog engine;
     private CapabilityBase capabilityBase;
 
-    public Agent(BeliefBase beliefBase,
+    public Agent(String name,
+                 BeliefBase beliefBase,
                  GoalBase goalBase,
                  PlanBase planBase,
                  GoalPlanningRuleBase goalPlanningRuleBase,
                  PlanRevisionRuleBase planRevisionRuleBase,
                  CapabilityBase capabilityBase) {
+        this.name = name;
         this.beliefBase = beliefBase;
         this.goalBase = goalBase;
         this.planBase = planBase;
@@ -38,11 +41,11 @@ public class Agent {
     public boolean receiveMessage(){ return false; }
 
     public void deliberation() throws NoSolutionException, MalformedGoalException {
-        if(this.state == State.SUSPEND){
+        if(this.state == State.SUSPEND && !this.receiveMessage()){
             return;
         }
+        this.state = State.ACTIVE;
         boolean flag = false;
-        flag = flag || this.receiveMessage();
         flag = flag || this.goalPlanningRuleBase.execute(goalBase,planBase,engine);
         flag = flag || this.planRevisionRuleBase.execute(planBase,engine);
         flag = flag || this.planBase.oneStep(engine) == -1;
@@ -62,6 +65,18 @@ public class Agent {
         this.state = State.ACTIVE;
     }
 
+    @Override
+    public String toString() {
+        String result = "<Agent: "+name;
+        result += "\n\t Belief Base: "+ engine.getTheory().toString();
+        result += "\n\t Goal Base: "+ goalBase.toString();
+        result += "\n\t Capability Base: "+ capabilityBase.toString();
+        result += "\n\t Plan Base: "+ planBase.toString();
+        result += "\n\t Goal Planning Rule Base: "+ goalPlanningRuleBase.toString();
+        result += "\n\t Plan Revision Rule Base: "+ planRevisionRuleBase.toString();
+        result += ">";
+        return result;
+    }
 
     public static void main(String[] args)throws InvalidTheoryException,
             MalformedGoalException, NoSolutionException, NoMoreSolutionException {
@@ -472,6 +487,24 @@ class BeliefBase{
         this.gClauses = gClauses;
         this.hornClauses = hornClauses;
     }
+
+    @Override
+    public String toString() {
+        String prefix = "";
+        StringBuilder result = new StringBuilder();
+        for(GpredClause gclause: gClauses){
+            result.append(prefix);
+            prefix = "\n";
+            result.append(gclause.toString());
+        }
+        for(String hclause: hornClauses){
+            result.append(prefix);
+            prefix = "\n";
+            result.append(hclause.toString());
+        }
+        return result.toString();
+    }
+
     public void initial(Prolog engine){
         for(String hornClause : hornClauses){
             Theory theory = new Theory(hornClause);
@@ -1132,6 +1165,19 @@ class PlanBase{
             status.add(0);
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        String prefix = "";
+        for(Plan plan: plans){
+            result.append(prefix);
+            prefix = "\n";
+            result.append(plan.toString());
+        }
+        return result.toString();
+    }
+
     public void addPlan(Plan plan){
         plans.add(plan);
         status.add(0);
@@ -1162,7 +1208,11 @@ class PlanBase{
         return true;
     }
 
-    public void initial(CapabilityBase capabilityBase){ }
+    public void initial(CapabilityBase capabilityBase){
+        for(Plan plan: plans){
+            plan.binding(capabilityBase);
+        }
+    }
 }
 
 
@@ -1177,6 +1227,9 @@ class GoalPlanningRule{
         this.plan = plan;
     }
 
+    public void binding(CapabilityBase caps){
+        this.plan.binding(caps);
+    }
     public boolean execute(GoalBase goalBase, PlanBase planBase, Prolog engine) throws MalformedGoalException, NoSolutionException {
 
         boolean result = goalBase.checkExist(this.goal);
@@ -1192,6 +1245,17 @@ class GoalPlanningRule{
             planBase.addPlan(new Plan(plan, goal, env));
         }
         return result && info.isSuccess();
+    }
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("<Goal Planning Rule: \n\tGoal:");
+        result.append(goal.toString());
+        result.append("\n\tCondition: ");
+        result.append(condition.toString());
+        result.append("\n\tPlan: ");
+        result.append(this.plan.toString());
+        return result.toString();
     }
 }
 
@@ -1211,7 +1275,22 @@ class GoalPlanningRuleBase{
         }
         return flag;
     }
-    public void initial(CapabilityBase capabilityBase) { }
+    public void initial(CapabilityBase capabilityBase){
+        for(GoalPlanningRule rule: rules){
+            rule.binding(capabilityBase);
+        }
+    }
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        String prefix = "";
+        for(GoalPlanningRule rule: rules){
+            result.append(prefix);
+            prefix = "\n";
+            result.append(rule.toString());
+        }
+        return result.toString();
+    }
 }
 
 class PlanRevisionRule{
@@ -1224,6 +1303,10 @@ class PlanRevisionRule{
         this.condition = condition;
     }
 
+    public void binding(CapabilityBase caps){
+        this.oldPlan.binding(caps);
+        this.newPlan.binding(caps);
+    }
     public boolean execute(PlanBase planBase, Prolog engine) throws MalformedGoalException, NoSolutionException {
         Env env = new Env();
         SolveInfo info = condition.performQuery(env, engine);
@@ -1237,6 +1320,17 @@ class PlanRevisionRule{
             return planBase.revisePlans(this.oldPlan,this.newPlan,env);
         }
         return false;
+    }
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("<Goal Planning Rule: \n\tPlan pattern:");
+        result.append(oldPlan.toString());
+        result.append("\n\tCondition: ");
+        result.append(condition.toString());
+        result.append("\n\tRevised Plan: ");
+        result.append(newPlan.toString());
+        return result.toString();
     }
 }
 
@@ -1257,7 +1351,22 @@ class PlanRevisionRuleBase{
         }
         return flag;
     }
-    public void initial(CapabilityBase capabilityBase) { }
+    public void initial(CapabilityBase capabilityBase){
+        for(PlanRevisionRule rule: rules){
+            rule.binding(capabilityBase);
+        }
+    }
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        String prefix = "";
+        for(PlanRevisionRule rule: rules){
+            result.append(prefix);
+            prefix = "\n";
+            result.append(rule.toString());
+        }
+        return result.toString();
+    }
 }
 
 
