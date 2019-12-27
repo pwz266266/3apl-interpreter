@@ -1,4 +1,3 @@
-
 options
 {
   LOOKAHEAD= 3;
@@ -21,18 +20,19 @@ options
   FORCE_LA_CHECK = true;
 }
 
-PARSER_BEGIN(TripAPL_parser)
-import Agent.*;
+PARSER_BEGIN(condition_parser)
 import java.util.ArrayList;
 import alice.tuprolog.*;
-public class TripAPL_parser
+import java.io.*;
+public class condition_parser
 {
- public static void main(String args[]) throws ParseException
- {
- TripAPL_parser parser = new TripAPL_parser(System.in);
+ public static void main(String args[]) throws ParseException, FileNotFoundException {
+    condition_parser parser = new condition_parser(new FileInputStream("./src/QueryParserTest1.txt"));
+    Query query = parser.query();
+    System.out.println(query.toString());
  }
 }
-PARSER_END(TripAPL_parser)
+PARSER_END(condition_parser)
 SKIP :
 {
         " "
@@ -76,133 +76,8 @@ TOKEN :
     | <GIVES: ":-">
     | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (["0" - "9"])+)>
     | <VAR: (["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*>
-    | <LITERAL: <VAL><LPAR> ((<VAL> | <VAR>) (<COMMA> (<VAL> | <VAR>))*)? <RPAR> >
-    | <LITERALS: (<LITERAL> (<COMMA> | <SEMICOL>))* <LITERAL> <PROLOGEND> >
-    | <HORN: <LITERAL> <GIVES> <LITERALS> >
+    | <ATOM: (<VAL> | <VAR>)>
 }
-
-
-
-
-Agent Program():
-{
-    Token t;
-    String name;
-    BeliefBase bb = null;
-    CapabilityBase cb = null;
-    GoalBase gb = null;
-    PlanBase pb = null;
-    GoalPlanningRuleBase gp = null;
-    PlanRevisionRuleBase pr = null;
-}
-{
-    <NAME> <COLON> (t = <VAR> | t = <VAL>) {name  = t.image;}
-    <BELBASE> <COLON> bb = beliefs()
-    <GOALBASE> <COLON> (gb = goals())?
-    <CAPBASE> <COLON> cb = capbilities()
-    <PLANBASE> <COLON> (pb = plans())?
-    <GP_RULES> <COLON> (gp = g_rules())?
-    <PR_RULES> <COLON> (pr = r_rules())?
-    {return new Agent.Agent(name,bb,cb,gb,pb,gp,pr);}
-}
-
-CapabilityBase capbilities():
-{
-    Capability buffer;
-    ArrayList<Capability> result = new ArrayList<Capability>();
-}
-{
-    (buffer = capability(){result.add(buffer);})*
-    {return new CapabilityBase(result);}
-}
-
-Capability capability():
-{
-    Atom t;
-    Query precondition;
-    String name;
-    Literal literal;
-    ArrayList<Literal> postcondition;
-    ArrayList<String> arguments;
-}
-{
-    <LBRACE> precondition = query() <RBRACE> name = val() <LPAR> (t = atom() {arguments.add(t.toString());})? (<COMMA> t = atom() {arguments.add(t.toString());})* <RPAR> <LBRACE> (literal = literal() {postcondition.add(literal);})* <RBRACE>
-    {return new Capability(precondition, name, arguments, postcondition);}
-}
-
-BeliefBase beliefs():
-{
-    ArrayList<GpredClause> bs = new ArrayList<Belief>();
-    GpredClause buffer;
-    ArrayList<String> hs = new ArrayList<String>();
-}
-{
-    ( LOOKAHEAD(2) (buffer0 = gpredclause() <PROLOGEND> {bs.add(buffer);}) | t = <HORN> {hs.add(t.image);})*
-    {return new BeliefBase(hs,bs);}
-}
-
-
-GoalBase goals():
-{
-    Goal buffer;
-    ArrayList<Goal> result = new ArrayList<Goal>();
-}
-{
-    (buffer = goal() {result.add(buffer);} (<COMMA> goal() {result.add(buffer);})*)?
-    {return new GoalBase(result);}
-}
-
-Goal goal():
-{
-    GpredClause buffer;
-    ArrayList<GpredClause> component = new ArrayList<GpredClause>();
-}
-{
-    buffer = gpredclause() {component.add(buffer);} (<AND> buffer = gpredclause() {component.add(buffer);})*
-    {return new Goal(component);}
-}
-
-
-PlanBase plans():
-{
-    Plan buffer;
-    ArrayList<Plan> plans = new ArrayList<>();
-}
-{
-    (<LBRACE> buffer = plan() {plans.add(buffer);} <RBRACE>)*
-    {return new PlanBase(plans);}
-}
-
-Plan plan():
-{
-
-}
-{
-
-}
-
-
-
-
-
-
-
-
-
-
-
-ArrayList<Literal> literals():
-{
-    Literal buffer;
-    ArrayList<Literal> result = new ArrayList<Literal>();
-}
-{
-    buffer = literal() {result.add(buffer);} (<COMMA> buffer = literal() {result.add(buffer);})*
-    {return result;}
-}
-
-
-
 
 
 Query query():

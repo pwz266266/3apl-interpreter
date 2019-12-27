@@ -1,5 +1,3 @@
-package Agent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class Agent {
         }
         this.state = State.ACTIVE;
         boolean flag = false;
-        flag = flag || this.goalPlanningRuleBase.execute(goalBase,planBase,engine);
+        flag = this.goalPlanningRuleBase.execute(goalBase,planBase,engine);
         flag = flag || this.planRevisionRuleBase.execute(planBase,engine);
         flag = flag || this.planBase.oneStep(engine) == -1;
         if(! flag){
@@ -80,6 +78,11 @@ public class Agent {
 
     public static void main(String[] args)throws InvalidTheoryException,
             MalformedGoalException, NoSolutionException, NoMoreSolutionException {
+
+        test2();
+    }
+
+    public static void test1() throws MalformedGoalException, NoSolutionException, NoMoreSolutionException {
         System.out.println();
         Atom x0 = new Atom("x0");
         Atom x1 = new Atom("x1");
@@ -121,22 +124,32 @@ public class Agent {
         post.add(l2);
         Capability cap = new Capability(wffclause0, "capName", argu, post);
         System.out.println(cap);
-//        Prolog engine = new Prolog();
-//        Theory theory1 = new Theory("test(x0,x1,12).");
-//        Theory theory2 = new Theory("test(x3,x4,36).");
-//        engine.addTheory(theory1);
-//        engine.addTheory(theory2);
-//        engine.addTheory(new Theory("result."));
-//        SolveInfo info = wffclause0.performQuery(env,engine);
-//        while (info.isSuccess()) {
-//            System.out.println("solution: " + info.getSolution() +
-//                    " - bindings: " + info);
-//            if (engine.hasOpenAlternatives()) {
-//                info = engine.solveNext();
-//            } else {
-//                break;
-//            }
-//        }
+        Prolog engine = new Prolog();
+        Theory theory1 = new Theory("test(x0,x1,12).");
+        Theory theory2 = new Theory("test(x3,x4,36).");
+        engine.addTheory(theory1);
+        engine.addTheory(theory2);
+        engine.addTheory(new Theory("result."));
+        SolveInfo info = wffclause0.performQuery(env,engine);
+        while (info.isSuccess()) {
+            System.out.println("solution: " + info.getSolution() +
+                    " - bindings: " + info);
+            if (engine.hasOpenAlternatives()) {
+                info = engine.solveNext();
+            } else {
+                break;
+            }
+        }
+    }
+    public static void test2(){
+        CodePosition pos = new CodePosition(4,false);
+        CodePosition level1 = new CodePosition(6,false);
+        CodePosition level2 = new CodePosition(0,true);
+        CodePosition level3 = new CodePosition(3,false);
+        pos.setNextLevel(level1);
+        level1.setNextLevel(level2);
+        level2.setNextLevel(level3);
+        System.out.println(pos.toString());
     }
 }
 
@@ -633,6 +646,7 @@ abstract class BasicPlan{
     abstract public String toString();
     public void binding(CapabilityBase caps){};
     public void ModifyEnv(Env env){};
+    public PlanType type() {return PlanType.ATOMIC;}
 }
 
 abstract class Sequential extends BasicPlan{
@@ -650,6 +664,9 @@ abstract class Sequential extends BasicPlan{
             return ((Sequential)components.get(first)).findByPos(x);
         }
     }
+
+    @Override
+    public PlanType type() {return PlanType.SEQUENTIAL;}
 
     public void replace(ArrayList<Integer> start, int length, SeqPlan newPlan){
         if(start.size() == 1){
@@ -804,7 +821,7 @@ class CapAction extends BasicPlan{
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append("<CapAction: "+ this.predicate +"(");
+        result.append("<CapAction: ").append(this.predicate).append("(");
         String prefix = "";
         for(Atom x: arguments){
             result.append(prefix);
@@ -930,6 +947,9 @@ class IfPlan extends Sequential{
     }
 
     @Override
+    public PlanType type() {return PlanType.IF;}
+
+    @Override
     public int oneStep(Env env, Prolog engine) throws NoSolutionException, MalformedGoalException {
         if(currentPos == 0){
             SolveInfo info = this.condition.performQuery(env, engine);
@@ -966,9 +986,9 @@ class IfPlan extends Sequential{
     @Override
     public String toString(Env env) {
         StringBuilder result = new StringBuilder("<IfPlan: "+this.condition.toString(env));
-        String prefix = "\n\t";
+        result.append("then: \n\t");
         result.append(this.components.get(0).toString(env));
-        result.append("else: ");
+        result.append("else: \n\t");
         result.append(this.components.get(1).toString(env));
         result.append(">");
         return result.toString();
@@ -1372,4 +1392,53 @@ class PlanRevisionRuleBase{
 
 enum State{
     ACTIVE,SUSPEND
+}
+
+enum PlanType{
+    ATOMIC,SEQUENTIAL,IF
+}
+
+class CodePosition{
+    private int pos;
+    private boolean special;
+    private CodePosition nextLevel;
+    public CodePosition(int pos, boolean special){
+        this.pos = pos;
+        this.special = special;
+        this.nextLevel = null;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public boolean isSpecial() {
+        return special;
+    }
+
+    public void setSpecial(boolean special) {
+        this.special = special;
+    }
+
+    public CodePosition getNextLevel() {
+        return nextLevel;
+    }
+
+    public void setNextLevel(CodePosition nextLevel) {
+        this.nextLevel = nextLevel;
+    }
+
+    @Override
+    public String toString(){
+        String result = special ? pos == 0 ? "then" : "else" : Integer.toString(pos);
+        if(nextLevel == null){
+            return result + ";";
+        }else{
+            return result + "::" + nextLevel.toString();
+        }
+    }
 }

@@ -1,0 +1,1 @@
+((not predict(3,54,6) and predicate(aw, bd, A)) or not predicate(1,2,3))

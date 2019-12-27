@@ -22,6 +22,7 @@ options
 }
 
 PARSER_BEGIN(TripAPL_parser)
+import Agent.*;
 import java.util.ArrayList;
 import alice.tuprolog.*;
 public class TripAPL_parser
@@ -43,15 +44,15 @@ SKIP :
 TOKEN :
 {
       <NAME: "Name">
-    | <CAPBASE: "Capabilities">
+    | <CAPBASE: "Capability Base">
     | <BELBASE: "Belief Base">
     | <GOALBASE: "Goal Base">
     | <PLANBASE: "Plan Base">
-    | <GP_RULES: "Goal Planning rules">
-    | <PR_RULES: "Plan revision rules">
+    | <GP_RULES: "Goal Planning Rule Base">
+    | <PR_RULES: "Plan revision Rule Base">
     | <COMMA: ",">
     | <COLON: ":">
-    | <DOT: ".">
+    | <PROLOGEND: ".">
     | <LBRACE: "{">
     | <RBRACE: "}">
     | <AND: "and">
@@ -73,11 +74,9 @@ TOKEN :
     | <NOT: "not">
     | <IMPLY: "<-">
     | <GIVES: ":-">
-    | <ATOM: ((["a"-"z"])+ (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*)>
-    | <IDENT: <ATOM> | ("'" (["!"-"~"])+ "'") >
-    | <ATOMG: <ATOM> "(" (<IDENT>)? ("," <IDENT>)* ")" >
-    | <ATOMV: <ATOM> "(" (<IDENT> | <VAR>)? ("," (<IDENT> | <VAR>))* ")">
+    | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (["0" - "9"])+)>
     | <VAR: (["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*>
+    | <ATOM: (<VAL> | <VAR>)>
 }
 
 
@@ -85,7 +84,8 @@ TOKEN :
 
 Agent Program():
 {
-    String name = null;
+    Token t;
+    String name;
     BeliefBase bb = null;
     CapabilityBase cb = null;
     GoalBase gb = null;
@@ -94,57 +94,62 @@ Agent Program():
     PlanRevisionRuleBase pr = null;
 }
 {
-    <NAME> <COLON> name = ident()
+    <NAME> <COLON> (t = <ATOM>) {name  = t.image;}
     <BELBASE> <COLON> (bb = beliefs())?
     <GOALBASE> <COLON> (gb = goals())?
-    <CAPBASE> <COLON> (cb = capabilities())?
+    <CAPBASE> <COLON> cb = capbilities()
     <PLANBASE> <COLON> (pb = plans())?
     <GP_RULES> <COLON> (gp = g_rules())?
     <PR_RULES> <COLON> (pr = r_rules())?
-    {return new Agent(name,bb,cb,gb,pb,gp,pr);}
+    {return new Agent.Agent(name,bb,cb,gb,pb,gp,pr);}
 }
 
-ArrayList<Capability> capabilities():
+CapabilityBase capbilities():
 {
     Capability buffer;
     ArrayList<Capability> result = new ArrayList<Capability>();
 }
 {
-    buffer = capability() {result.add(buffer);}(<COMMA> buffer = capability(){result.add(buffer);})*
-    {return result;}
+    (buffer = capability(){result.add(buffer);})*
+    {return new CapabilityBase(result);}
 }
 
 Capability capability():
 {
-    WFF query;
-    String atom;
-    ArrayList<Literal> literals;
+    Token t;
+    Query precondition;
+    String name;
+    ArrayList<Literal> postcondition;
+    ArrayList<String> arguments;
 }
 {
-    <LBRACE> query = query() <RBRACE> atom = Atom() <LBRACE> literals = literals() <RBRACE>
-    {return new Capability(query, atom, literals);}
+    <LBRACE> precondition = query() <RBRACE> name = ident() <LPAR> (t = <ATOM> {arguments.add(t.image);})? (<COMMA> t = <ATOM> {arguments.add(t.image);})* <RPAR> <LBRACE> literals = literals() <RBRACE>
+    {return new Capability(precondition, name, arguments, postcondition);}
 }
 
-ArrayList<Belief> beliefs():
+BeliefBase beliefs():
 {
-    ArrayList<Belief> bs = new ArrayList<Belief>();
-    Belief buffer;
+    ArrayList<GpredClause> bs = new ArrayList<Belief>();
+    GpredClause buffer;
+    ArrayList<String> hs = new ArrayList<String>();
+    String buffer0;
 }
 {
     buffer = belief() {bs.add(buffer);} (<COMMA> buffer = belief() {bs.add(buffer);})*
     {return bs;}
 }
 
-Belief belief():
+
+GpredClause belief():
 {
     String x = null;
 }
 {
-    x = atom() <DOT>     | (atom() <GIVES> literals() <DOT>)
+    x = atom() <PROLOGEND>     | (atom() <GIVES> literals() <PROLOGEND> )
     {return new Belief(x);}
 }
 
-ArrayList<Goal> goals():
+GoalBase goals():
 {
     Goal buffer;
     ArrayList<Goal> result = new ArrayList<Goal>();
@@ -275,86 +280,99 @@ ArrayList<Literal> literals():
     {return result;}
 }
 
+
+
+
+
+
+Query query():
+{
+    Query sub0;
+    Query sub1;
+    boolean isOr;
+}
+{
+    (sub0 = singlequery() {return sub0;})
+    | (<LPAR> sub0 = singlequery() ((<OR> sub1 = singlequery() <RPAR> {return new wffBinary(true, sub0, sub1);}) |
+    (<AND> sub1 = singlequery() <RPAR> {return new wffBinary(false, sub0, sub1);})))
+}
+
+Query singlequery():
+{
+    Query query;
+}
+{
+    (query = truequery() {return query;}) | (query = literal() {return query;})
+}
+
+TrueQuery truequery():
+{
+}
+{
+    <TRUE> {return new TrueQuery();}
+}
+
+
 Literal literal():
 {
-    Literal result;
-    String i;
+    VpredClause clause;
 }
 {
-    (i = atom() {result = new Literal(true,i);}) | (<NOT> <LPAR> i = atom() {result = new Literal(true,i);}<RPAR>)
-    {return result;}
+    (clause = vpredclause() {return new Literal(false, clause);}) | (<NOT> clause = vpredclause() {return new Literal(true, clause);})
 }
 
-WFF wff():
-{
-    WFF result;
-    WFF i;
-}
-{
-    result = literal()
-    | (result = literal() <AND> i = wff() {result = new WFFExpression(true, result, i);})
-    | (result = literal() <OR> i = wff() {result = new WFFExpression(false, result, i);})
-    {return result;}
-}
-
-WFF query():
-{
-    WFF result;
-}
-{
-    result = wff() | (<TRUE> { result = new True();})
-    {return result;}
-}
-
-String iv():
-{
-    String t;
-}
-{
-    t = ident() | t = var()
-    {return t;}
-}
-
-AtomG atom():
+GpredClause gpredclause():
 {
     Token t;
-    String buffer;
-    ArrayList<String> parameters = new ArrayList<>();
+    ArrayList<Atom> arguments = new ArrayList<Atom>();
+    Atom buffer;
 }
 {
-    t = <ATOM> <LPAR> (buffer = ident() {parameters.add(buffer);})? (<COMMA> buffer = ident() {parameters.add(buffer);})* <RPAR>
-    {return new AtomG(t.image, parameters);}
-
+    t = <VAL> <LPAR> (buffer = val() {arguments.add(buffer);} )? (<COMMA> buffer = val() {arguments.add(buffer);})* <RPAR>
+    {return new GpredClause(t.image, arguments);}
 }
 
-String ident():
+VpredClause vpredclause():
+{
+    Token t;
+    ArrayList<Atom> arguments = new ArrayList<Atom>();
+    Atom buffer;
+}
+{
+    t = <VAL> <LPAR> (buffer = atom() {arguments.add(buffer);} )? (<COMMA> buffer = atom() {arguments.add(buffer);})* <RPAR>
+    {return new VpredClause(t.image, arguments);}
+}
+
+
+
+
+
+
+
+
+
+
+
+Atom val():
 {
     Token t;
 }
 {
-    t = <IDENT>
-    {return t.image;}
+    t = <VAL>{return new Atom(t.image);}
 }
 
-String var():
+Atom var():
 {
     Token t;
 }
 {
-    t = <VAR>
-    {return t.image;}
+    t = <VAR>{return new Atom(t.image);}
 }
 
-AtomV Atom():
+Atom atom():
 {
-    Token t;
-    String buffer;
-    ArrayList<String> parameters = new ArrayList<>();
-    ArrayList<String> vars = new ArrayList<>();
+    Atom a;
 }
 {
-    t = <ATOM> <LPAR> (((buffer = ident()) | (buffer = var() {vars.append(buffer);})) {parameters.add(buffer);})?
-                (<COMMA> ((buffer = ident()) | (buffer = var(){vars.append(buffer);})) {parameters.add(buffer);})* <RPAR>
-    {return new AtomV(t.image, parameters, vars);}
+    a = var() | a = val() {return a;}
 }
-
