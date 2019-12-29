@@ -76,7 +76,9 @@ TOKEN :
     | <GIVES: ":-">
     | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (["0" - "9"])+)>
     | <VAR: (["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*>
-    | <ATOM: (<VAL> | <VAR>)>
+    | <LITERAL: <VAL><LPAR> ((<VAL> | <VAR>) (<COMMA> (<VAL> | <VAR>))*)? <RPAR> >
+    | <LITERALS: (<LITERAL> (<COMMA> | <SEMICOL>))* <LITERAL> <PROLOGEND> >
+    | <HORN: <LITERAL> <GIVES> <LITERALS> >
 }
 
 
@@ -94,11 +96,11 @@ Agent Program():
     PlanRevisionRuleBase pr = null;
 }
 {
-    <NAME> <COLON> (t = <ATOM>) {name  = t.image;}
-    <BELBASE> <COLON> (bb = beliefs())?
-    <GOALBASE> <COLON> (gb = goals())?
+    <NAME> <COLON> (t = <VAR> | t = <VAL>) {name  = t.image;}
+    <BELBASE> <COLON> bb = beliefs()
+    <GOALBASE> <COLON> gb = goals()
     <CAPBASE> <COLON> cb = capbilities()
-    <PLANBASE> <COLON> (pb = plans())?
+    <PLANBASE> <COLON> pb = plans()
     <GP_RULES> <COLON> (gp = g_rules())?
     <PR_RULES> <COLON> (pr = r_rules())?
     {return new Agent.Agent(name,bb,cb,gb,pb,gp,pr);}
@@ -116,14 +118,15 @@ CapabilityBase capbilities():
 
 Capability capability():
 {
-    Token t;
+    Atom t;
     Query precondition;
     String name;
+    Literal literal;
     ArrayList<Literal> postcondition;
     ArrayList<String> arguments;
 }
 {
-    <LBRACE> precondition = query() <RBRACE> name = ident() <LPAR> (t = <ATOM> {arguments.add(t.image);})? (<COMMA> t = <ATOM> {arguments.add(t.image);})* <RPAR> <LBRACE> literals = literals() <RBRACE>
+    <LBRACE> precondition = query() <RBRACE> name = val() <LPAR> (t = atom() {arguments.add(t.toString());})? (<COMMA> t = atom() {arguments.add(t.toString());})* <RPAR> <LBRACE> (literal = literal() {postcondition.add(literal);})* <RBRACE>
     {return new Capability(precondition, name, arguments, postcondition);}
 }
 
@@ -132,22 +135,12 @@ BeliefBase beliefs():
     ArrayList<GpredClause> bs = new ArrayList<Belief>();
     GpredClause buffer;
     ArrayList<String> hs = new ArrayList<String>();
-    String buffer0;
 }
 {
-    buffer = belief() {bs.add(buffer);} (<COMMA> buffer = belief() {bs.add(buffer);})*
-    {return bs;}
+    ( LOOKAHEAD(2) (buffer0 = gpredclause() <PROLOGEND> {bs.add(buffer);}) | t = <HORN> {hs.add(t.image);})*
+    {return new BeliefBase(hs,bs);}
 }
 
-
-GpredClause belief():
-{
-    String x = null;
-}
-{
-    x = atom() <PROLOGEND>     | (atom() <GIVES> literals() <PROLOGEND> )
-    {return new Belief(x);}
-}
 
 GoalBase goals():
 {
@@ -155,120 +148,74 @@ GoalBase goals():
     ArrayList<Goal> result = new ArrayList<Goal>();
 }
 {
-    buffer = goal() {result.add(buffer);} (<COMMA> goal() {result.add(buffer);})*
-    {return result;}
+    (buffer = goal() {result.add(buffer);} (<COMMA> goal() {result.add(buffer);})*)?
+    {return new GoalBase(result);}
 }
 
 Goal goal():
 {
-    String buffer;
-    ArrayList<String> component = new ArrayList<String>();
+    GpredClause buffer;
+    ArrayList<GpredClause> component = new ArrayList<GpredClause>();
 }
 {
-    buffer = atom() {component.add(buffer);} (<AND> atom() {component.add(buffer);})*
+    buffer = gpredclause() {component.add(buffer);} (<AND> buffer = gpredclause() {component.add(buffer);})*
     {return new Goal(component);}
 }
 
-ArrayList<Executable> plans():
+
+PlanBase plans():
 {
-    Executable buffer;
-    ArrayList<Executable> result = new ArrayList<Executable>();
+    Plan buffer;
+    ArrayList<Plan> plans = new ArrayList<>();
 }
 {
-    buffer = plan() (<COMMA> buffer = plan())*
-    {return result;}
+    (<LBRACE> buffer = plan() {plans.add(buffer);} <RBRACE>)*
+    {return new PlanBase(plans);}
 }
 
-Executable plan():
+Plan plan():
 {
-    Executable result;
+    SeqPlan plan;
 }
 {
-    result = basicaction()
-    | result = composedplan()
-    | result = plan2()
-    {return result;}
+    <LBRACE> plan = seqPlan() <RBRACE> {return new Plan(plan, null, null);}
 }
 
-seqPlan plan2():   //For elimination of left recursion, part of composed plan
+
+SeqPlan seqPlan():
 {
-    Executable buffer1;
-    Executable buffer2;
+    BasicPlan buffer;
+    ArrayList<BasicPlan> components = new ArrayList<>();
 }
 {
-    (buffer1 = basicaction() <SEMICOL> buffer2 = plan()) | (buffer1 = composedplan() <SEMICOL> buffer2 = plan())
-    {return new seqPlan(buffer1, buffer2);}
-}
-BasicAction basicaction():
-{
-    String par1;
-    String par2;
-    String par3;
-    BasicAction result;
-}
-{
-    (<NONE> {result = new BasicAction(0,null,null,null);})
-    | (par1 = atom() {result = new BasicAction(4,par1,null,null);})
-    | (<SEND> <LPAR> par1 = iv() <COMMA> par2 = iv() <COMMA> par3 = atom() <RPAR> {result = new BasicAction(2,par1,par2,par3);})
-    | (<JAVA> <LPAR> par1 = ident() <COMMA> par2 = atom() <COMMA> par3 = var() <RPAR> {result = new BasicAction(3,par1,par2,par3);})
-    | (par1 = Atom() {result = new BasicAction(1,par1,null,null);})
-    {return result;}
+     (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ {return new SeqPlan(components);}
 }
 
-Executable composedplan():
+BasicPlan basicplan():
 {
-    WFF bufferCond;
-    Executable buffer1;
-    Executable buffer2 = null;
-    Executable result;
+    Query testbuffer;
+    ArrayList<Atom> arguments = new ArrayList<Atom>();
+    ArrayList<BasicPlan> components = new ArrayList<BasicPlan>();
+    BasicPlan buffer;
+    Atom argbuffer;
+    Token t;
+    SeqPlan ifPlan;
+    SeqPlan elsePlan;
 }
 {
-    (<IF> bufferCond = wff() <THEN> buffer1 = plan() (<ELSE> buffer2 = plan())? {result = new condPlan(bufferCond, buffer1, buffer2);})
-    | (<WHILE> bufferCond = query() <DO> buffer1 = plan() {result = new whilePlan(bufferCond, buffer1);})
-    {return result;}
-}
-
-ArrayList<PG> g_rules():
-{
-    PG buffer;
-    ArrayList<PG> result = new ArrayList<PG>();
-}
-{
-    buffer = g_rule() {result.add(buffer);} (<COMMA> buffer = g_rule() {result.add(buffer);})*
-    {return result;}
+    (<JAVA> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new JavaAction(arguments);})
+    | ( testbuffer = query() <QUSMARK> {return new TestAction(testbuffer); } )
+    | (<SEND> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new SendAction(arguments);})
+    | ( t = <VAL> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new CapAction(t.image, arguments);})
+    | (<WHILE> <LPAR> testbuffer = query() <RPAR> <LBRACE> (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ {return new WhilePlan(components, testbuffer);} <RBRACE>)
+    | (<IF> <LPAR> testbuffer = query() <RPAR> <LBRACE> ifPlan = seqPlan() <RBRACE> <ELSE> <LBRACE> elsePlan = seqPlan() <RBRACE> {return new IfPlan(ifPlan, elsePlan, testbuffer);})
 }
 
-PG g_rule():
-{
-    String atom = null;
-    WFF query;
-    Executable plan;
-}
-{
-    (atom = atom())? <IMPLY> query = query() <VBAR> plan = plan()
-    {return new PG(atom,query,plan);}
-}
 
-ArrayList<PR> r_rules():
-{
-    PR buffer;
-    ArrayList<PR> result = new ArrayList<PR>();
-}
-{
-    buffer = r_rule() {result.add(buffer);} (<COMMA> buffer = r_rule() {result.add(buffer);})*
-    {return result;}
-}
 
-PR r_rule():
-{
-    Executable plan1;
-    WFF query;
-    Executable plan2;
-}
-{
-    plan1 = plan() <IMPLY> query = query() <VBAR> plan2 = plan()
-    {return new PR(plan1,query,plan2);}
-}
+
+
+
 
 ArrayList<Literal> literals():
 {
@@ -284,7 +231,6 @@ ArrayList<Literal> literals():
 
 
 
-
 Query query():
 {
     Query sub0;
@@ -293,9 +239,10 @@ Query query():
 }
 {
     (sub0 = singlequery() {return sub0;})
-    | (<LPAR> sub0 = singlequery() ((<OR> sub1 = singlequery() <RPAR> {return new wffBinary(true, sub0, sub1);}) |
-    (<AND> sub1 = singlequery() <RPAR> {return new wffBinary(false, sub0, sub1);})))
+    | (<LPAR> sub0 = query() ((<OR> sub1 = query() <RPAR> {return new wffBinary(true, sub0, sub1);}) |
+    (<AND> sub1 = query() <RPAR> {return new wffBinary(false, sub0, sub1);})))
 }
+
 
 Query singlequery():
 {
@@ -304,6 +251,7 @@ Query singlequery():
 {
     (query = truequery() {return query;}) | (query = literal() {return query;})
 }
+
 
 TrueQuery truequery():
 {
@@ -321,6 +269,7 @@ Literal literal():
     (clause = vpredclause() {return new Literal(false, clause);}) | (<NOT> clause = vpredclause() {return new Literal(true, clause);})
 }
 
+
 GpredClause gpredclause():
 {
     Token t;
@@ -331,6 +280,7 @@ GpredClause gpredclause():
     t = <VAL> <LPAR> (buffer = val() {arguments.add(buffer);} )? (<COMMA> buffer = val() {arguments.add(buffer);})* <RPAR>
     {return new GpredClause(t.image, arguments);}
 }
+
 
 VpredClause vpredclause():
 {
@@ -344,15 +294,6 @@ VpredClause vpredclause():
 }
 
 
-
-
-
-
-
-
-
-
-
 Atom val():
 {
     Token t;
@@ -360,6 +301,7 @@ Atom val():
 {
     t = <VAL>{return new Atom(t.image);}
 }
+
 
 Atom var():
 {
@@ -369,10 +311,11 @@ Atom var():
     t = <VAR>{return new Atom(t.image);}
 }
 
+
 Atom atom():
 {
     Atom a;
 }
 {
-    a = var() | a = val() {return a;}
+    a = var() {return a;}| a = val() {return a;}
 }

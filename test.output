@@ -1,0 +1,31 @@
+<Plan: with no goal
+	<Sequence: 
+		<SendAction: argument = (X,41,5)>
+		<JavaActoin: arguments = (1,x,Y)>  (not implemented)
+		<TestAction: (predict(s,tR,R) , true)?>
+		<IfPlan: predict(s,t,a)
+		then: 
+			<Sequence: 
+				<CapAction: goto(X,Y,12)>
+			>
+		else: 
+			<Sequence: 
+				<TestAction: true?>
+			>
+		>
+		<WhilePlan: true
+			<JavaActoin: arguments = (1,23,5)>  (not implemented)
+			<IfPlan: (predict(dasf,asdew,d) , true)
+			then: 
+				<Sequence: 
+					<CapAction: goto(X,T,z)>
+				>
+			else: 
+				<Sequence: 
+					<CapAction: goto(s,d,t,a)>
+					<CapAction: whatever(X,g,sgs,s)>
+				>
+			>
+		>
+	>
+>

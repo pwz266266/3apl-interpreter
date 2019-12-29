@@ -194,7 +194,7 @@ class Env{
                 return x.value;
             }
         }
-        return null;
+        return var;
     }
 
     class VVPair{
@@ -376,7 +376,10 @@ class Goal{
 
     @Override
     public String toString(){
-        StringBuilder result = new StringBuilder();
+        return toString("");
+    }
+    public String toString(String indent){
+        StringBuilder result = new StringBuilder(indent);
         String prefix = "";
         for(GpredClause goal: subgoals){
             result.append(prefix);
@@ -437,13 +440,17 @@ class GoalBase{
 
     @Override
     public String toString(){
+        return toString("");
+    }
+    public String toString(String indent){
         String prefix = "";
         StringBuilder result = new StringBuilder();
         for(Goal goal: goals){
             result.append(prefix);
             prefix = "\n";
-            result.append(goal.toString());
+            result.append(goal.toString(indent+"\t"));
         }
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
@@ -502,19 +509,23 @@ class BeliefBase{
     }
 
     @Override
-    public String toString() {
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
         String prefix = "";
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(indent);
         for(GpredClause gclause: gClauses){
             result.append(prefix);
             prefix = "\n";
-            result.append(gclause.toString());
+            result.append(indent+"\t"+gclause.toString());
         }
         for(String hclause: hornClauses){
             result.append(prefix);
             prefix = "\n";
-            result.append(hclause.toString());
+            result.append(indent+"\t"+hclause);
         }
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
@@ -550,7 +561,10 @@ class Capability{
     }
     @Override
     public String toString(){
-        StringBuilder result = new StringBuilder("<Capability: " + name + ">");
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent+"<Capability: " + name +"\n");
         result.append("(");
         String prefix = "";
         for(String arg : arguments){
@@ -558,22 +572,22 @@ class Capability{
             prefix = ",";
             result.append(arg);
         }
-        result.append(")\n{");
+        result.append(")"+indent+"\n{");
         result.append(precondition.toString());
-        result.append("}\n{");
+        result.append("}"+indent+"\n{");
         prefix = "";
         for(Literal lit : postcondition){
             result.append(prefix);
             prefix = ",";
             result.append(lit.toString());
         }
-        result.append("}\n");
-
+        result.append("}");
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
-    public String toString(Env env){
-        StringBuilder result = new StringBuilder("<Capability: " + name + ">");
+    public String toString(Env env, String indent){
+        StringBuilder result = new StringBuilder(indent+"<Capability: " + name + "\n");
         result.append("(");
         String prefix = "";
         for(String arg : arguments){
@@ -581,19 +595,24 @@ class Capability{
             prefix = ",";
             result.append(arg);
         }
-        result.append(")\n{");
-        result.append(precondition.toString(env) );
-        result.append("}\n{");
+        result.append(")"+indent+"\n{");
+        result.append(precondition.toString(env));
+        result.append("}"+indent+"\n{");
         prefix = "";
         for(Literal lit : postcondition){
             result.append(prefix);
             prefix = ",";
             result.append(lit.toString(env));
         }
-        result.append("}\n");
-
+        result.append("}");
+        result.append("\n"+indent+">");
         return result.toString();
     }
+
+    public String toString(Env env){
+        return toString(env, "");
+    }
+
     boolean perform(Prolog engine, Env env) throws MalformedGoalException, NoSolutionException {
         SolveInfo info = precondition.performQuery(env, engine);
         if(info.isSuccess()){
@@ -617,13 +636,16 @@ class CapabilityBase{
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         String prefix = "";
         for(Capability cap: capabilities){
             result.append(prefix);
             prefix = ";\n";
-            result.append(cap);
+            result.append(cap.toString(indent));
         }
         return result.toString();
     }
@@ -642,8 +664,15 @@ class CapabilityBase{
 
 abstract class BasicPlan{
     abstract public int oneStep(Env env, Prolog engine) throws NoSolutionException, MalformedGoalException;
-    abstract public String toString(Env env);
-    abstract public String toString();
+    abstract public String toString(Env env, String indent);
+    abstract public String toString(String indent);
+    @Override
+    public String toString(){
+        return toString("");
+    }
+    public  String toString(Env env){
+        return toString(env, "");
+    }
     public void binding(CapabilityBase caps){};
     public void ModifyEnv(Env env){};
     public PlanType type() {return PlanType.ATOMIC;}
@@ -710,28 +739,28 @@ class SeqPlan extends Sequential{
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder();
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<Sequence: ");
-        String prefix = "\n\t";
+        String prefix = "\n";
         for(BasicPlan x: components){
             result.append(prefix);
-            result.append(x.toString(env));
+            result.append(x.toString(env,indent+"\t"));
         }
-        result.append(">");
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<Sequence: ");
-        String prefix = "\n\t";
+        String prefix = "\n";
         for(BasicPlan x: components){
             result.append(prefix);
-            result.append(x.toString());
+            result.append(x.toString(indent+"\t"));
         }
-        result.append(">");
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
@@ -763,8 +792,8 @@ class JavaAction extends BasicPlan{
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder();
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<JavaActoin: arguments = (");
         String prefix = "";
         for(Atom x: arguments){
@@ -781,8 +810,8 @@ class JavaAction extends BasicPlan{
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<JavaActoin: arguments = (");
         String prefix = "";
         for(Atom x: arguments){
@@ -819,8 +848,8 @@ class CapAction extends BasicPlan{
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<CapAction: ").append(this.predicate).append("(");
         String prefix = "";
         for(Atom x: arguments){
@@ -833,8 +862,8 @@ class CapAction extends BasicPlan{
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder();
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<CapAction: "+ this.predicate +"(");
         String prefix = "";
         for(Atom x: arguments){
@@ -869,22 +898,31 @@ class SendAction extends BasicPlan{
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<SendAction: argument = (");
         String prefix = "";
-        for(Atom x: arguments){
-            result.append(prefix);
-            prefix = ",";
-            result.append(x.toString());
+        if(arguments == null){
+            result.append("NULL!");
+        }else{
+            for(Atom x: arguments){
+                result.append(prefix);
+                prefix = ",";
+                if(x == null){
+                    result.append("NULL");
+                }
+                else{
+                    result.append(x.toString());
+                }
+            }
         }
         result.append(")>");
         return result.toString();
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder();
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<SendAction: argument = (");
         String prefix = "";
         for(Atom x: arguments){
@@ -924,13 +962,13 @@ class TestAction extends BasicPlan{
     }
 
     @Override
-    public String toString(Env env) {
-        return "<TestAction: "+this.query.toString(env)+"?>";
+    public String toString(Env env, String indent) {
+        return indent+"<TestAction: "+this.query.toString(env)+"?>";
     }
 
     @Override
-    public String toString(){
-        return "<TestAction: "+this.query.toString()+"?>";
+    public String toString(String indent){
+        return indent+"<TestAction: "+this.query.toString()+"?>";
     }
 }
 
@@ -944,6 +982,7 @@ class IfPlan extends Sequential{
         this.components = new ArrayList<BasicPlan>();
         this.components.add(ifComponent);
         this.components.add(elseComponent);
+        this.insideEnv = new Env();
     }
 
     @Override
@@ -984,24 +1023,24 @@ class IfPlan extends Sequential{
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder("<IfPlan: "+this.condition.toString(env));
-        result.append("then: \n\t");
-        result.append(this.components.get(0).toString(env));
-        result.append("else: \n\t");
-        result.append(this.components.get(1).toString(env));
-        result.append(">");
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent+"<IfPlan: "+this.condition.toString(env));
+        result.append("\n"+indent+"then: \n");
+        result.append(this.components.get(0).toString(env, "\t"+indent));
+        result.append("\n"+indent+"else: \n");
+        result.append(this.components.get(1).toString(env, "\t"+indent));
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder("<IfPlan: "+this.condition.toString());
-        String prefix = "\n\t";
-        result.append(this.components.get(0).toString());
-        result.append("else: ");
-        result.append(this.components.get(1).toString());
-        result.append(">");
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent+"<IfPlan: "+this.condition.toString());
+        result.append("then: \n");
+        result.append(this.components.get(0).toString("\t"+indent));
+        result.append("else: \n");
+        result.append(this.components.get(1).toString("\t"+indent));
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
@@ -1032,6 +1071,8 @@ class WhilePlan extends Sequential{
     public WhilePlan(ArrayList<BasicPlan> components, Query condition){
         this.condition = condition;
         this.currentPos = 0;
+        this.insideEnv = new Env();
+        this.components = components;
     }
 
     @Override
@@ -1069,26 +1110,26 @@ class WhilePlan extends Sequential{
     }
 
     @Override
-    public String toString(Env env) {
-        StringBuilder result = new StringBuilder("<WhilePlan: "+this.condition.toString(env));
-        String prefix = "\n\t";
+    public String toString(Env env, String indent) {
+        StringBuilder result = new StringBuilder(indent+"<WhilePlan: "+this.condition.toString(env));
+        String prefix = "\n";
         for(BasicPlan x: components){
             result.append(prefix);
-            result.append(x.toString(env));
+            result.append(x.toString(env,indent+"\t"));
         }
-        result.append(">");
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder("<WhilePlan: "+this.condition.toString());
-        String prefix = "\n\t";
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent+"<WhilePlan: "+this.condition.toString());
+        String prefix = "\n";
         for(BasicPlan x: components){
             result.append(prefix);
-            result.append(x.toString());
+            result.append(x.toString(indent+"\t"));
         }
-        result.append(">");
+        result.append("\n"+indent+">");
         return result.toString();
     }
 
@@ -1114,7 +1155,7 @@ class WhilePlan extends Sequential{
 
 class Plan{
     private SeqPlan plan;
-    private Goal associatedGoal;
+    private Goal associatedGoal = null;
     private Env insideEnv;
     public Plan(SeqPlan plan, Goal associatedGoal, Env insideEnv){
         this.plan = plan;
@@ -1153,14 +1194,17 @@ class Plan{
     }
 
     @Override
-    public String toString() {
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
         String toPrint;
         if(associatedGoal == null){
             toPrint = "with no goal";
         }else{
             toPrint = "with goal: "+associatedGoal.toString();
         }
-        return "<Plan: "+toPrint+"\n\t"+this.plan.toString(insideEnv)+">";
+        return indent+"<Plan: "+toPrint+"\n"+this.plan.toString(insideEnv,"\t"+indent)+"\n"+indent+">";
     }
 
     public void binding(CapabilityBase caps) {
@@ -1187,13 +1231,16 @@ class PlanBase{
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         String prefix = "";
         for(Plan plan: plans){
             result.append(prefix);
             prefix = "\n";
-            result.append(plan.toString());
+            result.append(plan.toString(indent+"\t"));
         }
         return result.toString();
     }
@@ -1267,14 +1314,17 @@ class GoalPlanningRule{
         return result && info.isSuccess();
     }
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         result.append("<Goal Planning Rule: \n\tGoal:");
         result.append(goal.toString());
         result.append("\n\tCondition: ");
         result.append(condition.toString());
-        result.append("\n\tPlan: ");
-        result.append(this.plan.toString());
+        result.append("\n\tPlan: \n");
+        result.append(this.plan.toString(indent+"\t"));
         return result.toString();
     }
 }
@@ -1301,13 +1351,16 @@ class GoalPlanningRuleBase{
         }
     }
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         String prefix = "";
         for(GoalPlanningRule rule: rules){
             result.append(prefix);
             prefix = "\n";
-            result.append(rule.toString());
+            result.append(rule.toString(indent+"\t"));
         }
         return result.toString();
     }
@@ -1342,14 +1395,17 @@ class PlanRevisionRule{
         return false;
     }
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append("<Goal Planning Rule: \n\tPlan pattern:");
-        result.append(oldPlan.toString());
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
+        result.append("<Goal Planning Rule: \n\tPlan pattern:\n");
+        result.append(oldPlan.toString(indent+"\t"));
         result.append("\n\tCondition: ");
         result.append(condition.toString());
-        result.append("\n\tRevised Plan: ");
-        result.append(newPlan.toString());
+        result.append("\n\tRevised Plan: \n");
+        result.append(newPlan.toString(indent+"\t"));
         return result.toString();
     }
 }
@@ -1377,13 +1433,16 @@ class PlanRevisionRuleBase{
         }
     }
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
+    public String toString(){
+        return toString("");
+    }
+    public String toString(String indent) {
+        StringBuilder result = new StringBuilder(indent);
         String prefix = "";
         for(PlanRevisionRule rule: rules){
             result.append(prefix);
             prefix = "\n";
-            result.append(rule.toString());
+            result.append(rule.toString(indent+"\t"));
         }
         return result.toString();
     }

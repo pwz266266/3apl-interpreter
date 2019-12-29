@@ -1,7 +1,7 @@
 
 options
 {
-  LOOKAHEAD= 3;
+  LOOKAHEAD= 1;
 
   CHOICE_AMBIGUITY_CHECK = 2;
   OTHER_AMBIGUITY_CHECK = 1;
@@ -21,18 +21,19 @@ options
   FORCE_LA_CHECK = true;
 }
 
-PARSER_BEGIN(TripAPL_parser)
-import Agent.*;
+PARSER_BEGIN(plan_parser)
 import java.util.ArrayList;
 import alice.tuprolog.*;
-public class TripAPL_parser
+import java.io.*;
+public class plan_parser
 {
- public static void main(String args[]) throws ParseException
- {
- TripAPL_parser parser = new TripAPL_parser(System.in);
+ public static void main(String args[]) throws ParseException, FileNotFoundException {
+    plan_parser parser = new plan_parser(new FileInputStream("./src/PlanParserTest1.txt"));
+    Plan plan = parser.plan();
+    System.out.println(plan.toString());
  }
 }
-PARSER_END(TripAPL_parser)
+PARSER_END(plan_parser)
 SKIP :
 {
         " "
@@ -75,101 +76,20 @@ TOKEN :
     | <IMPLY: "<-">
     | <GIVES: ":-">
     | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (["0" - "9"])+)>
-    | <VAR: (["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*>
-    | <LITERAL: <VAL><LPAR> ((<VAL> | <VAR>) (<COMMA> (<VAL> | <VAR>))*)? <RPAR> >
-    | <LITERALS: (<LITERAL> (<COMMA> | <SEMICOL>))* <LITERAL> <PROLOGEND> >
-    | <HORN: <LITERAL> <GIVES> <LITERALS> >
+    | <VAR: ((["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*)>
+
 }
 
 
-
-
-Agent Program():
-{
-    Token t;
-    String name;
-    BeliefBase bb = null;
-    CapabilityBase cb = null;
-    GoalBase gb = null;
-    PlanBase pb = null;
-    GoalPlanningRuleBase gp = null;
-    PlanRevisionRuleBase pr = null;
-}
-{
-    <NAME> <COLON> (t = <VAR> | t = <VAL>) {name  = t.image;}
-    <BELBASE> <COLON> bb = beliefs()
-    <GOALBASE> <COLON> gb = goals()
-    <CAPBASE> <COLON> cb = capbilities()
-    <PLANBASE> <COLON> pb = plans()
-    <GP_RULES> <COLON> (gp = g_rules())?
-    <PR_RULES> <COLON> (pr = r_rules())?
-    {return new Agent.Agent(name,bb,cb,gb,pb,gp,pr);}
-}
-
-CapabilityBase capbilities():
-{
-    Capability buffer;
-    ArrayList<Capability> result = new ArrayList<Capability>();
-}
-{
-    (buffer = capability(){result.add(buffer);})*
-    {return new CapabilityBase(result);}
-}
-
-Capability capability():
-{
-    Atom t;
-    Query precondition;
-    String name;
-    Literal literal;
-    ArrayList<Literal> postcondition;
-    ArrayList<String> arguments;
-}
-{
-    <LBRACE> precondition = query() <RBRACE> name = val() <LPAR> (t = atom() {arguments.add(t.toString());})? (<COMMA> t = atom() {arguments.add(t.toString());})* <RPAR> <LBRACE> (literal = literal() {postcondition.add(literal);})* <RBRACE>
-    {return new Capability(precondition, name, arguments, postcondition);}
-}
-
-BeliefBase beliefs():
-{
-    ArrayList<GpredClause> bs = new ArrayList<Belief>();
-    GpredClause buffer;
-    ArrayList<String> hs = new ArrayList<String>();
-}
-{
-    ( LOOKAHEAD(2) (buffer0 = gpredclause() <PROLOGEND> {bs.add(buffer);}) | t = <HORN> {hs.add(t.image);})*
-    {return new BeliefBase(hs,bs);}
-}
-
-
-GoalBase goals():
-{
-    Goal buffer;
-    ArrayList<Goal> result = new ArrayList<Goal>();
-}
-{
-    (buffer = goal() {result.add(buffer);} (<COMMA> goal() {result.add(buffer);})*)?
-    {return new GoalBase(result);}
-}
-
-Goal goal():
-{
-    GpredClause buffer;
-    ArrayList<GpredClause> component = new ArrayList<GpredClause>();
-}
-{
-    buffer = gpredclause() {component.add(buffer);} (<AND> buffer = gpredclause() {component.add(buffer);})*
-    {return new Goal(component);}
-}
 
 
 PlanBase plans():
 {
     Plan buffer;
-    ArrayList<Plan> plans = new ArrayList<>();
+    ArrayList<Plan> plans = new ArrayList<Plan>();
 }
 {
-    (<LBRACE> buffer = plan() {plans.add(buffer);} <RBRACE>)*
+    (buffer = plan() {plans.add(buffer);})*
     {return new PlanBase(plans);}
 }
 
@@ -178,14 +98,14 @@ Plan plan():
     SeqPlan plan;
 }
 {
-    <LBRACE> plan = seqPlan() <RBRACE> {return new Plan(plan, null, null);}
+    <LBRACE> plan = seqPlan() <RBRACE> {return new Plan(plan);}
 }
 
 
 SeqPlan seqPlan():
 {
     BasicPlan buffer;
-    ArrayList<BasicPlan> components = new ArrayList<>();
+    ArrayList<BasicPlan> components = new ArrayList<BasicPlan>();
 }
 {
      (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ {return new SeqPlan(components);}
@@ -203,11 +123,11 @@ BasicPlan basicplan():
     SeqPlan elsePlan;
 }
 {
-    (<JAVA> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new JavaAction(arguments);})
-    | ( testbuffer = query() <QUSMARK> {return new TestAction(testbuffer); } )
-    | (<SEND> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new SendAction(arguments);})
-    | ( t = <VAL> <LPAR> ((argbuffer = atom() <COMMA> {arguments.add(argbuffer);})* (argbuffer = atom() {arguments.add(argbuffer);}))? <RPAR> {return new CapAction(t.image, arguments);})
-    | (<WHILE> <LPAR> testbuffer = query() <RPAR> <LBRACE> (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ {return new WhilePlan(components, testbuffer);} <RBRACE>)
+    (<JAVA> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new JavaAction(arguments);})
+    | LOOKAHEAD(query() <QUSMARK> <SEMICOL> ) (testbuffer = query() <QUSMARK> {return new TestAction(testbuffer); } )
+    | (<SEND> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR>{return new SendAction(arguments);})
+    | ( t = <VAL> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new CapAction(t.image, arguments);})
+    | (<WHILE> <LPAR> testbuffer = query() <RPAR> <LBRACE> (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ <RBRACE> {return new WhilePlan(components, testbuffer);} )
     | (<IF> <LPAR> testbuffer = query() <RPAR> <LBRACE> ifPlan = seqPlan() <RBRACE> <ELSE> <LBRACE> elsePlan = seqPlan() <RBRACE> {return new IfPlan(ifPlan, elsePlan, testbuffer);})
 }
 
@@ -317,5 +237,5 @@ Atom atom():
     Atom a;
 }
 {
-    a = var() {return a;}| a = val() {return a;}
+    (a = var() {return a;})| (a = val() {return a;})
 }
