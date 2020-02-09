@@ -1,31 +1,18 @@
-<Plan: with no goal
-	<Sequence: 
-		<SendAction: argument = (X,41,5)>
-		<JavaActoin: arguments = (1,x,Y)>  (not implemented)
-		<TestAction: (predict(s,tR,R) , true)?>
-		<IfPlan: predict(s,t,a)
-		then: 
-			<Sequence: 
-				<CapAction: goto(X,Y,12)>
-			>
-		else: 
-			<Sequence: 
-				<TestAction: true?>
-			>
-		>
-		<WhilePlan: true
-			<JavaActoin: arguments = (1,23,5)>  (not implemented)
-			<IfPlan: (predict(dasf,asdew,d) , true)
-			then: 
-				<Sequence: 
-					<CapAction: goto(X,T,z)>
-				>
-			else: 
-				<Sequence: 
-					<CapAction: goto(s,d,t,a)>
-					<CapAction: whatever(X,g,sgs,s)>
-				>
-			>
-		>
-	>
->
+Exception in thread "main" ParseException: Encountered " "}" "} "" at line 15, column 1.
+Was expecting one of:
+    "if" ...
+    "while" ...
+    "Send" ...
+    "Java" ...
+    <VAL> ...
+    <VAL> ...
+    
+	at plan_parser.generateParseException(plan_parser.java:838)
+	at plan_parser.jj_consume_token(plan_parser.java:720)
+	at plan_parser.basicplan(plan_parser.java:223)
+	at plan_parser.seqPlan(plan_parser.java:46)
+	at plan_parser.basicplan(plan_parser.java:217)
+	at plan_parser.basicplan(plan_parser.java:185)
+	at plan_parser.seqPlan(plan_parser.java:46)
+	at plan_parser.plan(plan_parser.java:35)
+	at plan_parser.main(plan_parser.java:8)

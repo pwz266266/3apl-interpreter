@@ -1,0 +1,153 @@
+Agent started @ GMT time: Sun, Feb 2, 2020 03:00:43 pm 
+
+<Agent: Cleaner
+	Belief Base:
+ positionAt(self,0,0).
+
+positionAt(rubbish,1,2).
+
+positionAt(rubbish,0,4).
+
+positionAt(bin,5,6).
+
+
+Goal Base:
+	clean.
+
+Capability Base: 
+	<Capability: pick (X,Y)
+		{((positionAt(self,X,Y) ; positionAt(rubbish,X,Y)) ; \+ occupied)}
+		{\+ positionAt(rubbish,X,Y),occupied}
+	>;
+	<Capability: moveTo (X1,Y1)
+		{positionAt(self,X0,Y0)}
+		{\+ positionAt(self,X0,Y0),positionAt(self,X1,Y1)}
+	>;
+	<Capability: throw ()
+		{((positionAt(self,X,Y) ; positionAt(bin,X,Y)) ; occupied)}
+		{\+ occupied}
+	>
+Plan Base:
+
+Goal Planning Rule Base:
+	<Goal Planning Rule: 
+	Goal:
+		clean.
+	Condition:
+		positionAt(rubbish,_,_)
+	Plan: 
+		<Sequence: 
+			<TestAction: positionAt(bin,Xb,Yb)?>
+			<WhilePlan: positionAt(rubbish,X,Y)
+				<CapAction: moveTo(X,Y)>
+				<CapAction: pick(X,Y)>
+				<CapAction: moveTo(Xb,Yb)>
+				<CapAction: throw()>
+			>
+			<CapAction: moveTo(0,0)>
+		>
+	>
+
+Plan Revision Rule Base:
+	<Plan Revision Rule: 	
+	Plan pattern:
+		<Sequence: 
+			<WhilePlan: positionAt(rubbish,X,Y)
+				<CapAction: moveTo(X,Y)>
+				<CapAction: pick(X,Y)>
+				<CapAction: moveTo(Xb,Yb)>
+				<CapAction: throw()>
+			>
+		>
+	Condition: 
+		received(AMS,0,inform,description_terminate)
+	Revised Plan: 
+		<Sequence: 
+			<IfPlan: occupied
+			then: 
+				<Sequence: 
+					<CapAction: moveTo(Xb,Yb)>
+					<CapAction: throw()>
+				>
+			else: 
+				<Sequence: 
+					<TestAction: true?>
+				>
+			>
+		>
+	>
+>
+----------------------------------------------------------------------
+Agent Clock: 0
+
+Goal planning rule applied, with guard "positionAt(rubbish,_,_)" and goal "clean.".
+Execute: <TestAction: positionAt(bin,Xb,Yb)?> , success.
+----------------------------------------------------------------------
+Agent Clock: 1
+
+Query: "positionAt(rubbish,X,Y)" in while statement, true.
+----------------------------------------------------------------------
+Agent Clock: 2
+
+Execute: <CapAction: moveTo(X,Y)> , success.
+Belief "positionAt(self,0,0)" deleted.
+Belief "positionAt(self,1,2)" added.
+----------------------------------------------------------------------
+Agent Clock: 3
+
+Execute: <CapAction: pick(X,Y)> , success.
+Belief "positionAt(rubbish,1,2)" deleted.
+Belief "occupied" added.
+----------------------------------------------------------------------
+Agent Clock: 4
+
+Execute: <CapAction: moveTo(Xb,Yb)> , success.
+Belief "positionAt(self,1,2)" deleted.
+Belief "positionAt(self,5,6)" added.
+----------------------------------------------------------------------
+Agent Clock: 5
+
+Execute: <CapAction: throw()> , success.
+Belief "occupied" deleted.
+----------------------------------------------------------------------
+Agent Clock: 6
+
+Query: "positionAt(rubbish,X,Y)" in while statement, true.
+----------------------------------------------------------------------
+Agent Clock: 7
+
+Execute: <CapAction: moveTo(X,Y)> , success.
+Belief "positionAt(self,5,6)" deleted.
+Belief "positionAt(self,0,4)" added.
+----------------------------------------------------------------------
+Agent Clock: 8
+
+Execute: <CapAction: pick(X,Y)> , success.
+Belief "positionAt(rubbish,0,4)" deleted.
+Belief "occupied" added.
+----------------------------------------------------------------------
+Agent Clock: 9
+
+Execute: <CapAction: moveTo(Xb,Yb)> , success.
+Belief "positionAt(self,0,4)" deleted.
+Belief "positionAt(self,5,6)" added.
+----------------------------------------------------------------------
+Agent Clock: 10
+
+Execute: <CapAction: throw()> , success.
+Belief "occupied" deleted.
+----------------------------------------------------------------------
+Agent Clock: 11
+
+Query: "positionAt(rubbish,X,Y)" in while statement, false.
+----------------------------------------------------------------------
+Agent Clock: 12
+
+Execute: <CapAction: moveTo(0,0)> , success.
+Belief "positionAt(self,5,6)" deleted.
+Belief "positionAt(self,0,0)" added.
+Goal "clean." completed and deleted.
+----------------------------------------------------------------------
+Agent Clock: 13
+
+No action taken, suspend.

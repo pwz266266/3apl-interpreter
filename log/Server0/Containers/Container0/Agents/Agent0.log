@@ -1,0 +1,215 @@
+Agent started @ GMT time: Sun, Feb 2, 2020 03:00:43 pm 
+
+<Agent: Cleaner
+	Belief Base:
+ positionAt(self,0,0).
+
+positionAt(rubbish,1,2).
+
+positionAt(rubbish,0,4).
+
+positionAt(bin,5,6).
+
+
+Goal Base:
+	clean.
+	randomMove.
+
+Capability Base: 
+	<Capability: pick (X,Y)
+		{((positionAt(self,X,Y) ; positionAt(rubbish,X,Y)) ; \+ occupied)}
+		{\+ positionAt(rubbish,X,Y),occupied}
+	>;
+	<Capability: moveTo (X1,Y1)
+		{positionAt(self,X0,Y0)}
+		{\+ positionAt(self,X0,Y0),positionAt(self,X1,Y1)}
+	>;
+	<Capability: throw ()
+		{((positionAt(self,X,Y) ; positionAt(bin,X,Y)) ; occupied)}
+		{\+ occupied}
+	>;
+	<Capability: jump (X,Y)
+		{positionAt(self,X1,Y1)}
+		{positionAt(self,X,Y),\+ positionAt(self,X1,Y1)}
+	>
+Plan Base:	<Plan: with no goal
+		<Sequence: 
+			<CapAction: moveTo(3,4)>
+			<CapAction: moveTo(4,5)>
+			<CapAction: moveTo(1,2)>
+			<CapAction: moveTo(5,6)>
+		>
+	>
+
+Goal Planning Rule Base:
+	<Goal Planning Rule: 
+	Goal:
+		clean.
+	Condition:
+		positionAt(rubbish,_,_)
+	Plan: 
+		<Sequence: 
+			<TestAction: positionAt(bin,Xb,Yb)?>
+			<WhilePlan: positionAt(rubbish,X,Y)
+				<CapAction: moveTo(X,Y)>
+				<CapAction: pick(X,Y)>
+				<CapAction: moveTo(Xb,Yb)>
+				<CapAction: throw()>
+			>
+			<CapAction: jump(10,10)>
+			<WhilePlan: positionAt(rubbish,X,Y)
+				<CapAction: moveTo(X,Y)>
+				<CapAction: pick(X,Y)>
+				<CapAction: moveTo(Xb,Yb)>
+				<CapAction: throw()>
+			>
+		>
+	>
+	<Goal Planning Rule: 
+	Goal:
+		randomMove.
+	Condition:
+		true
+	Plan: 
+		<Sequence: 
+			<CapAction: moveTo(13,14)>
+			<CapAction: moveTo(14,15)>
+			<CapAction: moveTo(11,12)>
+		>
+	>
+
+Plan Revision Rule Base:
+	<Plan Revision Rule: 	
+	Plan pattern:
+		<Sequence: 
+			<WhilePlan: positionAt(rubbish,X,Y)
+				<CapAction: moveTo(X,Y)>
+				<CapAction: pick(X,Y)>
+				<CapAction: moveTo(Xb,Yb)>
+				<CapAction: throw()>
+			>
+			<CapAction: randomethings()>
+		>
+	Condition: 
+		positionAt(self,10,10)
+	Revised Plan: 
+		<Sequence: 
+			<IfPlan: occupied
+			then: 
+				<Sequence: 
+					<CapAction: moveTo(Xb,Yb)>
+					<CapAction: throw()>
+				>
+			else: 
+				<Sequence: 
+					<TestAction: true?>
+				>
+			>
+			<CapAction: moveTo(0,0)>
+		>
+	>
+>
+----------------------------------------------------------------------
+Agent Clock: 0
+
+Goal planning rule applied, with guard "positionAt(rubbish,_,_)" and goal "clean.".
+Execute: <CapAction: moveTo(3,4)> , success.
+Belief "positionAt(self,0,0)" deleted.
+Belief "positionAt(self,3,4)" added.
+Execute: <TestAction: positionAt(bin,Xb,Yb)?> , success.
+----------------------------------------------------------------------
+Agent Clock: 1
+
+Goal planning rule applied, with guard "true" and goal "randomMove.".
+Execute: <CapAction: moveTo(4,5)> , success.
+Belief "positionAt(self,3,4)" deleted.
+Belief "positionAt(self,4,5)" added.
+Query: "positionAt(rubbish,X,Y)" in while statement, true.
+Execute: <CapAction: moveTo(13,14)> , success.
+Belief "positionAt(self,4,5)" deleted.
+Belief "positionAt(self,13,14)" added.
+----------------------------------------------------------------------
+Agent Clock: 2
+
+Execute: <CapAction: moveTo(1,2)> , success.
+Belief "positionAt(self,13,14)" deleted.
+Belief "positionAt(self,1,2)" added.
+Execute: <CapAction: moveTo(X,Y)> , success.
+Belief "positionAt(self,1,2)" deleted.
+Belief "positionAt(self,1,2)" added.
+Execute: <CapAction: moveTo(14,15)> , success.
+Belief "positionAt(self,1,2)" deleted.
+Belief "positionAt(self,14,15)" added.
+----------------------------------------------------------------------
+Agent Clock: 3
+
+Execute: <CapAction: moveTo(5,6)> , success.
+Belief "positionAt(self,14,15)" deleted.
+Belief "positionAt(self,5,6)" added.
+Execute: <CapAction: moveTo(11,12)> , success.
+Belief "positionAt(self,5,6)" deleted.
+Belief "positionAt(self,11,12)" added.
+Goal "randomMove." completed and deleted.
+----------------------------------------------------------------------
+Agent Clock: 4
+
+Execute: <CapAction: pick(X,Y)> , success.
+Belief "positionAt(rubbish,1,2)" deleted.
+Belief "occupied" added.
+----------------------------------------------------------------------
+Agent Clock: 5
+
+Execute: <CapAction: moveTo(Xb,Yb)> , success.
+Belief "positionAt(self,11,12)" deleted.
+Belief "positionAt(self,5,6)" added.
+----------------------------------------------------------------------
+Agent Clock: 6
+
+Execute: <CapAction: throw()> , success.
+Belief "occupied" deleted.
+----------------------------------------------------------------------
+Agent Clock: 7
+
+Query: "positionAt(rubbish,X,Y)" in while statement, true.
+----------------------------------------------------------------------
+Agent Clock: 8
+
+Execute: <CapAction: moveTo(X,Y)> , success.
+Belief "positionAt(self,5,6)" deleted.
+Belief "positionAt(self,0,4)" added.
+----------------------------------------------------------------------
+Agent Clock: 9
+
+Execute: <CapAction: pick(X,Y)> , success.
+Belief "positionAt(rubbish,0,4)" deleted.
+Belief "occupied" added.
+----------------------------------------------------------------------
+Agent Clock: 10
+
+Execute: <CapAction: moveTo(Xb,Yb)> , success.
+Belief "positionAt(self,0,4)" deleted.
+Belief "positionAt(self,5,6)" added.
+----------------------------------------------------------------------
+Agent Clock: 11
+
+Execute: <CapAction: throw()> , success.
+Belief "occupied" deleted.
+----------------------------------------------------------------------
+Agent Clock: 12
+
+Query: "positionAt(rubbish,X,Y)" in while statement, false.
+----------------------------------------------------------------------
+Agent Clock: 13
+
+Execute: <CapAction: jump(10,10)> , success.
+Belief "positionAt(self,10,10)" added.
+Belief "positionAt(self,5,6)" deleted.
+----------------------------------------------------------------------
+Agent Clock: 14
+
+Query: "positionAt(rubbish,X,Y)" in while statement, false.
+Goal "clean." completed and deleted.
+----------------------------------------------------------------------
+Agent Clock: 15
+
+No action taken, suspend.
