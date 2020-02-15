@@ -219,26 +219,30 @@ class Env{
 
 
 
-class Atom{
-    private String name;
+class Atom extends GpredClause{
 
     public Atom(String name){
-        this.name = name;
+        super(name, null);
     }
     @Override
     public String toString() {
-        return this.name;
+        return this.predicate;
     }
-
+    @Override
+    public String toString(Env env){ return env.getVal(this.predicate);}
     public boolean isVar() {
-        return Character.isUpperCase(this.name.charAt(0)) || this.name.charAt(0) == '_';
+        return Character.isUpperCase(this.predicate.charAt(0)) || this.predicate.charAt(0) == '_';
+    }
+    @Override
+    public GpredClause applyEnv(Env env){
+        return new Atom(env.getVal(this.predicate));
     }
 }
 
 class GpredClause{
     protected String predicate;
-    protected ArrayList<Atom> arguments;
-    public GpredClause(String predicate, ArrayList<Atom> arguments){
+    protected ArrayList<GpredClause> arguments;
+    public GpredClause(String predicate, ArrayList<GpredClause> arguments){
         this.predicate = predicate;
         this.arguments = arguments;
     }
@@ -251,13 +255,25 @@ class GpredClause{
         }
         result.append(predicate + "(");
         String prefix = "";
-        for(Atom x: arguments){
+        for(GpredClause x: arguments){
             result.append(prefix);
             prefix = ",";
             result.append(x.toString());
         }
         result.append(")");
         return result.toString();
+    }
+
+    public String toString(Env env){
+        return toString();
+    }
+
+    public GpredClause applyEnv(Env env){
+        ArrayList<GpredClause> newArguments = new ArrayList<>();
+        for(GpredClause subClause : this.arguments){
+            newArguments.add(subClause.applyEnv(env));
+        }
+        return new VpredClause(this.predicate, newArguments);
     }
 
     public Struct toProlog(){
@@ -267,25 +283,21 @@ class GpredClause{
 
 class VpredClause extends GpredClause{
 
-    public VpredClause(String predicate, ArrayList<Atom> arguments){
+    public VpredClause(String predicate, ArrayList<GpredClause> arguments){
         super(predicate, arguments);
     }
-    public ArrayList<Atom> getArguments(){ return this.arguments;}
+    public ArrayList<GpredClause> getArguments(){ return this.arguments;}
     public String getPredicate(){ return this.predicate;}
+    @Override
     public String toString(Env env){
         StringBuilder result = new StringBuilder();
         if(arguments.size() != 0){
             result.append(predicate + "(");
             String prefix = "";
-            for(Atom x: arguments){
+            for(GpredClause x: arguments){
                 result.append(prefix);
                 prefix = ",";
-                if(x.isVar()){
-                    String temp = env.getVal(x.toString());
-                    result.append(temp == null ? x.toString() : temp);
-                }else{
-                    result.append(x.toString());
-                }
+                result.append(x.toString(env));
             }
             result.append(")");
             return result.toString();
@@ -1044,16 +1056,8 @@ class SendAction extends BasicPlan{
     @Override
     public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) throws NoSolutionException, MalformedGoalException {
         try {
-            ArrayList<Atom> newArguments = new ArrayList<>();
-            for(Atom arg : content.getArguments()){
-                newArguments.add(new Atom(env.getVal(arg.toString())));
-            }
-            VpredClause newBody = new VpredClause(content.getPredicate(), newArguments);
-            ArrayList<Atom> newArguments_reply = new ArrayList<>();
-            for(Atom arg : reply.getArguments()){
-                newArguments_reply.add(new Atom(env.getVal(arg.toString())));
-            }
-            VpredClause newReply = new VpredClause(reply.getPredicate(), newArguments_reply);
+            VpredClause newBody = (VpredClause) content.applyEnv(env);
+            VpredClause newReply = (VpredClause) reply.applyEnv(env);
             Message message = new Message(performative, "container" + "_" + container.getID() + "_" + agent.getID(), env.getVal(receiver), newReply, newBody);
             if(fw!=null) {
                 fw.write("Send " + message.toString() + " to Container.\n");

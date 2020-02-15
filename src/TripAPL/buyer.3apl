@@ -9,7 +9,7 @@ Goal Base:
     buy()
 Capability Base:
     {
-        (received(inform, Saler, price(pen, X), channel(1)) and received(inform, Saler, price(pencil, Y), channel(1)))
+        ( received(inform, Saler, price(pen, X), channel(1)) and received(inform, Saler, price(pencil, Y), channel(1)) )
     }
     getPrice(Saler)
     {

@@ -140,11 +140,7 @@ public class Container {
                         for(Var var : info.getBindingVars()){
                             env.changeVal(var.getName(), var.getTerm().toString());
                         }
-                        ArrayList<Atom> newArguments = new ArrayList<>();
-                        for(Atom arg : message.getBody().getArguments()){
-                            newArguments.add(new Atom(env.getVal(arg.toString())));
-                        }
-                        VpredClause newBody = new VpredClause(message.getBody().getPredicate(), newArguments);
+                        VpredClause newBody = (VpredClause) message.getBody().applyEnv(env);
                         Message replyMessage = new Message(Performative.INFORM, env.getVal("Sender"), message.getSender(),message.getReply(),newBody);
                         if(Integer.parseInt(message.getSender().split("_")[1]) == this.getID()){
                             int agentID = Integer.parseInt(message.getSender().split("_")[2]);
