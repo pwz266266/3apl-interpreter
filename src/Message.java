@@ -2,14 +2,14 @@ import java.util.ArrayList;
 
 public class Message {
     private Performative performative;
-    private String sender;
+    private String senderID;
     private String receiverID;
     private VpredClause reply;
     private VpredClause body;
 
-    public Message(Performative performative, String sender, String receiverID, VpredClause reply, VpredClause body) {
+    public Message(Performative performative, String senderID, String receiverID, VpredClause reply, VpredClause body) {
         this.performative = performative;
-        this.sender = sender;
+        this.senderID = senderID;
         this.receiverID = receiverID;
         this.reply = reply;
         this.body = body;
@@ -24,11 +24,11 @@ public class Message {
     }
 
     public String getSender() {
-        return sender;
+        return senderID;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSender(String senderID) {
+        this.senderID = senderID;
     }
 
     public String getReceiverID() {
@@ -53,6 +53,14 @@ public class Message {
 
     public void setBody(VpredClause body) {
         this.body = body;
+    }
+
+    public String receive(){
+        return "received("+Performative.toString(this.getPerformative())+","+this.getSender()+","+this.getBody().toString()+","+this.getReply().toString()+").";
+    }
+
+    public String toString(){
+        return "Message<"+Performative.toString(this.getPerformative())+", Sender:"+this.getSender()+", Receiver:"+this.getReceiverID()+","+this.getBody().toString()+","+this.getReply().toString()+">";
     }
 }
 

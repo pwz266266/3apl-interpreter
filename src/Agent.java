@@ -62,13 +62,17 @@ public class Agent {
         this.ID = ID;
     }
 
-    public boolean receiveMessage(){
+    public boolean receiveMessage(FileWriter fw) throws IOException {
         ArrayList<Message> messages = this.container.forwardMessage(this);
         if(messages.size()==0){
             return false;
         }
+
         for(Message message : messages){
-            //TODO:: Implement.
+            this.engine.addTheory(new Theory(message.receive()));
+            if(fw!=null){
+                fw.write("Received "+message.toString()+" from Container.\n");
+            }
         }
         return true;
     }
@@ -90,7 +94,7 @@ public class Agent {
             fw.write("\n");
             fw.write(this.toString()+"\n");
         }
-        if(this.state == State.SUSPEND && !this.receiveMessage()){
+        if(this.state == State.SUSPEND && !this.receiveMessage(fw)){
             if(this.Debug){
                 fw.write("-".repeat(70)+"\n");
                 fw.write("Agent Clock: "+this.clock+"\n\n");
@@ -136,6 +140,7 @@ public class Agent {
         planRevisionRuleBase.initial(capabilityBase);
         this.state = State.ACTIVE;
         this.container = container;
+        this.engine.loadLibrary(new ArithmeticLibrary());
     }
     public void setContainer(Container container){
         this.container = container;
@@ -224,9 +229,6 @@ class Atom{
     public String toString() {
         return this.name;
     }
-    public Struct toProlog(){
-        return new Struct(this.name);
-    }
 
     public boolean isVar() {
         return Character.isUpperCase(this.name.charAt(0)) || this.name.charAt(0) == '_';
@@ -268,6 +270,8 @@ class VpredClause extends GpredClause{
     public VpredClause(String predicate, ArrayList<Atom> arguments){
         super(predicate, arguments);
     }
+    public ArrayList<Atom> getArguments(){ return this.arguments;}
+    public String getPredicate(){ return this.predicate;}
     public String toString(Env env){
         StringBuilder result = new StringBuilder();
         if(arguments.size() != 0){
@@ -1039,7 +1043,23 @@ class SendAction extends BasicPlan{
 
     @Override
     public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) throws NoSolutionException, MalformedGoalException {
-        container.addMessage(new Message(performative,agent.getName()+agent.getID(),receiver,reply,content));
+        try {
+            ArrayList<Atom> newArguments = new ArrayList<>();
+            for(Atom arg : content.getArguments()){
+                newArguments.add(new Atom(env.getVal(arg.toString())));
+            }
+            VpredClause newBody = new VpredClause(content.getPredicate(), newArguments);
+            ArrayList<Atom> newArguments_reply = new ArrayList<>();
+            for(Atom arg : reply.getArguments()){
+                newArguments_reply.add(new Atom(env.getVal(arg.toString())));
+            }
+            VpredClause newReply = new VpredClause(reply.getPredicate(), newArguments_reply);
+            Message message = new Message(performative, "container" + "_" + container.getID() + "_" + agent.getID(), env.getVal(receiver), newReply, newBody);
+            if(fw!=null) {
+                fw.write("Send " + message.toString() + " to Container.\n");
+            }
+            container.addMessage(message);
+        }catch(Exception e){}
         return 1;
     }
 
@@ -1505,13 +1525,18 @@ class GoalPlanningRule{
     }
     public boolean execute(GoalBase goalBase, PlanBase planBase, Prolog engine, FileWriter fw) throws MalformedGoalException, NoSolutionException {
 
-        boolean result = goalBase.checkExist(this.goal);
+        boolean result = true;
+        if(this.goal != null){
+            result = goalBase.checkExist(this.goal);
+
+        }
+
         Env env = new Env();
         SolveInfo info = condition.performQuery(env,engine);
         if(result && info.isSuccess()){
             if(fw != null){
                 try{
-                    fw.write("Goal planning rule applied, with guard \"" +this.condition.toString() + "\" and goal \"" + this.goal.toString()+"\".\n");
+                    fw.write("Goal planning rule applied, with guard \"" +this.condition.toString() + "\" and goal \"" + (this.goal == null ? "" : this.goal.toString())+"\".\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }

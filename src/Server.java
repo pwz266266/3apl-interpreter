@@ -22,12 +22,20 @@ public class Server {
     private ArrayList<Container> containers;
     private int clock = 0;
     private HashMap<Container, ArrayList<Message>> messagePool;
+
+    public void addMessage(Message message) {
+        this.messageToSend.add(message);
+    }
+
+    private ArrayList<Message> messageToSend;
     public Server(ArrayList<Container> containers, long ID){
         this.ID = ID;
         this.containers = containers;
         messagePool = new HashMap<>();
+        messageToSend = new ArrayList<>();
         for(Container container : containers){
             this.messagePool.put(container, new ArrayList<>());
+            container.setServer(this);
         }
     }
 
@@ -91,7 +99,7 @@ public class Server {
                 buffer += ", ";
             }
         }
-
+        proceedMessage(fw);
         if(this.Debug){
             fw.write(buffer+"\n");
             fw.flush();
@@ -125,5 +133,41 @@ public class Server {
         ArrayList<Message> messages = new ArrayList(this.messagePool.get(container));
         this.messagePool.get(container).clear();
         return messages;
+    }
+
+    public void proceedMessage(FileWriter fw) throws IOException {
+        ArrayList<Message> receivedMessages = this.messageToSend;
+        this.messageToSend = new ArrayList<>();
+        if(fw!=null){
+            for(Message message : receivedMessages){
+                fw.write("Received "+message.toString()+" from Containers.\n");
+            }
+            fw.write("\n");
+        }
+        for(Message message : receivedMessages){
+            if(message.getReceiverID().equals("ams")){
+                int containerID = Integer.parseInt(message.getSender().split("_")[1]);
+                for(Container container : this.containers){
+                    if(container.getID() != containerID){
+                        this.messagePool.get(container).add(message);
+                        if(fw!=null){
+                            fw.write("Distribute " + message.toString() + " to Container"+container.getID()+".\n");
+                        }
+                        break;
+                    }
+                }
+            }else{
+                int containerID = Integer.parseInt(message.getReceiverID().split("_")[1]);
+                for(Container container : this.containers){
+                    if(container.getID() == containerID){
+                        this.messagePool.get(container).add(message);
+                        if(this.Debug){
+                            fw.write("Send " + message.toString() + " to Container"+container.getID()+".\n");
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-Agent started @ GMT time: Sun, Feb 2, 2020 03:00:43 pm 
+Agent started @ GMT time: Wed, Feb 12, 2020 08:15:22 pm 
 
 <Agent: Cleaner
 	Belief Base:
@@ -50,6 +50,7 @@ Goal Planning Rule Base:
 	Plan: 
 		<Sequence: 
 			<TestAction: positionAt(bin,Xb,Yb)?>
+			<SendAction: Performative = QUERY, Receiver = ams, Content = cleaner, reply_whatever>
 			<WhilePlan: positionAt(rubbish,X,Y)
 				<CapAction: moveTo(X,Y)>
 				<CapAction: pick(X,Y)>
@@ -125,7 +126,7 @@ Goal planning rule applied, with guard "true" and goal "randomMove.".
 Execute: <CapAction: moveTo(4,5)> , success.
 Belief "positionAt(self,3,4)" deleted.
 Belief "positionAt(self,4,5)" added.
-Query: "positionAt(rubbish,X,Y)" in while statement, true.
+Send Message<query, Sender:container_0_1, Receiver:ams,cleaner,reply_whatever> to Container.
 Execute: <CapAction: moveTo(13,14)> , success.
 Belief "positionAt(self,4,5)" deleted.
 Belief "positionAt(self,13,14)" added.
@@ -135,9 +136,7 @@ Agent Clock: 2
 Execute: <CapAction: moveTo(1,2)> , success.
 Belief "positionAt(self,13,14)" deleted.
 Belief "positionAt(self,1,2)" added.
-Execute: <CapAction: moveTo(X,Y)> , success.
-Belief "positionAt(self,1,2)" deleted.
-Belief "positionAt(self,1,2)" added.
+Query: "positionAt(rubbish,X,Y)" in while statement, true.
 Execute: <CapAction: moveTo(14,15)> , success.
 Belief "positionAt(self,1,2)" deleted.
 Belief "positionAt(self,14,15)" added.
@@ -154,74 +153,80 @@ Goal "randomMove." completed and deleted.
 ----------------------------------------------------------------------
 Agent Clock: 4
 
+Execute: <CapAction: moveTo(X,Y)> , success.
+Belief "positionAt(self,11,12)" deleted.
+Belief "positionAt(self,1,2)" added.
+----------------------------------------------------------------------
+Agent Clock: 5
+
 Execute: <CapAction: pick(X,Y)> , success.
 Belief "positionAt(rubbish,1,2)" deleted.
 Belief "occupied" added.
 ----------------------------------------------------------------------
-Agent Clock: 5
+Agent Clock: 6
 
 Execute: <CapAction: moveTo(Xb,Yb)> , success.
-Belief "positionAt(self,11,12)" deleted.
+Belief "positionAt(self,1,2)" deleted.
 Belief "positionAt(self,5,6)" added.
 ----------------------------------------------------------------------
-Agent Clock: 6
+Agent Clock: 7
 
 Execute: <CapAction: throw()> , success.
 Belief "occupied" deleted.
 ----------------------------------------------------------------------
-Agent Clock: 7
+Agent Clock: 8
 
 Query: "positionAt(rubbish,X,Y)" in while statement, true.
 ----------------------------------------------------------------------
-Agent Clock: 8
+Agent Clock: 9
 
 Execute: <CapAction: moveTo(X,Y)> , success.
 Belief "positionAt(self,5,6)" deleted.
 Belief "positionAt(self,0,4)" added.
 ----------------------------------------------------------------------
-Agent Clock: 9
+Agent Clock: 10
 
 Execute: <CapAction: pick(X,Y)> , success.
 Belief "positionAt(rubbish,0,4)" deleted.
 Belief "occupied" added.
 ----------------------------------------------------------------------
-Agent Clock: 10
+Agent Clock: 11
 
 Execute: <CapAction: moveTo(Xb,Yb)> , success.
 Belief "positionAt(self,0,4)" deleted.
 Belief "positionAt(self,5,6)" added.
 ----------------------------------------------------------------------
-Agent Clock: 11
+Agent Clock: 12
 
 Execute: <CapAction: throw()> , success.
 Belief "occupied" deleted.
 ----------------------------------------------------------------------
-Agent Clock: 12
+Agent Clock: 13
 
 Query: "positionAt(rubbish,X,Y)" in while statement, false.
 ----------------------------------------------------------------------
-Agent Clock: 13
+Agent Clock: 14
 
 Execute: <CapAction: jump(10,10)> , success.
 Belief "positionAt(self,10,10)" added.
 Belief "positionAt(self,5,6)" deleted.
 ----------------------------------------------------------------------
-Agent Clock: 14
+Agent Clock: 15
 
 Plan revision rule applied, with guard "positionAt(self,10,10)".
 Query: "occupied" in if statement, false.
 ----------------------------------------------------------------------
-Agent Clock: 15
+Agent Clock: 16
 
 Execute: <TestAction: true?> , success.
 ----------------------------------------------------------------------
-Agent Clock: 16
+Agent Clock: 17
 
 Execute: <CapAction: moveTo(0,0)> , success.
 Belief "positionAt(self,10,10)" deleted.
 Belief "positionAt(self,0,0)" added.
 Goal "clean." completed and deleted.
 ----------------------------------------------------------------------
-Agent Clock: 17
+Agent Clock: 18
 
 No action taken, suspend.

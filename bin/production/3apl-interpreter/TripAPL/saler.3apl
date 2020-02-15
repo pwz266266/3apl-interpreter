@@ -1,0 +1,56 @@
+Name: Saler
+Belief Base:
+    money(0).
+    price(pen,2).
+    price(pencil,1).
+    goods(pen,6).
+    goods(pencil,2).
+Goal Base:
+    inform(),
+    sale()
+Capability Base:
+    {(price(X,Price) and (goods(X,Count) and (sub(Count,1,NCount) and (money(Money) and (sum(Money, Price, NMoney) and
+    not sum(Count,Count,0))))))}
+    sale(X,Buyer)
+    {not money(Money), not goods(X,Count), not received(query, Buyer, buy(X), channel(1)), money(NMoney), goods(X,NCount)}
+Plan Base:
+
+Goal Planning Rule Base:
+{
+    inform()
+}
+<- true |
+{
+    Send(inform, ams, is(saler),channel(1));
+    Test: received(query, Buyer, price(), channel(1));
+    Send(inform, Buyer, price(pen,2),channel(1));
+    Send(inform, Buyer, price(pencil,1),channel(1));
+}
+
+
+{
+}
+<- received(query, Buyer, buy(X), channel(1)) |
+{
+    sale(X, Buyer);
+    Send(inform, Buyer, sale(X), channel(1));
+}
+
+
+{
+    sale()
+}
+<- (goods(pencil,0) and goods(pen,0)) |
+{
+
+}
+
+Plan Revision Rule Base:
+{
+    sale(X, Buyer);
+    Send(inform, Buyer, sale(X), channel(1));
+}
+<- goods(X,0) |
+{
+    Send(inform, Buyer, no(X), channel(1));
+}

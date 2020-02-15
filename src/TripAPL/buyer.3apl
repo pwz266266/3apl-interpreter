@@ -1,0 +1,91 @@
+Name: Buyer
+Belief Base:
+    pocket(20).
+    holding(0).
+    stock(pen,0).
+    stock(pencil,0).
+Goal Base:
+    query(),
+    buy()
+Capability Base:
+    {
+        (received(inform, Saler, price(pen, X), channel(1)) and received(inform, Saler, price(pencil, Y), channel(1)))
+    }
+    getPrice(Saler)
+    {
+        not received(inform, Saler, is(saler), channel(1)), not received(inform, Saler, price(pen, X), channel(1)), not received(inform, Saler, price(pencil, Y), channel(1))
+        , price(pen, X), price(pencil, Y), saler(Saler)
+    }
+
+    {(price(X,A) and (pocket(Pocket) and holding(Holding) and (sub(Pocket, A, NPocket) and sum(Holding,A,NHolding)))}
+    buy(X)
+    {not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(NHolding)}
+
+    {(received(inform, Saler, sale(X), channel(1)) and (holding(Holding) and (price(X, Price) and
+    (sub(Holding, Price, NHolding) and (stock(X,Count) and sum(Count, 1, NCount))))))}
+    pay(X,Saler)
+    {not received(inform, Saler, sale(X), channel(1)), not holding(Holding), not stock(X,Count), holding(NHolding), stock(X,NCount)}
+
+    {(pocket(Pocket) and (holding(Holding) and sum(Pocket, Holding, NPocket))}
+    retractOrders(Saler)
+    {not received(inform, Saler, no(pen), channel(1)), not received(inform, Saler, no(pencil), channel(1)), not saler(Saler)
+    , not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(0)}
+
+
+Plan Base:
+
+
+Goal Planning Rule Base:
+    {
+        query()
+    }
+    <- true |
+    {
+        while((not received(inform, Saler, is(saler), channel(1)))){
+            Send(query, ams, is(saler), channel(1));
+        };
+        Test: received(inform, Saler, is(saler), channel(1));
+        getPrice(Saler);
+    }
+
+    {
+    }
+    <- (saler(Saler) and (not received(inform, Saler, no(pencil), channel(1))))
+    {
+        buy(pencil)
+        Send(query, Saler, buy(pencil), channel(1));
+        pay(pencil,Saler);
+    }
+
+    {
+    }
+    <- (saler(Saler) and (not received(inform, Saler, no(pen), channel(1))))
+    {
+        buy(pen)
+        Send(query, Saler, buy(pen), channel(1));
+        pay(pen,Saler);
+    }
+
+    {
+        buy()
+    }
+    <- (received(inform, Saler, no(pen), channel(1)) and received(inform, Saler, no(pencil), channel(1)))
+    {
+        retractOrders(Saler).
+    }
+
+Plan Revision Rule Base:
+{
+    pay(pen,Saler)
+}
+<- received(inform, Saler, no(pen), channel(1))
+{
+}
+
+
+{
+    pay(pencil,Saler)
+}
+<- received(inform, Saler, no(pencil), channel(1))
+{
+}

@@ -1,4 +1,4 @@
-Container started @ GMT time: Sun, Feb 2, 2020 03:00:42 pm 
+Container started @ GMT time: Wed, Feb 12, 2020 08:15:21 pm 
 ----------------------------------------------------------------------
 Container Clock: 0
 Agent 0(Cleaner) is initialized.
@@ -11,6 +11,7 @@ Active agent list: 0(Cleaner), 1(Cleaner),
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 2
+Send Message<query, Sender:container_0_1, Receiver:ams,cleaner,reply_whatever> to Server.
 Active agent list: 0(Cleaner), 1(Cleaner), 
 Suspended agent list: 
 ----------------------------------------------------------------------
@@ -79,8 +80,8 @@ Active agent list: 1(Cleaner),
 Suspended agent list: 0(Cleaner), 
 ----------------------------------------------------------------------
 Container Clock: 19
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 1(Cleaner), 
+Suspended agent list: 0(Cleaner), 
 ----------------------------------------------------------------------
 Container Clock: 20
 Active agent list: 

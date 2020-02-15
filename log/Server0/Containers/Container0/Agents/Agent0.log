@@ -1,4 +1,4 @@
-Agent started @ GMT time: Sun, Feb 2, 2020 03:00:43 pm 
+Agent started @ GMT time: Wed, Feb 12, 2020 08:15:22 pm 
 
 <Agent: Cleaner
 	Belief Base:
@@ -38,6 +38,7 @@ Plan Base:	<Plan: with no goal
 			<CapAction: moveTo(4,5)>
 			<CapAction: moveTo(1,2)>
 			<CapAction: moveTo(5,6)>
+			<SendAction: performative = INFORM, receiver = ams, Content = cleaner, reply>
 		>
 	>
 
@@ -146,6 +147,9 @@ Agent Clock: 3
 Execute: <CapAction: moveTo(5,6)> , success.
 Belief "positionAt(self,14,15)" deleted.
 Belief "positionAt(self,5,6)" added.
+Execute: <CapAction: pick(X,Y)> , success.
+Belief "positionAt(rubbish,1,2)" deleted.
+Belief "occupied" added.
 Execute: <CapAction: moveTo(11,12)> , success.
 Belief "positionAt(self,5,6)" deleted.
 Belief "positionAt(self,11,12)" added.
@@ -153,9 +157,7 @@ Goal "randomMove." completed and deleted.
 ----------------------------------------------------------------------
 Agent Clock: 4
 
-Execute: <CapAction: pick(X,Y)> , success.
-Belief "positionAt(rubbish,1,2)" deleted.
-Belief "occupied" added.
+Send Message<inform, Sender:container_0_0, Receiver:ams,cleaner,reply> to Container.
 ----------------------------------------------------------------------
 Agent Clock: 5
 

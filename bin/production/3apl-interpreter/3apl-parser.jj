@@ -27,18 +27,10 @@ import java.io.*;
 import alice.tuprolog.*;
 public class TripAPL_parser
 {
-    public static void main(String args[]) throws ParseException, IOException {
-        String filename = "./src/AgentParserTest4";
-        TripAPL_parser parser = new TripAPL_parser(new FileInputStream(filename+".txt"));
-        File file = new File(filename + ".output");
-        FileWriter fr = new FileWriter(file);
-        Agent result = parser.Program();
-        String data = result.toString();
-        System.out.println(data);
-        fr.write(data);
-        fr.flush();
-        fr.close();
-    }
+    private static int ID = 0;
+  static public Agent compile(String filename) throws FileNotFoundException, ParseException {
+    return new TripAPL_parser(new FileInputStream(filename)).Program(ID++);
+  }
 }
 PARSER_END(TripAPL_parser)
 SKIP :
@@ -84,7 +76,7 @@ TOKEN :
     | <IMPLY: "<-">
     | <GIVES: ":-">
     | <PNOT: "\\+">
-    | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (["0" - "9"])+)>
+    | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (("-")? ((["0" - "9"]|"."))+))>
     | <VAR: ((["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*)>
 }
 
@@ -92,7 +84,7 @@ TOKEN :
 
 
 
-Agent Program():
+Agent Program(int id):
 {
     Token t;
     String name;
@@ -111,7 +103,7 @@ Agent Program():
     <PLANBASE> <COLON> pb = plans()
     <GP_RULES> <COLON> gp = g_rules()
     <PR_RULES> <COLON> pr = p_rules()
-    {return new Agent(name,bb,gb,pb,gp,pr,cb);}
+    {return new Agent(name,bb,gb,pb,gp,pr,cb,id);}
 }
 
 CapabilityBase capbilities():
@@ -179,12 +171,12 @@ Goal goal():
 
 GoalPlanningRule g_rule():
 {
-    Goal goal0;
+    Goal goal0 = null;
     Query condition;
     SeqPlan plan0;
 }
 {
-   <LBRACE> goal0 = goal() <RBRACE> <IMPLY> condition = query() "|" <LBRACE> plan0 = seqPlan() <RBRACE> {return new GoalPlanningRule(goal0,condition,plan0);}
+   (<LBRACE> goal0 = goal() <RBRACE> )? <IMPLY> condition = query() "|" <LBRACE> plan0 = seqPlan() <RBRACE> {return new GoalPlanningRule(goal0,condition,plan0);}
 }
 
 
@@ -265,7 +257,7 @@ BasicPlan basicplan():
 {
     (<JAVA> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new JavaAction(arguments);})
     | <TEST> (testbuffer = query() {return new TestAction(testbuffer); } )
-    | (<SEND> <LPAR>t = <VAL>"," argbuffer = atom() "," content = vpredclause() "," reply = vpredclause()<RPAR>{return new SendAction(t.image, argbuffer.toString, content, reply);})
+    | (<SEND> <LPAR>t = <VAL>"," argbuffer = atom() "," content = vpredclause() "," reply = vpredclause()<RPAR>{return new SendAction(t.image, argbuffer.toString(), content, reply);})
     | ( t = <VAL> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new CapAction(t.image, arguments);})
     | (<WHILE> <LPAR> testbuffer = query() <RPAR> <LBRACE> (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ <RBRACE> {return new WhilePlan(components, testbuffer);} )
     | (<IF> <LPAR> testbuffer = query() <RPAR> <LBRACE> ifPlan = seqPlan() <RBRACE> <ELSE> <LBRACE> elsePlan = seqPlan() <RBRACE> {return new IfPlan(ifPlan, elsePlan, testbuffer);})

@@ -3,8 +3,7 @@ import java.util.ArrayList;
 import java.io.*;
 import alice.tuprolog.*;
 public class TripAPL_parser implements TripAPL_parserConstants {
-  static int ID = 0;
-
+    private static int ID = 0;
   static public Agent compile(String filename) throws FileNotFoundException, ParseException {
     return new TripAPL_parser(new FileInputStream(filename)).Program(ID++);
   }
@@ -222,19 +221,23 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   }
 
   final public GoalPlanningRule g_rule() throws ParseException {
-    Goal goal0;
+    Goal goal0 = null;
     Query condition;
     SeqPlan plan0;
-    jj_consume_token(LBRACE);
-    goal0 = goal();
-    jj_consume_token(RBRACE);
+    if (jj_2_17(3)) {
+      jj_consume_token(LBRACE);
+      goal0 = goal();
+      jj_consume_token(RBRACE);
+    } else {
+      ;
+    }
     jj_consume_token(IMPLY);
     condition = query();
     jj_consume_token(VBAR);
     jj_consume_token(LBRACE);
     plan0 = seqPlan();
     jj_consume_token(RBRACE);
-                                                                                                         {if (true) return new GoalPlanningRule(goal0,condition,plan0);}
+                                                                                                             {if (true) return new GoalPlanningRule(goal0,condition,plan0);}
     throw new Error("Missing return statement in function");
   }
 
@@ -260,7 +263,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     GoalPlanningRule g;
     label_7:
     while (true) {
-      if (jj_2_17(3)) {
+      if (jj_2_18(3)) {
         ;
       } else {
         break label_7;
@@ -277,7 +280,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     PlanRevisionRule p;
     label_8:
     while (true) {
-      if (jj_2_18(3)) {
+      if (jj_2_19(3)) {
         ;
       } else {
         break label_8;
@@ -294,7 +297,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     ArrayList<Plan> plans = new ArrayList<Plan>();
     label_9:
     while (true) {
-      if (jj_2_19(3)) {
+      if (jj_2_20(3)) {
         ;
       } else {
         break label_9;
@@ -323,7 +326,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       buffer = basicplan();
                             components.add(buffer);
       jj_consume_token(SEMICOL);
-      if (jj_2_20(3)) {
+      if (jj_2_21(3)) {
         ;
       } else {
         break label_10;
@@ -344,15 +347,15 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Token t;
     SeqPlan ifPlan;
     SeqPlan elsePlan;
-    if (jj_2_26(3)) {
+    if (jj_2_27(3)) {
       jj_consume_token(JAVA);
       jj_consume_token(LPAR);
-      if (jj_2_22(3)) {
+      if (jj_2_23(3)) {
         argbuffer = atom();
                                          arguments.add(argbuffer);
         label_11:
         while (true) {
-          if (jj_2_21(3)) {
+          if (jj_2_22(3)) {
             ;
           } else {
             break label_11;
@@ -366,11 +369,11 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       }
       jj_consume_token(RPAR);
                                                                                                                                         {if (true) return new JavaAction(arguments);}
-    } else if (jj_2_27(3)) {
+    } else if (jj_2_28(3)) {
       jj_consume_token(TEST);
       testbuffer = query();
                                     {if (true) return new TestAction(testbuffer);}
-    } else if (jj_2_28(3)) {
+    } else if (jj_2_29(3)) {
       jj_consume_token(SEND);
       jj_consume_token(LPAR);
       t = jj_consume_token(VAL);
@@ -382,15 +385,15 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       reply = vpredclause();
       jj_consume_token(RPAR);
                                                                                                                 {if (true) return new SendAction(t.image, argbuffer.toString(), content, reply);}
-    } else if (jj_2_29(3)) {
+    } else if (jj_2_30(3)) {
       t = jj_consume_token(VAL);
       jj_consume_token(LPAR);
-      if (jj_2_24(3)) {
+      if (jj_2_25(3)) {
         argbuffer = atom();
                                                arguments.add(argbuffer);
         label_12:
         while (true) {
-          if (jj_2_23(3)) {
+          if (jj_2_24(3)) {
             ;
           } else {
             break label_12;
@@ -404,7 +407,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       }
       jj_consume_token(RPAR);
                                                                                                                                               {if (true) return new CapAction(t.image, arguments);}
-    } else if (jj_2_30(3)) {
+    } else if (jj_2_31(3)) {
       jj_consume_token(WHILE);
       jj_consume_token(LPAR);
       testbuffer = query();
@@ -415,7 +418,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
         buffer = basicplan();
                                                                                   components.add(buffer);
         jj_consume_token(SEMICOL);
-        if (jj_2_25(3)) {
+        if (jj_2_26(3)) {
           ;
         } else {
           break label_13;
@@ -423,7 +426,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       }
       jj_consume_token(RBRACE);
                                                                                                                                  {if (true) return new WhilePlan(components, testbuffer);}
-    } else if (jj_2_31(3)) {
+    } else if (jj_2_32(3)) {
       jj_consume_token(IF);
       jj_consume_token(LPAR);
       testbuffer = query();
@@ -450,7 +453,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
                         result.add(buffer);
     label_14:
     while (true) {
-      if (jj_2_32(3)) {
+      if (jj_2_33(3)) {
         ;
       } else {
         break label_14;
@@ -467,18 +470,18 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Query sub0;
     Query sub1;
     boolean isOr;
-    if (jj_2_35(3)) {
+    if (jj_2_36(3)) {
       sub0 = singlequery();
                            {if (true) return sub0;}
-    } else if (jj_2_36(3)) {
+    } else if (jj_2_37(3)) {
       jj_consume_token(LPAR);
       sub0 = query();
-      if (jj_2_33(3)) {
+      if (jj_2_34(3)) {
         jj_consume_token(OR);
         sub1 = query();
         jj_consume_token(RPAR);
                                                            {if (true) return new wffBinary(true, sub0, sub1);}
-      } else if (jj_2_34(3)) {
+      } else if (jj_2_35(3)) {
         jj_consume_token(AND);
         sub1 = query();
         jj_consume_token(RPAR);
@@ -496,10 +499,10 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Query singlequery() throws ParseException {
     Query query;
-    if (jj_2_37(3)) {
+    if (jj_2_38(3)) {
       query = truequery();
                           {if (true) return query;}
-    } else if (jj_2_38(3)) {
+    } else if (jj_2_39(3)) {
       query = literal();
                                                                 {if (true) return query;}
     } else {
@@ -517,10 +520,10 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Literal literal() throws ParseException {
     VpredClause clause;
-    if (jj_2_39(3)) {
+    if (jj_2_40(3)) {
       clause = vpredclause();
                              {if (true) return new Literal(false, clause);}
-    } else if (jj_2_40(3)) {
+    } else if (jj_2_41(3)) {
       jj_consume_token(NOT);
       clause = vpredclause();
                                                                                                    {if (true) return new Literal(true, clause);}
@@ -537,7 +540,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Atom buffer;
     t = jj_consume_token(VAL);
     jj_consume_token(LPAR);
-    if (jj_2_41(3)) {
+    if (jj_2_42(3)) {
       buffer = val();
                                       arguments.add(buffer);
     } else {
@@ -545,7 +548,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     }
     label_15:
     while (true) {
-      if (jj_2_42(3)) {
+      if (jj_2_43(3)) {
         ;
       } else {
         break label_15;
@@ -565,7 +568,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Atom buffer;
     t = jj_consume_token(VAL);
     jj_consume_token(LPAR);
-    if (jj_2_43(3)) {
+    if (jj_2_44(3)) {
       buffer = atom();
                                        arguments.add(buffer);
     } else {
@@ -573,7 +576,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     }
     label_16:
     while (true) {
-      if (jj_2_44(3)) {
+      if (jj_2_45(3)) {
         ;
       } else {
         break label_16;
@@ -603,10 +606,10 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Atom atom() throws ParseException {
     Atom a;
-    if (jj_2_45(3)) {
+    if (jj_2_46(3)) {
       a = var();
                 {if (true) return a;}
-    } else if (jj_2_46(3)) {
+    } else if (jj_2_47(3)) {
       a = val();
                                          {if (true) return a;}
     } else {
@@ -938,41 +941,107 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     finally { jj_save(45, xla); }
   }
 
+  private boolean jj_2_47(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_47(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(46, xla); }
+  }
+
+  private boolean jj_3R_18() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_46()) {
+    jj_scanpos = xsp;
+    if (jj_3_47()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_46() {
+    if (jj_3R_31()) return true;
+    return false;
+  }
+
+  private boolean jj_3_17() {
+    if (jj_scan_token(LBRACE)) return true;
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3_23() {
+    if (jj_3R_18()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_22()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_scan_token(COMMA)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_17()) jj_scanpos = xsp;
+    if (jj_scan_token(IMPLY)) return true;
+    if (jj_3R_26()) return true;
+    if (jj_scan_token(VBAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_9()) {
+    jj_scanpos = xsp;
+    if (jj_3_10()) return true;
+    }
+    xsp = jj_scanpos;
+    if (jj_3_11()) jj_scanpos = xsp;
+    if (jj_3R_19()) return true;
+    return false;
+  }
+
   private boolean jj_3R_31() {
     if (jj_scan_token(VAR)) return true;
     return false;
   }
 
-  private boolean jj_3_43() {
+  private boolean jj_3_44() {
     if (jj_3R_18()) return true;
     return false;
   }
 
-  private boolean jj_3_31() {
+  private boolean jj_3_32() {
     if (jj_scan_token(IF)) return true;
     if (jj_scan_token(LPAR)) return true;
     if (jj_3R_26()) return true;
     return false;
   }
 
-  private boolean jj_3_30() {
+  private boolean jj_3_31() {
     if (jj_scan_token(WHILE)) return true;
     if (jj_scan_token(LPAR)) return true;
     if (jj_3R_26()) return true;
     return false;
   }
 
-  private boolean jj_3_29() {
+  private boolean jj_3_30() {
     if (jj_scan_token(VAL)) return true;
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_24()) jj_scanpos = xsp;
+    if (jj_3_25()) jj_scanpos = xsp;
     if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_28() {
+  private boolean jj_3_29() {
     if (jj_scan_token(SEND)) return true;
     if (jj_scan_token(LPAR)) return true;
     if (jj_scan_token(VAL)) return true;
@@ -984,7 +1053,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_27() {
+  private boolean jj_3_28() {
     if (jj_scan_token(TEST)) return true;
     if (jj_3R_26()) return true;
     return false;
@@ -1004,8 +1073,6 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   private boolean jj_3R_25() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_26()) {
-    jj_scanpos = xsp;
     if (jj_3_27()) {
     jj_scanpos = xsp;
     if (jj_3_28()) {
@@ -1014,7 +1081,9 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     jj_scanpos = xsp;
     if (jj_3_30()) {
     jj_scanpos = xsp;
-    if (jj_3_31()) return true;
+    if (jj_3_31()) {
+    jj_scanpos = xsp;
+    if (jj_3_32()) return true;
     }
     }
     }
@@ -1023,17 +1092,17 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_26() {
+  private boolean jj_3_27() {
     if (jj_scan_token(JAVA)) return true;
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_22()) jj_scanpos = xsp;
+    if (jj_3_23()) jj_scanpos = xsp;
     if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_41() {
+  private boolean jj_3_42() {
     if (jj_3R_30()) return true;
     return false;
   }
@@ -1048,21 +1117,21 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_43()) jj_scanpos = xsp;
+    if (jj_3_44()) jj_scanpos = xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_44()) { jj_scanpos = xsp; break; }
+      if (jj_3_45()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_38() {
+  private boolean jj_3_39() {
     if (jj_3R_19()) return true;
     return false;
   }
 
-  private boolean jj_3_20() {
+  private boolean jj_3_21() {
     if (jj_3R_25()) return true;
     if (jj_scan_token(SEMICOL)) return true;
     return false;
@@ -1070,10 +1139,10 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   private boolean jj_3R_32() {
     Token xsp;
-    if (jj_3_20()) return true;
+    if (jj_3_21()) return true;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_20()) { jj_scanpos = xsp; break; }
+      if (jj_3_21()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
@@ -1104,7 +1173,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_23() {
+  private boolean jj_3_24() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_18()) return true;
     return false;
@@ -1115,10 +1184,10 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_41()) jj_scanpos = xsp;
+    if (jj_3_42()) jj_scanpos = xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_42()) { jj_scanpos = xsp; break; }
+      if (jj_3_43()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(RPAR)) return true;
     return false;
@@ -1130,7 +1199,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_21() {
+  private boolean jj_3_22() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_18()) return true;
     return false;
@@ -1139,14 +1208,14 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   private boolean jj_3R_19() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_39()) {
+    if (jj_3_40()) {
     jj_scanpos = xsp;
-    if (jj_3_40()) return true;
+    if (jj_3_41()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_39() {
+  private boolean jj_3_40() {
     if (jj_3R_29()) return true;
     return false;
   }
@@ -1158,27 +1227,22 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_32() {
+  private boolean jj_3_33() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_19()) return true;
     return false;
   }
 
-  private boolean jj_3_33() {
+  private boolean jj_3_34() {
     if (jj_scan_token(OR)) return true;
     if (jj_3R_26()) return true;
     if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_25() {
+  private boolean jj_3_26() {
     if (jj_3R_25()) return true;
     if (jj_scan_token(SEMICOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_19() {
-    if (jj_3R_24()) return true;
     return false;
   }
 
@@ -1187,12 +1251,17 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
+  private boolean jj_3_20() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
   private boolean jj_3R_28() {
     if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
-  private boolean jj_3_44() {
+  private boolean jj_3_45() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_18()) return true;
     return false;
@@ -1219,7 +1288,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_18() {
+  private boolean jj_3_19() {
     if (jj_3R_23()) return true;
     return false;
   }
@@ -1227,14 +1296,14 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   private boolean jj_3R_27() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_37()) {
+    if (jj_3_38()) {
     jj_scanpos = xsp;
-    if (jj_3_38()) return true;
+    if (jj_3_39()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_37() {
+  private boolean jj_3_38() {
     if (jj_3R_28()) return true;
     return false;
   }
@@ -1244,35 +1313,35 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_46() {
+  private boolean jj_3_47() {
     if (jj_3R_30()) return true;
     return false;
   }
 
-  private boolean jj_3_42() {
+  private boolean jj_3_43() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_30()) return true;
     return false;
   }
 
-  private boolean jj_3_36() {
+  private boolean jj_3_37() {
     if (jj_scan_token(LPAR)) return true;
     if (jj_3R_26()) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_33()) {
+    if (jj_3_34()) {
     jj_scanpos = xsp;
-    if (jj_3_34()) return true;
+    if (jj_3_35()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_17() {
+  private boolean jj_3_18() {
     if (jj_3R_22()) return true;
     return false;
   }
 
-  private boolean jj_3_34() {
+  private boolean jj_3_35() {
     if (jj_scan_token(AND)) return true;
     if (jj_3R_26()) return true;
     if (jj_scan_token(RPAR)) return true;
@@ -1282,14 +1351,14 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   private boolean jj_3R_26() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_35()) {
+    if (jj_3_36()) {
     jj_scanpos = xsp;
-    if (jj_3_36()) return true;
+    if (jj_3_37()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_35() {
+  private boolean jj_3_36() {
     if (jj_3R_27()) return true;
     return false;
   }
@@ -1300,7 +1369,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_40() {
+  private boolean jj_3_41() {
     if (jj_scan_token(NOT)) return true;
     if (jj_3R_29()) return true;
     return false;
@@ -1312,67 +1381,18 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     return false;
   }
 
-  private boolean jj_3_24() {
+  private boolean jj_3_25() {
     if (jj_3R_18()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_23()) { jj_scanpos = xsp; break; }
+      if (jj_3_24()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
   private boolean jj_3_7() {
     if (jj_scan_token(PNOT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_45()) {
-    jj_scanpos = xsp;
-    if (jj_3_46()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_45() {
-    if (jj_3R_31()) return true;
-    return false;
-  }
-
-  private boolean jj_3_22() {
-    if (jj_3R_18()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_21()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(COMMA)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    if (jj_scan_token(LBRACE)) return true;
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3_10()) return true;
-    }
-    xsp = jj_scanpos;
-    if (jj_3_11()) jj_scanpos = xsp;
-    if (jj_3R_19()) return true;
     return false;
   }
 
@@ -1400,7 +1420,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[46];
+  final private JJCalls[] jj_2_rtns = new JJCalls[47];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1628,7 +1648,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 46; i++) {
+    for (int i = 0; i < 47; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1681,6 +1701,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
             case 43: jj_3_44(); break;
             case 44: jj_3_45(); break;
             case 45: jj_3_46(); break;
+            case 46: jj_3_47(); break;
           }
         }
         p = p.next;

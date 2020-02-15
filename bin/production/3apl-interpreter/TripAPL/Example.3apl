@@ -1,13 +1,12 @@
 Name: Cleaner
+
 Belief Base:
     positionAt(self,0,0).
     positionAt(rubbish,1,2).
     positionAt(rubbish,0,4).
     positionAt(bin,5,6).
-
 Goal Base:
-    clean(),
-    randomMove()
+    clean()
 
 Capability Base:
     {((positionAt(self,X,Y) and positionAt(rubbish,X,Y)) and not occupied())}
@@ -22,17 +21,7 @@ Capability Base:
     throw()
     {not occupied()}
 
-    {positionAt(self,X1,Y1)}
-    jump(X,Y)
-    {positionAt(self,X,Y), not positionAt(self,X1,Y1)}
-
 Plan Base:
-    {
-        moveTo(3,4);
-        moveTo(4,5);
-        moveTo(1,2);
-        moveTo(5,6);
-    }
 
 Goal Planning Rule Base:
     {
@@ -41,31 +30,13 @@ Goal Planning Rule Base:
     <- positionAt(rubbish, _, _) |
     {
         Test: positionAt(bin,Xb,Yb);
-        Send(query,ams,cleaner(),reply_whatever());
         while(positionAt(rubbish,X,Y)) {
             moveTo(X,Y);
             pick(X,Y);
             moveTo(Xb, Yb);
             throw();
         };
-        jump(10,10);
-        while(positionAt(rubbish,X,Y)) {
-            moveTo(X,Y);
-            pick(X,Y);
-            moveTo(Xb, Yb);
-            throw();
-        };
-       randomethings();
-    }
-
-    {
-        randomMove()
-    }
-    <- true |
-    {
-        moveTo(13,14);
-        moveTo(14,15);
-        moveTo(11,12);
+        moveTo(0,0);
     }
 
 Plan Revision Rule Base:
@@ -76,9 +47,8 @@ Plan Revision Rule Base:
            moveTo(Xb, Yb);
            throw();
        };
-       randomethings();
    }
-   <- positionAt(self,10,10) |
+   <- received(AMS, 0, inform, description_terminate) |
    {
         if (occupied())
         {
@@ -89,7 +59,4 @@ Plan Revision Rule Base:
         {
             Test: true;
         };
-        moveTo(0,0);
-
    }
-
