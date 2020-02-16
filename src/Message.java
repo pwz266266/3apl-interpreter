@@ -60,7 +60,7 @@ public class Message {
     }
 
     public String toString(){
-        return "Message<"+Performative.toString(this.getPerformative())+", Sender:"+this.getSender()+", Receiver:"+this.getReceiverID()+","+this.getBody().toString()+","+this.getReply().toString()+">";
+        return "Message<"+Performative.toString(this.getPerformative())+", Sender:"+this.getSender()+", Receiver:"+this.getReceiverID()+", "+this.getBody().toString()+", "+this.getReply().toString()+">";
     }
 }
 

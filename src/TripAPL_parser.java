@@ -586,12 +586,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
         buffer = gsubClause();
                                                                                                               arguments.add(buffer);
       }
-                                                                                                                                         {if (true) return new GpredClause(predicate.toString(),arguments);}
       jj_consume_token(RPAR);
+                                                                                                                                             {if (true) return new GpredClause(predicate.toString(),arguments);}
     } else {
       ;
     }
-                                                                                                                                                                                                         {if (true) return predicate;}
+                                                                                                                                                                                                          {if (true) return predicate;}
     throw new Error("Missing return statement in function");
   }
 
@@ -632,7 +632,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       if (jj_2_51(3)) {
         jj_consume_token(LPAR);
         if (jj_2_49(3)) {
-          buffer = gsubClause();
+          buffer = vsubClause();
                                                     arguments.add(buffer);
         } else {
           ;
@@ -645,11 +645,11 @@ public class TripAPL_parser implements TripAPL_parserConstants {
             break label_18;
           }
           jj_consume_token(COMMA);
-          buffer = gsubClause();
+          buffer = vsubClause();
                                                                                                                arguments.add(buffer);
         }
-                                                                                                                                          {if (true) return new GpredClause(predicate.toString(),arguments);}
         jj_consume_token(RPAR);
+                                                                                                                                              {if (true) return new GpredClause(predicate.toString(),arguments);}
       } else {
         ;
       }
@@ -1459,7 +1459,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   private boolean jj_3_50() {
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_32()) return true;
+    if (jj_3R_33()) return true;
     return false;
   }
 
@@ -1565,7 +1565,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   }
 
   private boolean jj_3_49() {
-    if (jj_3R_32()) return true;
+    if (jj_3R_33()) return true;
     return false;
   }
 

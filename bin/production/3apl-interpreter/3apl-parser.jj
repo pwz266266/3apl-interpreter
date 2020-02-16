@@ -325,26 +325,44 @@ Literal literal():
 GpredClause gpredclause():
 {
     Token t;
-    ArrayList<Atom> arguments = new ArrayList<Atom>();
-    Atom buffer;
+    ArrayList<GpredClause> arguments = new ArrayList();
+    GpredClause buffer;
 }
 {
-    t = <VAL> <LPAR> (buffer = val() {arguments.add(buffer);} )? (<COMMA> buffer = val() {arguments.add(buffer);})* <RPAR>
+    t = <VAL> <LPAR> (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* <RPAR>
     {return new GpredClause(t.image, arguments);}
 }
 
+GpredClause gsubClause():
+{
+    Atom predicate;
+    ArrayList<GpredClause> arguments = new ArrayList();
+    GpredClause buffer;
+}
+{
+    predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments);} )? {return predicate;}
+}
 
 VpredClause vpredclause():
 {
     Token t;
-    ArrayList<Atom> arguments = new ArrayList<Atom>();
-    Atom buffer;
+    ArrayList<GpredClause> arguments = new ArrayList();
+    GpredClause buffer;
 }
 {
-    t = <VAL> <LPAR> (buffer = atom() {arguments.add(buffer);} )? (<COMMA> buffer = atom() {arguments.add(buffer);})* <RPAR>
+    t = <VAL> <LPAR> (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})* <RPAR>
     {return new VpredClause(t.image, arguments);}
 }
 
+GpredClause vsubClause():
+{
+    Atom predicate;
+    ArrayList<GpredClause> arguments = new ArrayList();
+    GpredClause buffer;
+}
+{
+    (predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;})
+}
 
 Atom val():
 {

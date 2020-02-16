@@ -340,7 +340,7 @@ GpredClause gsubClause():
     GpredClause buffer;
 }
 {
-    predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* {return new GpredClause(predicate.toString(),arguments);} ")")? {return predicate;}
+    predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments);} )? {return predicate;}
 }
 
 VpredClause vpredclause():
@@ -361,7 +361,7 @@ GpredClause vsubClause():
     GpredClause buffer;
 }
 {
-    (predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* {return new GpredClause(predicate.toString(),arguments);} ")")? {return predicate;}) | (predicate = var() {return predicate;})
+    (predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;})
 }
 
 Atom val():

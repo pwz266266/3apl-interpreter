@@ -69,6 +69,7 @@ public class Container {
                     fw.write("Agent "+agent.getID()+"("+agent.getName()+") is initialized.\n");
                 }
             }else if(this.Debug){
+                agent.deliberation();
                 bufferSuspend += agent.getID() + "(" + agent.getName() + "), ";
             }
         }
@@ -123,7 +124,7 @@ public class Container {
         this.server.addMessage(message);
     }
 
-    public void proceedMessage(FileWriter fw) throws NoSolutionException, IOException {
+    public void proceedMessage(FileWriter fw) throws NoSolutionException, IOException, MalformedGoalException {
         ArrayList<Message> receivedMessage = this.messagesToSend;
         this.messagesToSend = new ArrayList<>();
         for(Message message : receivedMessage){
@@ -131,7 +132,7 @@ public class Container {
                 if(message.getPerformative() == Performative.INFORM){
                     this.engine.addTheory(new Theory(message.receive()));
                 }else if(message.getPerformative() == Performative.QUERY){
-                    SolveInfo info = this.engine.solve(new Struct("received(inform,Sender,"+message.getBody().toString()+",Reply)"));
+                    SolveInfo info = this.engine.solve("received(inform,Sender,"+message.getBody().toString()+","+message.getReply()+").");
                     if(info.isSuccess()){
                         if(fw!=null){
                             fw.write(message.toString()+" Request Succeed.\n");

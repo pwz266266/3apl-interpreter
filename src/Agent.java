@@ -7,6 +7,9 @@ import java.util.*;
 import alice.tuprolog.*;
 import alice.tuprolog.exceptions.MalformedGoalException;
 import alice.tuprolog.exceptions.NoSolutionException;
+import com.codepoetics.protonpack.Seq;
+
+import javax.sound.midi.SysexMessage;
 
 
 public class Agent {
@@ -63,7 +66,11 @@ public class Agent {
     }
 
     public boolean receiveMessage(FileWriter fw) throws IOException {
+//        System.out.println(this.name);
         ArrayList<Message> messages = this.container.forwardMessage(this);
+//        for(Message message : messages){
+//            System.out.println(message);
+//        }
         if(messages.size()==0){
             return false;
         }
@@ -94,26 +101,36 @@ public class Agent {
             fw.write("\n");
             fw.write(this.toString()+"\n");
         }
-        if(this.state == State.SUSPEND && !this.receiveMessage(fw)){
-            if(this.Debug){
-                fw.write("-".repeat(70)+"\n");
-                fw.write("Agent Clock: "+this.clock+"\n\n");
-                fw.write("Agent Suspended."+"\n");
-                fw.flush();
-                fw.close();
-            }
-            this.clock++;
-            return;
-        }
         if(this.Debug){
             fw.write("-".repeat(70)+"\n");
             fw.write("Agent Clock: "+this.clock+"\n\n");
         }
-        this.state = State.ACTIVE;
-        boolean flag1 = this.goalPlanningRuleBase.execute(goalBase,planBase,engine,fw);
+        boolean received = this.receiveMessage(fw);
+        if(this.state == State.SUSPEND){
+
+            if(received){
+                this.state = State.ACTIVE;
+                if(this.Debug){
+                    assert fw != null;
+                    fw.write("Agent ACTIVATED."+"\n");
+                    fw.flush();
+                    fw.close();
+                }
+            }else{
+                if(this.Debug){
+                    assert fw != null;
+                    fw.write("Agent SUSPENDED."+"\n");
+                    fw.flush();
+                    fw.close();
+                }
+            }
+            this.clock++;
+            return;
+        }
         boolean flag2 = this.planRevisionRuleBase.execute(planBase,engine,fw);
         boolean flag3 = this.planBase.oneStep(engine,fw, container,this) == 1;
-        if(! (flag1 || flag2 || flag3)){
+        boolean flag1 = this.goalPlanningRuleBase.execute(goalBase,planBase,engine,fw);
+        if(! (flag1 || flag2 || flag3 || received)){
             this.state = State.SUSPEND;
         }
         this.goalBase.checkGoals(engine, fw);
@@ -122,8 +139,8 @@ public class Agent {
             if(this.state == State.SUSPEND){
                 fw.write("No action taken, suspend."+"\n");
             }
-//            fw.write("\nCurrent Belief: \n{\n"+ engine.getTheory().toString()+"}\n");
-//            fw.write("\n"+ this.goalBase.toString()+"\n");
+            fw.write("\nCurrent Belief: \n{\n"+ engine.getTheory().toString()+"}\n");
+            fw.write("\n"+ this.goalBase.toString()+"\n");
             fw.flush();
             fw.close();
         }
@@ -167,7 +184,16 @@ public class Agent {
 
 class Env{
     ArrayList<VVPair> list = new ArrayList<>();
-
+    @Override
+    public String toString(){
+        StringBuilder result = new StringBuilder("Environment:");
+        String prefix = "";
+        for(VVPair pair: this.list){
+            result.append(prefix + pair.variable+":"+pair.value);
+            prefix = "|";
+        }
+        return result.toString();
+    }
     public ArrayList<String> getVarList(){
         ArrayList<String> result = new ArrayList<>();
         for(VVPair pair : list){
@@ -265,7 +291,19 @@ class GpredClause{
     }
 
     public String toString(Env env){
-        return toString();
+        StringBuilder result = new StringBuilder();
+        if(arguments.size() != 0){
+            result.append(predicate + "(");
+            String prefix = "";
+            for(GpredClause x: arguments){
+                result.append(prefix);
+                prefix = ",";
+                result.append(x.toString(env));
+            }
+            result.append(")");
+            return result.toString();
+        }
+        return predicate;
     }
 
     public GpredClause applyEnv(Env env){
@@ -288,22 +326,6 @@ class VpredClause extends GpredClause{
     }
     public ArrayList<GpredClause> getArguments(){ return this.arguments;}
     public String getPredicate(){ return this.predicate;}
-    @Override
-    public String toString(Env env){
-        StringBuilder result = new StringBuilder();
-        if(arguments.size() != 0){
-            result.append(predicate + "(");
-            String prefix = "";
-            for(GpredClause x: arguments){
-                result.append(prefix);
-                prefix = ",";
-                result.append(x.toString(env));
-            }
-            result.append(")");
-            return result.toString();
-        }
-        return predicate;
-    }
 
     public Struct toProlog(Env env){
         return new Struct(toString(env));
@@ -363,13 +385,13 @@ class wffBinary extends Query{
     }
     @Override
     public String toString(){
-        String operator = isOr ? " , " : " ; ";
+        String operator = isOr ? " ; " : " , ";
         return "(" + argument1.toString() + operator + argument2.toString() + ")";
     }
 
     @Override
     public String toString(Env env){
-        String operator = isOr ? " , " : " ; ";
+        String operator = isOr ? " ; " : " , ";
         return "(" + argument1.toString(env) + operator + argument2.toString(env) + ")";
     }
 }
@@ -451,6 +473,9 @@ class Goal{
         return flag;
     }
     public boolean blockGoal(GpredClause goal){
+        if(goal == null){
+            return true;
+        }
         boolean flag = false;
         int i = 0;
         for(GpredClause clause: subgoals){
@@ -539,6 +564,9 @@ class GoalBase{
 
     public boolean blockGoal(Goal goal){
         boolean flag = false;
+        if(goal == null){
+            return true;
+        }
         for(GpredClause subgoal: goal.getSubgoals()){
             boolean tempFlag = false;
             for(Goal egoal: goals){
@@ -672,6 +700,10 @@ class Capability{
 
     boolean perform(Prolog engine, Env env, FileWriter fw) throws MalformedGoalException, NoSolutionException {
         SolveInfo info = precondition.performQuery(env, engine);
+//        if(this.name.equals("pay")){
+//            System.out.println("\n");
+//            System.out.println(env);
+//        }
         if(info.isSuccess()){
             if(fw != null){
                 try{
@@ -686,6 +718,13 @@ class Capability{
                 String val_n = var.getTerm().toString();
                 env.changeVal(var_n, val_n);
             }
+//            if(this.name.equals("pay")){
+//                System.out.println(precondition.toString(env));
+//                System.out.println(env);
+//                for(Literal literal : postcondition){
+//                    System.out.println(literal.toString(env));
+//                }
+//            }
             for(Literal cond :postcondition){
                 cond.performChange(env,engine,fw);
             }
@@ -736,6 +775,7 @@ abstract class BasicPlan{
     abstract public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) throws NoSolutionException, MalformedGoalException;
     abstract public String toString(Env env, String indent);
     abstract public String toString(String indent);
+    abstract public BasicPlan clone();
     @Override
     public String toString(){
         return toString("");
@@ -909,6 +949,15 @@ class SeqPlan extends Sequential{
     }
 
     @Override
+    public SeqPlan clone() {
+        ArrayList<BasicPlan> newPlans = new ArrayList<>();
+        for(BasicPlan plan : components){
+            newPlans.add(plan.clone());
+        }
+        return new SeqPlan(newPlans);
+    }
+
+    @Override
     public void binding(CapabilityBase caps) {
         for(BasicPlan x : this.components){
             x.binding(caps);
@@ -966,6 +1015,11 @@ class JavaAction extends BasicPlan{
         result.append(")>  (not implemented)");
         return result.toString();
     }
+
+    @Override
+    public BasicPlan clone() {
+        return this;
+    }
 }
 
 
@@ -988,6 +1042,11 @@ class CapAction extends BasicPlan{
             }
         }
         if(this.cap == null){
+            try{
+                fw.write(", Capability "+this.predicate+ " doesn't exist, check for typo!\n");
+            }catch(Exception e){
+                System.out.println("Can't write to file.");
+            }
             return -2;
         }
         Env insideEnv = new Env();
@@ -1015,6 +1074,11 @@ class CapAction extends BasicPlan{
         }
         result.append(")>");
         return result.toString();
+    }
+
+    @Override
+    public BasicPlan clone() {
+        return this;
     }
 
     @Override
@@ -1079,6 +1143,11 @@ class SendAction extends BasicPlan{
     }
 
     @Override
+    public SendAction clone() {
+        return this;
+    }
+
+    @Override
     public String toString(Env env, String indent) {
         StringBuilder result = new StringBuilder(indent);
         result.append("<SendAction: performative = ");
@@ -1135,12 +1204,19 @@ class TestAction extends BasicPlan{
     public String toString(String indent){
         return indent+"<TestAction: "+this.query.toString()+"?>";
     }
+
+    @Override
+    public TestAction clone() {
+        return this;
+    }
 }
 
 class IfPlan extends Sequential{
     private Query condition;
     private Env insideEnv;
     private boolean currCond;
+    private SeqPlan ifComponent;
+    private SeqPlan elseComponent;
     public IfPlan(SeqPlan ifComponent, SeqPlan elseComponent, Query condition){
         this.condition = condition;
         this.currentPos = 0;
@@ -1148,6 +1224,8 @@ class IfPlan extends Sequential{
         this.components.add(ifComponent);
         this.components.add(elseComponent);
         this.insideEnv = new Env();
+        ifComponent = ifComponent;
+        elseComponent = elseComponent;
     }
 
     @Override
@@ -1191,7 +1269,7 @@ class IfPlan extends Sequential{
                 }
             }
             currentPos = 1;
-            return 0;
+            return this.oneStep( env,  engine,  fw,  container,  agent);
         }
         int result = this.components.get(currCond ? 0 : 1).oneStep(insideEnv, engine, fw, container, agent);
         if(result == 1){
@@ -1221,6 +1299,14 @@ class IfPlan extends Sequential{
         result.append(this.components.get(1).toString("\t"+indent));
         result.append("\n"+indent+">");
         return result.toString();
+    }
+
+    @Override
+    public IfPlan clone() {
+        this.components = new ArrayList<BasicPlan>();
+        this.components.add(ifComponent);
+        this.components.add(elseComponent);
+        return new IfPlan( ifComponent.clone(), elseComponent.clone(),  condition);
     }
 
     @Override
@@ -1278,7 +1364,7 @@ class WhilePlan extends Sequential{
                 }
 
                 currentPos = 1;
-                return 0;
+                return this.oneStep( env,  engine,  fw,  container,  agent);
             }
             else{
                 if(fw != null){
@@ -1330,6 +1416,15 @@ class WhilePlan extends Sequential{
     }
 
     @Override
+    public WhilePlan clone() {
+        ArrayList<BasicPlan> newPlans = new ArrayList<>();
+        for(BasicPlan plan : components){
+            newPlans.add(plan.clone());
+        }
+        return new WhilePlan(newPlans, condition);
+    }
+
+    @Override
     public void binding(CapabilityBase caps) {
         for(BasicPlan x: components){
             x.binding(caps);
@@ -1353,6 +1448,9 @@ class Plan{
     private SeqPlan plan;
     private Goal associatedGoal = null;
     private Env insideEnv;
+//    public Plan clone(Env insideEnv){
+//        return new Plan(this.plan.clone(), associatedGoal, insideEnv);
+//    }
     public Plan(SeqPlan plan, Goal associatedGoal, Env insideEnv){
         this.plan = plan;
         this.associatedGoal = associatedGoal;
@@ -1446,13 +1544,8 @@ class Plan{
 
 class PlanBase{
     private ArrayList<Plan> plans;
-    private ArrayList<Integer> status;
     public PlanBase(ArrayList<Plan> plans){
         this.plans = plans;
-        this.status = new ArrayList<>();
-        for(int i = 0; i<plans.size(); i++){
-            status.add(0);
-        }
     }
 
     @Override
@@ -1473,22 +1566,21 @@ class PlanBase{
 
     public void addPlan(Plan plan){
         plans.add(plan);
-        status.add(0);
     }
 
     public int oneStep(Prolog engine, FileWriter fw, Container container, Agent agent) throws MalformedGoalException, NoSolutionException {
         boolean flag = false;
-        for(int i = 0; i<status.size(); i++){
-            if(status.get(i) != -1){
-                flag = true;
-                int result = plans.get(i).oneStep(engine, fw, container, agent);
-                status.set(i,result);
-                if(result == 1){
-                    plans.get(i).complete(engine);
-                    plans.remove(i);
-                    status.remove(i);
-                }
+        ArrayList<Plan> toDelete = new ArrayList<>();
+        for(int i = 0; i<plans.size(); i++){
+            flag = true;
+            int result = plans.get(i).oneStep(engine, fw, container, agent);
+            if(result == 1){
+                toDelete.add(plans.get(i));
+                plans.get(i).complete(engine);
             }
+        }
+        for(Plan plan : toDelete){
+            plans.remove(plan);
         }
         return flag ? 1 : 0;
     }
@@ -1551,9 +1643,29 @@ class GoalPlanningRule{
                 String val_n = var.getTerm().toString();
                 env.changeVal(var_n, val_n);
             }
-            planBase.addPlan(new Plan(plan, goal, env));
+            planBase.addPlan(new Plan(plan.clone(), goal, env));
+            goalBase.blockGoal(this.goal);
         }
-        goalBase.blockGoal(this.goal);
+//        if(!result){
+//            if(fw != null){
+//                try{
+//                    fw.write("Goal planning rule failed, with guard \"" +this.condition.toString() + "\" and goal \"" + (this.goal == null ? "" : this.goal.toString())+"\".\n");
+//                    fw.write("Goal doesn't exist.\n");
+//                }catch(Exception e){
+//                    System.out.println("Can't write to file.");
+//                }
+//            }
+//        }
+//        if(!info.isSuccess()){
+//            if(fw != null){
+//                try{
+//                    fw.write("Goal planning rule failed, with guard \"" +this.condition.toString() + "\" and goal \"" + (this.goal == null ? "" : this.goal.toString())+"\".\n");
+//                    fw.write("Query failed.\n");
+//                }catch(Exception e){
+//                    System.out.println("Can't write to file.");
+//                }
+//            }
+//        }
         return result && info.isSuccess();
     }
     @Override
@@ -1563,7 +1675,11 @@ class GoalPlanningRule{
     public String toString(String indent) {
         StringBuilder result = new StringBuilder(indent);
         result.append("<Goal Planning Rule: \n"+indent+"Goal:\n\t"+indent);
-        result.append(goal.toString());
+        if(goal != null){
+            result.append(goal.toString());
+        }else{
+            result.append("no goal");
+        }
         result.append("\n"+indent+"Condition:\n\t"+indent);
         result.append(condition.toString());
         result.append("\n"+indent+"Plan: \n");

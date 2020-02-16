@@ -15,7 +15,13 @@ public class testProlog {
             MalformedGoalException, NoSolutionException, NoMoreSolutionException{
         Prolog engine = new Prolog();
         engine.loadLibrary(new ArithmeticLibrary());
-        SolveInfo info = engine.solve("root(12,G).");
+        engine.addTheory(new Theory("price(pen,2)."));
+        engine.addTheory(new Theory("price(pencil,1)."));
+        engine.addTheory(new Theory("money(0)."));
+        engine.addTheory(new Theory("goods(pen,6)."));
+        engine.addTheory(new Theory("goods(pencil,2)."));
+//        SolveInfo info = engine.solve("(price(pencil,Price) , goods(pencil,Count), sub(Count,1,NCount)).");
+        SolveInfo info = engine.solve("(geq(12,3)).");
 //                sum(1,2,A).
 //                sub(1,2,B).
 //                div(4,6,C).

@@ -1,408 +1,901 @@
-Container started @ GMT time: Wed, Feb 12, 2020 08:15:21 pm 
+Container started @ GMT time: Sun, Feb 16, 2020 03:46:18 pm 
 ----------------------------------------------------------------------
 Container Clock: 0
-Agent 0(Cleaner) is initialized.
-Agent 1(Cleaner) is initialized.
+Agent 0(Buyer) is initialized.
+Agent 2(Saler) is initialized.
 Active agent list: 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 1
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 2
-Send Message<query, Sender:container_0_1, Receiver:ams,cleaner,reply_whatever> to Server.
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 3
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)>.
+Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> Request Succeed.
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, is(saler), channel(1)> to Agent0.
+Send request Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Server.
+Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> Request Succeed.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 4
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)>.
+Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> Request Succeed.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Server.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 5
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)>.
+Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> Request Succeed.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Server.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 6
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, price, channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 7
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 8
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, price, channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, price, channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 9
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 10
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, price(pen,2), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 11
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, price(pencil,1), channel(1)> to Agent0.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pen,2), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 12
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pencil,1), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 13
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 14
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 15
-Active agent list: 0(Cleaner), 1(Cleaner), 
-Suspended agent list: 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 16
-Active agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
 Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 17
-Active agent list: 1(Cleaner), 
-Suspended agent list: 0(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 18
-Active agent list: 1(Cleaner), 
-Suspended agent list: 0(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 19
-Active agent list: 1(Cleaner), 
-Suspended agent list: 0(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 20
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 21
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 22
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 23
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 24
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 25
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 26
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 27
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 28
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 29
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 30
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 31
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 32
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 33
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 34
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 35
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 36
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 37
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 38
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 39
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 40
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 41
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 42
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 43
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 44
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 45
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 46
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 47
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 48
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 49
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 50
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 51
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 52
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 53
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_0_0, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 54
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 55
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 56
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pen), channel(1)> to Agent0.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 57
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 58
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_0_0, sale(pencil), channel(1)> to Agent0.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 59
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 60
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 2(Saler), 
+Suspended agent list: 
 ----------------------------------------------------------------------
 Container Clock: 61
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 0(Buyer), 
+Suspended agent list: 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 62
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Agent2.
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 63
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 64
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 65
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 66
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, no(pen), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 67
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 68
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 69
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 70
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 71
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 72
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 73
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 74
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 75
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 76
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 77
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 78
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 79
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 80
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 81
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 82
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 83
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 84
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 85
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 86
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 87
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 88
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 89
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 90
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 91
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 92
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 93
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 94
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 95
-Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
 ----------------------------------------------------------------------
 Container Clock: 96
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 97
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 98
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 99
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)>.
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Agent2.
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
 ----------------------------------------------------------------------
 Container Clock: 100
 Active agent list: 
-Suspended agent list: 0(Cleaner), 1(Cleaner), 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 101
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
+----------------------------------------------------------------------
+Container Clock: 102
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
+----------------------------------------------------------------------
+Container Clock: 103
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Server.
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
+----------------------------------------------------------------------
+Container Clock: 104
+Active agent list: 2(Saler), 
+Suspended agent list: 0(Buyer), 
+----------------------------------------------------------------------
+Container Clock: 105
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 106
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 107
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 108
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 109
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 110
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 111
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 112
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 113
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 114
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 115
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 116
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 117
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 118
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 119
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 120
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 121
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 122
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 123
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 124
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 125
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 126
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 127
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 128
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 129
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 130
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 131
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 132
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 133
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 134
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 135
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 136
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 137
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 138
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 139
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 140
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 141
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 142
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 143
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 144
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 145
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 146
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 147
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 148
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 149
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 150
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 151
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 152
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 153
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 154
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 155
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 156
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 157
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 158
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 159
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 160
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 161
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 162
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 163
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 164
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 165
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 166
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 167
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 168
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 169
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 170
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 171
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 172
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 173
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 174
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 175
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 176
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 177
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 178
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 179
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 180
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 181
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 182
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 183
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 184
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 185
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 186
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 187
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 188
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 189
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 190
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 191
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 192
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 193
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 194
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 195
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 196
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 197
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 198
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 199
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 
+----------------------------------------------------------------------
+Container Clock: 200
+Active agent list: 
+Suspended agent list: 0(Buyer), 2(Saler), 

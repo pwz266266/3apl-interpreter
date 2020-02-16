@@ -1,143 +1,178 @@
-Server started @ GMT time: Wed, Feb 12, 2020 08:15:21 pm 
+Server started @ GMT time: Sun, Feb 16, 2020 03:46:18 pm 
 ----------------------------------------------------------------------
 Server Clock: 0
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 1
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 2
-Received Message<query, Sender:container_0_1, Receiver:ams,cleaner,reply_whatever> from Containers.
+Received Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> from Containers.
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> from Containers.
 
-Active containers: 0, 
+Distribute Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container1.
+Distribute Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 3
+Received Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> from Containers.
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> from Containers.
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> from Containers.
 
-Active containers: 0, 
+Distribute Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container1.
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Container1.
+Distribute Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 4
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> from Containers.
+Received Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Container1.
+Distribute Message<query, Sender:container_1_1, Receiver:ams, is(saler), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 5
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, is(saler), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 6
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 7
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, price, channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, price, channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 8
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 9
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 10
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 11
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pen,2), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pen,2), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 12
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pencil,1), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, price(pencil,1), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 13
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 14
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 15
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 16
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 17
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 18
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 19
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 20
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 21
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 22
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 23
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 24
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 25
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 26
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 27
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 28
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 29
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 30
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 31
 
-Active containers: 0, 
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 32
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> from Containers.
 
-Active containers: 0, 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 33
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
-Active containers: 0, 
-----------------------------------------------------------------------
-Add container 1 @clock 34
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
+Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 34
 
@@ -148,11 +183,15 @@ Server Clock: 35
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 36
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 37
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 38
@@ -164,7 +203,9 @@ Server Clock: 39
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 40
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 41
@@ -172,7 +213,9 @@ Server Clock: 41
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 42
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 43
@@ -180,7 +223,9 @@ Server Clock: 43
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 44
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 45
@@ -188,7 +233,9 @@ Server Clock: 45
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 46
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 47
@@ -196,7 +243,9 @@ Server Clock: 47
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 48
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 49
@@ -208,11 +257,15 @@ Server Clock: 50
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 51
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 52
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 53
@@ -224,7 +277,9 @@ Server Clock: 54
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 55
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 56
@@ -232,7 +287,9 @@ Server Clock: 56
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 57
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pen), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 58
@@ -240,7 +297,9 @@ Server Clock: 58
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 59
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 60
@@ -248,7 +307,9 @@ Server Clock: 60
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 61
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pen), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 62
@@ -256,7 +317,9 @@ Server Clock: 62
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 63
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 64
@@ -268,11 +331,15 @@ Server Clock: 65
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 66
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, no(pen), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, no(pen), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 67
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 68
@@ -288,7 +355,9 @@ Server Clock: 70
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 71
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 72
@@ -308,7 +377,9 @@ Server Clock: 75
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 76
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 77
@@ -324,7 +395,9 @@ Server Clock: 79
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 80
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 81
@@ -344,7 +417,9 @@ Server Clock: 84
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 85
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 86
@@ -360,7 +435,9 @@ Server Clock: 88
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 89
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 90
@@ -380,7 +457,9 @@ Server Clock: 93
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 94
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
 
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 95
@@ -396,7 +475,9 @@ Server Clock: 97
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 98
+Received Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> from Containers.
 
+Send Message<query, Sender:container_1_1, Receiver:container_0_2, buy(pencil), channel(1)> to Container0.
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 99
@@ -404,5 +485,407 @@ Server Clock: 99
 Active containers: 0, 1, 
 ----------------------------------------------------------------------
 Server Clock: 100
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 101
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 102
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 103
+Received Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> from Containers.
+
+Send Message<inform, Sender:container_0_2, Receiver:container_1_1, sale(pencil), channel(1)> to Container1.
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 104
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 105
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 106
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 107
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 108
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 109
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 110
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 111
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 112
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 113
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 114
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 115
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 116
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 117
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 118
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 119
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 120
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 121
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 122
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 123
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 124
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 125
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 126
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 127
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 128
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 129
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 130
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 131
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 132
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 133
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 134
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 135
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 136
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 137
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 138
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 139
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 140
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 141
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 142
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 143
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 144
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 145
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 146
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 147
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 148
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 149
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 150
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 151
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 152
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 153
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 154
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 155
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 156
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 157
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 158
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 159
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 160
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 161
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 162
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 163
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 164
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 165
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 166
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 167
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 168
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 169
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 170
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 171
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 172
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 173
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 174
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 175
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 176
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 177
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 178
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 179
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 180
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 181
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 182
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 183
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 184
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 185
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 186
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 187
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 188
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 189
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 190
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 191
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 192
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 193
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 194
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 195
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 196
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 197
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 198
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 199
+
+Active containers: 0, 1, 
+----------------------------------------------------------------------
+Server Clock: 200
 
 Active containers: 0, 1, 

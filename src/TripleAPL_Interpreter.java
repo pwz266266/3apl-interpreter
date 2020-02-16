@@ -16,17 +16,22 @@ public class TripleAPL_Interpreter {
         String buyerFile = "./src/TripAPL/buyer.3apl";
         String salerFile = "./src/TripAPL/saler.3apl";
         Agent agent1 = TripAPL_parser.compile(buyerFile);
-        Agent agent2 = TripAPL_parser.compile(salerFile);
+        Agent agent2 = TripAPL_parser.compile(buyerFile);
+        Agent agent3 = TripAPL_parser.compile(salerFile);
 
         ArrayList<Agent> agents1 = new ArrayList<>();
+        ArrayList<Agent> agents2 = new ArrayList<>();
 
         agents1.add(agent1);
-        agents1.add(agent2);
+        agents1.add(agent3);
+        agents2.add(agent2);
 
         Container container1 = ContainerFactory.createContainer(agents1);
+        Container container2 = ContainerFactory.createContainer(agents2);
 
         ArrayList<Container> containers = new ArrayList<>();
         containers.add(container1);
+        containers.add(container2);
 
         Server server = ServerFactory.createServer(containers);
         File logdir = new File("./log");
@@ -35,7 +40,7 @@ public class TripleAPL_Interpreter {
         }
         logdir.mkdir();
         server.enableDebug("./log");
-        for(int i = 0; i<=100; i++){
+        for(int i = 0; i<=200; i++){
 
             server.run();
         }
