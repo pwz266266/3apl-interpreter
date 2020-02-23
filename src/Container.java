@@ -13,7 +13,9 @@ public class Container {
     public long getID() {
         return ID;
     }
-
+    private ArrayList<EnvironmentAction> envActions = new ArrayList<>();
+    private HashMap<Agent,ArrayList<EnvironmentRespond>> envRespondPool = new HashMap<>();
+    private ArrayList<EnvironmentRespond> envRespondList = new ArrayList<>();
     private Server server;
     private long ID;
     private Boolean Debug = false;
@@ -30,6 +32,7 @@ public class Container {
         this.messagesToSend = new ArrayList<>();
         for(Agent agent : agents){
             this.MessagePool.put(agent, new ArrayList<>());
+            this.envRespondPool.put(agent, new ArrayList<>());
             agent.setContainer(this);
         }
         this.engine.loadLibrary(new ArithmeticLibrary());
@@ -73,8 +76,11 @@ public class Container {
                 bufferSuspend += agent.getID() + "(" + agent.getName() + "), ";
             }
         }
+        receiveResponds();
+        proceedResponds();
         receiveMessage(fw);
         proceedMessage(fw);
+        sendAction();
         if(this.Debug){
             fw.write(bufferActive+"\n");
             fw.write(bufferSuspend+"\n");
@@ -83,6 +89,7 @@ public class Container {
         }
         this.clock++;
     }
+
     public void enableDebug(String logfile)  {
         this.logfile = new File(logfile+"/history.log");
         this.Debug = true;
@@ -110,6 +117,7 @@ public class Container {
     public void addAgent(Agent newAgent) throws IOException {
         this.agents.add(newAgent);
         this.MessagePool.put(newAgent, new ArrayList<>());
+        this.envRespondPool.put(newAgent, new ArrayList<>());
         newAgent.setContainer(this);
         if(this.Debug){
             FileWriter fw = new FileWriter(this.logfile);
@@ -117,6 +125,9 @@ public class Container {
             fw.write("Add agent "+newAgent.getID()+" @clock "+this.clock+"\n");
             fw.flush();
             fw.close();
+        }
+        if(this.server!=null){
+            server.addAgent(newAgent);
         }
     }
 
@@ -211,6 +222,32 @@ public class Container {
         return messages;
     }
 
+
+    public ArrayList<EnvironmentRespond> forwardRespond(Agent agent){
+        ArrayList<EnvironmentRespond> responds = new ArrayList(this.envRespondPool.get(agent));
+        this.envRespondPool.get(agent).clear();
+        return responds;
+    }
+
+    private void proceedResponds() {
+        ArrayList<EnvironmentRespond> currentResponds = new ArrayList<>(this.envRespondList);
+        this.envRespondList.clear();
+        for(EnvironmentRespond respond: currentResponds){
+            String agentID = respond.getAgentID();
+            int agentid = Integer.parseInt(agentID.split("_")[2]);
+            for(Agent agent : agents){
+                if(agent.getID() == agentid){
+                    this.envRespondPool.get(agent).add(respond);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void receiveResponds(){
+        this.envRespondList.addAll(this.server.forwardResponds(this));
+    }
+
     public Agent getAgent(int id){
         for(Agent agent : agents){
             if(agent.getID() == id){
@@ -218,5 +255,19 @@ public class Container {
             }
         }
         return null;
+    }
+
+    public void receiveAction(EnvironmentAction envAction) {
+        this.envActions.add(envAction);
+    }
+
+    public void sendAction(){
+        for(EnvironmentAction action : this.envActions){
+            this.server.receiveAction(action);
+        }
+        this.envActions.clear();
+    }
+    public ArrayList<Agent> getAgents(){
+        return this.agents;
     }
 }

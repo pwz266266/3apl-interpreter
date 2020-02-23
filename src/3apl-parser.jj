@@ -65,7 +65,7 @@ TOKEN :
     | <SEMICOL: ";">
     | <NONE: "None">
     | <SEND: "Send">
-    | <JAVA: "Java">
+    | <Env: "Env">
     | <TEST: "Test:">
     | <LPAR: "(">
     | <RPAR: ")">
@@ -255,7 +255,7 @@ BasicPlan basicplan():
 
 }
 {
-    (<JAVA> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new JavaAction(arguments);})
+    (<Env> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new EnvAction(arguments);})
     | <TEST> (testbuffer = query() {return new TestAction(testbuffer); } )
     | (<SEND> <LPAR>t = <VAL>"," argbuffer = atom() "," content = vpredclause() "," reply = vpredclause()<RPAR>{return new SendAction(t.image, argbuffer.toString(), content, reply);})
     | ( t = <VAL> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new CapAction(t.image, arguments);})

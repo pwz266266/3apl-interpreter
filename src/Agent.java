@@ -39,10 +39,16 @@ public class Agent {
     private int clock = 0;
     private Container container;
 
+    public ArrayList<EnvironmentRespond> getReceivedResponds() {
+        return receivedResponds;
+    }
+
+    private ArrayList<EnvironmentRespond> receivedResponds = new ArrayList<>();
+
     public long getID() {
         return ID;
     }
-
+    public String getFullID() {return "container" + "_" + container.getID() + "_" + this.getID();}
     private long ID;
     private File logfile;
     public Agent(String name,
@@ -84,6 +90,23 @@ public class Agent {
         return true;
     }
 
+    public boolean receiveResponds(FileWriter fw) throws IOException {
+        ArrayList<EnvironmentRespond> responds = this.container.forwardRespond(this);
+        if(responds.size()==0){
+            return false;
+        }
+        for (EnvironmentRespond respond: responds){
+            if(respond.getActionID() == -1){
+                for(Literal postCondition: respond.getPostCondition()){
+                    postCondition.performChange(new Env(), engine, null);
+                }
+            }else{
+                this.receivedResponds.add(respond);
+            }
+        }
+        return true;
+    }
+
     public void enableDebug(String logfile)  { this.logfile = new File(logfile); this.Debug = true;  }
     public void enableDebug()  { this.Debug = true;  }
     public void disableDebug() { this.Debug = false; }
@@ -106,6 +129,8 @@ public class Agent {
             fw.write("Agent Clock: "+this.clock+"\n\n");
         }
         boolean received = this.receiveMessage(fw);
+        boolean received2 = this.receiveResponds(fw);
+        received = received2 || received;
         if(this.state == State.SUSPEND){
 
             if(received){
@@ -177,6 +202,10 @@ public class Agent {
         result += "\n"+ planRevisionRuleBase.toString();
         result += ">";
         return result;
+    }
+
+    public void sendActionRequest(EnvironmentAction envAction){
+        this.container.receiveAction(envAction);
     }
 }
 
@@ -972,22 +1001,45 @@ class SeqPlan extends Sequential{
     }
 }
 
-class JavaAction extends BasicPlan{
+class EnvAction extends BasicPlan{
+    static int ID = 1;
     private ArrayList<Atom> arguments;
-
-    public JavaAction(ArrayList<Atom> arguments){
+    private boolean requestSent = false;
+    private int thisID = ID++;
+    public EnvAction(ArrayList<Atom> arguments){
         this.arguments = arguments;
     }
 
     @Override
     public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) {
-        return 1;
+        if(!requestSent){
+            String actionName = this.arguments.get(0).toString(env);
+            ArrayList<String> currentArguments = new ArrayList<>();
+            for(Atom arg: arguments.subList(1,2)){
+                currentArguments.add(arg.toString(env));
+            }
+            agent.sendActionRequest(new EnvironmentAction("container" + "_" + container.getID() + "_" + agent.getID(),actionName, currentArguments, thisID));
+            requestSent = true;
+        }else{
+            ArrayList<EnvironmentRespond> currentResponds = agent.getReceivedResponds();
+            for(EnvironmentRespond respond: currentResponds){
+                if(respond.getActionID() == thisID){
+                    for(Literal postCondition: respond.getPostCondition()){
+                        postCondition.performChange(env,engine,fw);
+                    }
+                    agent.getReceivedResponds().remove(respond);
+                    return respond.isSuccess() ? 1 : -1;
+                }
+            }
+
+        }
+        return -1;
     }
 
     @Override
     public String toString(Env env, String indent) {
         StringBuilder result = new StringBuilder(indent);
-        result.append("<JavaActoin: arguments = (");
+        result.append("<EnvAction: arguments = (");
         String prefix = "";
         for(Atom x: arguments){
             result.append(prefix);
@@ -1005,7 +1057,7 @@ class JavaAction extends BasicPlan{
     @Override
     public String toString(String indent) {
         StringBuilder result = new StringBuilder(indent);
-        result.append("<JavaActoin: arguments = (");
+        result.append("<EnvAction: arguments = (");
         String prefix = "";
         for(Atom x: arguments){
             result.append(prefix);
@@ -1018,7 +1070,8 @@ class JavaAction extends BasicPlan{
 
     @Override
     public BasicPlan clone() {
-        return this;
+        ArrayList<Atom> newArgs = new ArrayList<>(this.arguments);
+        return new EnvAction(newArgs);
     }
 }
 

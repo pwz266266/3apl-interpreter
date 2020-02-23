@@ -348,11 +348,11 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     SeqPlan ifPlan;
     SeqPlan elsePlan;
     if (jj_2_27(3)) {
-      jj_consume_token(JAVA);
+      jj_consume_token(Env);
       jj_consume_token(LPAR);
       if (jj_2_23(3)) {
         argbuffer = atom();
-                                         arguments.add(argbuffer);
+                                        arguments.add(argbuffer);
         label_11:
         while (true) {
           if (jj_2_22(3)) {
@@ -362,13 +362,13 @@ public class TripAPL_parser implements TripAPL_parserConstants {
           }
           jj_consume_token(COMMA);
           argbuffer = atom();
-                                                                                                 arguments.add(argbuffer);
+                                                                                                arguments.add(argbuffer);
         }
       } else {
         ;
       }
       jj_consume_token(RPAR);
-                                                                                                                                        {if (true) return new JavaAction(arguments);}
+                                                                                                                                       {if (true) return new EnvAction(arguments);}
     } else if (jj_2_28(3)) {
       jj_consume_token(TEST);
       testbuffer = query();
@@ -1426,7 +1426,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   }
 
   private boolean jj_3_27() {
-    if (jj_scan_token(JAVA)) return true;
+    if (jj_scan_token(Env)) return true;
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;

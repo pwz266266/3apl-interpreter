@@ -13,29 +13,37 @@ import java.util.Date;
 public class Server {
     private File logfile;
 
-    public long getID() {
-        return ID;
-    }
 
     private long ID;
     private Boolean Debug = false;
     private ArrayList<Container> containers;
     private int clock = 0;
     private HashMap<Container, ArrayList<Message>> messagePool;
-
+    private HashMap<Container, ArrayList<EnvironmentRespond>> envRespondPool;
+    private EnvironmentInterface environmentInter;
+    private ArrayList<Agent> agents = new ArrayList<>();
     public void addMessage(Message message) {
         this.messageToSend.add(message);
     }
-
+    private ArrayList<EnvironmentAction> envActions;
+    private ArrayList<EnvironmentRespond> envResponds;
     private ArrayList<Message> messageToSend;
-    public Server(ArrayList<Container> containers, long ID){
+    public Server(ArrayList<Container> containers, long ID, EnvironmentInterface environmentInter){
+        this.envActions = new ArrayList<>();
+        this.envResponds = new ArrayList<>();
         this.ID = ID;
         this.containers = containers;
         messagePool = new HashMap<>();
+        envRespondPool = new HashMap<>();
         messageToSend = new ArrayList<>();
         for(Container container : containers){
             this.messagePool.put(container, new ArrayList<>());
+            this.envRespondPool.put(container, new ArrayList<>());
             container.setServer(this);
+        }
+        this.environmentInter = environmentInter;
+        if(environmentInter != null){
+            this.environmentInter.setServer(this);
         }
     }
 
@@ -73,6 +81,7 @@ public class Server {
         }
     }
     public void run() throws NoSolutionException, MalformedGoalException, IOException {
+        environmentInter.environment.loop();
         FileWriter fw = null;
         if(this.Debug){
             fw = new FileWriter(this.logfile, true);
@@ -100,6 +109,9 @@ public class Server {
             }
         }
         proceedMessage(fw);
+        proceedResponds();
+        forwardActions();
+        receiveRespond();
         if(this.Debug){
             fw.write(buffer+"\n");
             fw.flush();
@@ -110,8 +122,14 @@ public class Server {
         }
         this.clock++;
     }
+
+    private void receiveRespond() {
+        this.envResponds.addAll(this.environmentInter.receiveResponds());
+    }
+
     public void addContainer(Container newContainer) throws IOException {
         this.containers.add(newContainer);
+        this.agents.addAll(newContainer.getAgents());
         messagePool.put(newContainer, new ArrayList<>());
         newContainer.setServer(this);
         if(this.Debug){
@@ -129,10 +147,47 @@ public class Server {
         }
     }
 
+    public void addAgent(Agent agent){
+        this.agents.add(agent);
+    }
+
     public ArrayList<Message> forwardMessage(Container container){
         ArrayList<Message> messages = new ArrayList(this.messagePool.get(container));
         this.messagePool.get(container).clear();
         return messages;
+    }
+
+    public ArrayList<EnvironmentRespond> forwardResponds(Container container){
+        ArrayList<EnvironmentRespond> responds = new ArrayList(this.envRespondPool.get(container));
+        this.envRespondPool.get(container).clear();
+        return responds;
+    }
+
+    public void forwardActions(){
+        if(this.environmentInter!=null){
+            this.environmentInter.forwardEnvActions(this.envActions);
+        }
+    }
+
+
+    private void proceedResponds() {
+        ArrayList<EnvironmentRespond> currentResponds = new ArrayList<>(this.envResponds);
+        this.envResponds.clear();
+        for(EnvironmentRespond respond: currentResponds){
+            String ContainerID = respond.getAgentID();
+            int containerid = Integer.parseInt(ContainerID.split("_")[1]);
+            for(Container container : containers){
+                if(container.getID() == containerid){
+                    this.envRespondPool.get(container).add(respond);
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public long getID() {
+        return ID;
     }
 
     public void proceedMessage(FileWriter fw) throws IOException {
@@ -168,6 +223,43 @@ public class Server {
                     }
                 }
             }
+        }
+    }
+    public void setEnvironment(Environment env){
+        if(env == null){
+            this.environmentInter = null;
+        }else if(this.environmentInter == null){
+            this.environmentInter = new EnvironmentInterface(env, this);
+        }else{
+            this.environmentInter.reset(env);
+        }
+    }
+
+    public void receiveAction(EnvironmentAction envAction){
+        if(this.environmentInter == null){
+            System.out.println("WARNING: No environment associated with current server!");
+        }else{
+            this.envActions.add(envAction);
+        }
+    }
+
+    public ArrayList<EnvironmentAction> getEnvActions(){
+        return this.envActions;
+    }
+
+    public void linkAgentEntity(String agentID, int entityID){
+        if(this.environmentInter == null){
+            System.out.println("WARNING: No environment associated with current server!");
+        }else{
+            this.environmentInter.link(agentID, entityID);
+        }
+    }
+
+    public void unlinkAgentEntity(String agentID, int entityID){
+        if(this.environmentInter == null){
+            System.out.println("WARNING: No environment associated with current server!");
+        }else{
+            this.environmentInter.unlink(agentID, entityID);
         }
     }
 }

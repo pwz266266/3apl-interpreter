@@ -53,7 +53,7 @@ public interface TripAPL_parserConstants {
   /** RegularExpression Id. */
   int SEND = 27;
   /** RegularExpression Id. */
-  int JAVA = 28;
+  int Env = 28;
   /** RegularExpression Id. */
   int TEST = 29;
   /** RegularExpression Id. */
@@ -112,7 +112,7 @@ public interface TripAPL_parserConstants {
     "\";\"",
     "\"None\"",
     "\"Send\"",
-    "\"Java\"",
+    "\"Env\"",
     "\"Test:\"",
     "\"(\"",
     "\")\"",

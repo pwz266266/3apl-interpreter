@@ -1,14 +1,16 @@
 import alice.tuprolog.*;
 import alice.tuprolog.exceptions.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public class testProlog {
     public static void main(String[] args) throws InvalidTheoryException,
-            MalformedGoalException, NoSolutionException, NoMoreSolutionException{
+            MalformedGoalException, NoSolutionException, NoMoreSolutionException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 
-        test0();
-
+//        test0();
+//        Class cls = Class.forName("Environment");
+//        Environment environment = (Environment) cls.getConstructor().newInstance();
     }
 
     public static void test0() throws InvalidTheoryException,
