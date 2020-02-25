@@ -5,12 +5,14 @@ public class EnvironmentRespond {
     private int actionID;
     private ArrayList<Literal> postCondition;
     private boolean success;
+    private int entityID;
 
-    public EnvironmentRespond(String agentID, ArrayList<Literal> postCondition, boolean success, int actionID){
+    public EnvironmentRespond(String agentID, ArrayList<Literal> postCondition, boolean success, int actionID, int entityID){
         this.actionID = actionID;
         this.agentID = agentID;
         this.postCondition = postCondition;
         this.success = success;
+        this.entityID = entityID;
     }
 
 
@@ -30,4 +32,11 @@ public class EnvironmentRespond {
         return success;
     }
 
+    public void setAgentID(String agentID) {
+        this.agentID = agentID;
+    }
+
+    public int getEntityID() {
+        return entityID;
+    }
 }

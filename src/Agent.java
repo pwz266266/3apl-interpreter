@@ -7,12 +7,9 @@ import java.util.*;
 import alice.tuprolog.*;
 import alice.tuprolog.exceptions.MalformedGoalException;
 import alice.tuprolog.exceptions.NoSolutionException;
-import com.codepoetics.protonpack.Seq;
-
-import javax.sound.midi.SysexMessage;
 
 
-public class Agent {
+public class Agent implements Runnable {
     public String getName() {
         return name;
     }
@@ -23,8 +20,8 @@ public class Agent {
         return state;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void activate(){
+        this.state = State.ACTIVE;
     }
 
     private State state;
@@ -38,13 +35,20 @@ public class Agent {
     private Boolean Debug = false;
     private int clock = 0;
     private Container container;
-
+    private boolean terminate = true;
     public ArrayList<EnvironmentRespond> getReceivedResponds() {
         return receivedResponds;
     }
 
     private ArrayList<EnvironmentRespond> receivedResponds = new ArrayList<>();
 
+    public void terminate(){
+        this.terminate = true;
+    }
+
+    public void restart(){
+        this.terminate = false;
+    }
     public long getID() {
         return ID;
     }
@@ -67,7 +71,7 @@ public class Agent {
         this.goalPlanningRuleBase = goalPlanningRuleBase;
         this.planRevisionRuleBase = planRevisionRuleBase;
         this.capabilityBase = capabilityBase;
-        this.state = State.READY;
+        this.state = State.INIT;
         this.ID = ID;
     }
 
@@ -138,8 +142,6 @@ public class Agent {
                 if(this.Debug){
                     assert fw != null;
                     fw.write("Agent ACTIVATED."+"\n");
-                    fw.flush();
-                    fw.close();
                 }
             }else{
                 if(this.Debug){
@@ -147,10 +149,11 @@ public class Agent {
                     fw.write("Agent SUSPENDED."+"\n");
                     fw.flush();
                     fw.close();
+                    this.clock++;
+                    return;
                 }
             }
             this.clock++;
-            return;
         }
         boolean flag2 = this.planRevisionRuleBase.execute(planBase,engine,fw);
         boolean flag3 = this.planBase.oneStep(engine,fw, container,this) == 1;
@@ -164,12 +167,15 @@ public class Agent {
             if(this.state == State.SUSPEND){
                 fw.write("No action taken, suspend."+"\n");
             }
-            fw.write("\nCurrent Belief: \n{\n"+ engine.getTheory().toString()+"}\n");
-            fw.write("\n"+ this.goalBase.toString()+"\n");
+//            fw.write("\nCurrent Belief: \n{\n"+ engine.getTheory().toString()+"}\n");
+//            fw.write("\n"+ this.goalBase.toString()+"\n");
             fw.flush();
             fw.close();
         }
         this.clock++;
+        if(this.goalBase.isEmpty() && this.planBase.isEmpty()){
+            this.state = State.FINISHED;
+        }
     }
 
     public void initial(Container container){
@@ -180,7 +186,7 @@ public class Agent {
         planBase.initial(capabilityBase);
         goalPlanningRuleBase.initial(capabilityBase);
         planRevisionRuleBase.initial(capabilityBase);
-        this.state = State.ACTIVE;
+        this.state = State.READY;
         this.container = container;
         this.engine.loadLibrary(new ArithmeticLibrary());
     }
@@ -206,6 +212,17 @@ public class Agent {
 
     public void sendActionRequest(EnvironmentAction envAction){
         this.container.receiveAction(envAction);
+    }
+
+    @Override
+    public void run() {
+        try {
+            while(this.state != State.FINISHED && !this.terminate){
+                deliberation();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -612,6 +629,10 @@ class GoalBase{
         return flag;
     }
     public void initial() { }
+
+    public boolean isEmpty() {
+        return goals.isEmpty();
+    }
 }
 
 class BeliefBase{
@@ -1013,9 +1034,16 @@ class EnvAction extends BasicPlan{
     @Override
     public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) {
         if(!requestSent){
+            try {
+                if(fw!=null){
+                    fw.write("Send action: " + this.toString() + "\n");
+                }
+            }catch(Exception e){
+                System.out.println("Can't write to file!!!");
+            }
             String actionName = this.arguments.get(0).toString(env);
             ArrayList<String> currentArguments = new ArrayList<>();
-            for(Atom arg: arguments.subList(1,2)){
+            for(Atom arg: arguments.subList(1,arguments.size())){
                 currentArguments.add(arg.toString(env));
             }
             agent.sendActionRequest(new EnvironmentAction("container" + "_" + container.getID() + "_" + agent.getID(),actionName, currentArguments, thisID));
@@ -1028,6 +1056,7 @@ class EnvAction extends BasicPlan{
                         postCondition.performChange(env,engine,fw);
                     }
                     agent.getReceivedResponds().remove(respond);
+                    requestSent = false;
                     return respond.isSuccess() ? 1 : -1;
                 }
             }
@@ -1050,7 +1079,7 @@ class EnvAction extends BasicPlan{
                 result.append(x.toString());
             }
         }
-        result.append(")>  (not implemented)");
+        result.append(")>");
         return result.toString();
     }
 
@@ -1064,7 +1093,7 @@ class EnvAction extends BasicPlan{
             prefix = ",";
             result.append(x.toString());
         }
-        result.append(")>  (not implemented)");
+        result.append(")>");
         return result.toString();
     }
 
@@ -1277,8 +1306,8 @@ class IfPlan extends Sequential{
         this.components.add(ifComponent);
         this.components.add(elseComponent);
         this.insideEnv = new Env();
-        ifComponent = ifComponent;
-        elseComponent = elseComponent;
+        this.ifComponent = ifComponent;
+        this.elseComponent = elseComponent;
     }
 
     @Override
@@ -1655,6 +1684,10 @@ class PlanBase{
             plan.binding(capabilityBase);
         }
     }
+
+    public boolean isEmpty(){
+        return this.plans.isEmpty();
+    }
 }
 
 
@@ -1876,7 +1909,7 @@ class PlanRevisionRuleBase{
 
 
 enum State{
-    ACTIVE,SUSPEND,READY
+    ACTIVE,SUSPEND,READY,FINISHED,INIT
 }
 
 enum PlanType{

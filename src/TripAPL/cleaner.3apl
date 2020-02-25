@@ -1,0 +1,101 @@
+Name: Cleaner
+
+Belief Base:
+
+Goal Base:
+    init()
+
+Capability Base:
+    {true}
+    tryToPickUp()
+    {moving()}
+
+    {true}
+    finish()
+    {not moving()}
+
+Plan Base:
+
+Goal Planning Rule Base:
+    {
+        init()
+    }
+    <- true |
+    {
+        Env(init);
+    }
+
+
+    <- (position(garbage,X,Y) and not moving()) |
+    {
+        tryToPickUp();
+        while(not position(self, X, Y)) {
+            Test: position(self, Xs, Ys);
+            if (les(X,Xs))
+            {
+                Env(move,left);
+            }
+            else
+            {
+                if (grt(X,Xs))
+                {
+                    Env(move,right);
+                }
+                else
+                {
+                    if (les(Y,Ys))
+                    {
+                        Env(move,down);
+                    }
+                    else
+                    {
+                        if (grt(Y,Ys))
+                        {
+                            Env(move,up);
+                        }
+                        else
+                        {
+                            Test: true;
+                        };
+                    };
+                };
+            };
+        };
+        Env(pickup);
+        Test: position(bin, Xb, Yb);
+        while(not position(self, Xb, Yb)) {
+            Test: position(self, Xs, Ys);
+            if (les(Xb,Xs))
+            {
+                Env(move,left);
+            }
+            else
+            {
+                if (grt(Xb,Xs))
+                {
+                    Env(move,right);
+                }
+                else
+                {
+                    if (les(Yb,Ys))
+                    {
+                        Env(move,down);
+                    }
+                    else
+                    {
+                        if (grt(Yb,Ys))
+                        {
+                            Env(move,up);
+                        }
+                        else
+                        {
+                            Test: true;
+                        };
+                    };
+                };
+            };
+        };
+        Env(throw);
+        finish();
+    }
+Plan Revision Rule Base:

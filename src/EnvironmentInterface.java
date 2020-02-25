@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class EnvironmentInterface {
@@ -43,6 +42,12 @@ public class EnvironmentInterface {
     }
 
     public ArrayList<EnvironmentRespond> receiveResponds() {
-        return this.environment.sendRespond();
+        ArrayList<EnvironmentRespond> responds = this.environment.sendRespond();
+        for(EnvironmentRespond respond : responds){
+            if(respond.getActionID() == -1){
+                respond.setAgentID(entityMap.get(respond.getEntityID()));
+            }
+        }
+        return responds;
     }
 }

@@ -165,68 +165,35 @@ Goal planning rule applied, with guard "true" and goal "query.".
 Agent Clock: 1
 
 Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:ams, is(saler), channel(1)> to Container.
 ----------------------------------------------------------------------
 Agent Clock: 2
 
 Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:ams, is(saler), channel(1)> to Container.
 ----------------------------------------------------------------------
 Agent Clock: 3
 
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, is(saler), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, is(saler), channel(1)> from Container.
+Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, false.
 ----------------------------------------------------------------------
 Agent Clock: 4
 
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Execute: <TestAction: received(inform,Saler,is(saler),channel(1))?> , success.
 ----------------------------------------------------------------------
 Agent Clock: 5
 
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, price, channel(1)> to Container.
 ----------------------------------------------------------------------
 Agent Clock: 6
 
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
+Execute: <CapAction: getPrice(Saler)> , failed.
 ----------------------------------------------------------------------
 Agent Clock: 7
 
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, true.
-Send Message<query, Sender:container_0_0, Receiver:ams, is(saler), channel(1)> to Container.
-----------------------------------------------------------------------
-Agent Clock: 8
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, is(saler), channel(1)> from Container.
-Query: "\+ received(inform,Saler,is(saler),channel(1))" in while statement, false.
-----------------------------------------------------------------------
-Agent Clock: 9
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, is(saler), channel(1)> from Container.
-Execute: <TestAction: received(inform,Saler,is(saler),channel(1))?> , success.
-----------------------------------------------------------------------
-Agent Clock: 10
-
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, price, channel(1)> to Container.
-----------------------------------------------------------------------
-Agent Clock: 11
-
-Execute: <CapAction: getPrice(Saler)> , failed.
-----------------------------------------------------------------------
-Agent Clock: 12
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, price(pen,2), channel(1)> from Container.
-Execute: <CapAction: getPrice(Saler)> , failed.
-----------------------------------------------------------------------
-Agent Clock: 13
-
-Execute: <CapAction: getPrice(Saler)> , failed.
-----------------------------------------------------------------------
-Agent Clock: 14
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, price(pencil,1), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, price(pen,2), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, price(pencil,1), channel(1)> from Container.
 Execute: <CapAction: getPrice(Saler)> , success.
 Belief "received(inform,container_1_1,is(saler),channel(1))" deleted.
 Belief "received(inform,container_1_1,price(pen,2),channel(1))" deleted.
@@ -237,13 +204,13 @@ Belief "saler(container_1_1)" added.
 Goal planning rule applied, with guard "(received(inform,Saler,is(saler),channel(1)) , saler(Saler))" and goal "".
 Goal "query." completed and deleted.
 ----------------------------------------------------------------------
-Agent Clock: 15
+Agent Clock: 8
 
 Execute: <CapAction: deleteDuplicated(Saler)> , success.
 Belief "received(inform,container_1_1,is(saler),channel(1))" deleted.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 16
+Agent Clock: 9
 
 Execute: <CapAction: buy(pencil)> , success.
 Belief "pocket(20)" deleted.
@@ -253,9 +220,9 @@ Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 17
+Agent Clock: 10
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 Execute: <CapAction: buy(pen)> , success.
 Belief "pocket(19)" deleted.
 Belief "holding(1)" deleted.
@@ -263,24 +230,20 @@ Belief "pocket(17)" added.
 Belief "holding(3)" added.
 Belief "buying(pen)" added.
 ----------------------------------------------------------------------
-Agent Clock: 18
+Agent Clock: 11
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
 ----------------------------------------------------------------------
-Agent Clock: 19
-
-Execute: <CapAction: pay(pencil,Saler)> , failed.
-Execute: <CapAction: pay(pen,Saler)> , failed.
-----------------------------------------------------------------------
-Agent Clock: 20
+Agent Clock: 12
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
 Execute: <CapAction: pay(pen,Saler)> , failed.
 ----------------------------------------------------------------------
-Agent Clock: 21
+Agent Clock: 13
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(3)" deleted.
@@ -288,12 +251,6 @@ Belief "stock(pencil,0)" deleted.
 Belief "buying(pencil)" deleted.
 Belief "holding(2)" added.
 Belief "stock(pencil,1)" added.
-Execute: <CapAction: pay(pen,Saler)> , failed.
-Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
-----------------------------------------------------------------------
-Agent Clock: 22
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
 Execute: <CapAction: pay(pen,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
 Belief "holding(2)" deleted.
@@ -301,6 +258,10 @@ Belief "stock(pen,0)" deleted.
 Belief "buying(pen)" deleted.
 Belief "holding(0)" added.
 Belief "stock(pen,1)" added.
+Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
+----------------------------------------------------------------------
+Agent Clock: 14
+
 Execute: <CapAction: buy(pencil)> , success.
 Belief "pocket(17)" deleted.
 Belief "holding(0)" deleted.
@@ -309,9 +270,9 @@ Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 23
+Agent Clock: 15
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 Execute: <CapAction: buy(pen)> , success.
 Belief "pocket(16)" deleted.
 Belief "holding(1)" deleted.
@@ -319,19 +280,19 @@ Belief "pocket(14)" added.
 Belief "holding(3)" added.
 Belief "buying(pen)" added.
 ----------------------------------------------------------------------
-Agent Clock: 24
+Agent Clock: 16
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
 ----------------------------------------------------------------------
-Agent Clock: 25
+Agent Clock: 17
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
 Execute: <CapAction: pay(pen,Saler)> , failed.
 ----------------------------------------------------------------------
-Agent Clock: 26
+Agent Clock: 18
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(3)" deleted.
@@ -342,9 +303,9 @@ Belief "stock(pencil,2)" added.
 Execute: <CapAction: pay(pen,Saler)> , failed.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 27
+Agent Clock: 19
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
 Execute: <CapAction: pay(pen,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
 Belief "holding(2)" deleted.
@@ -360,9 +321,9 @@ Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 28
+Agent Clock: 20
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 Execute: <CapAction: buy(pen)> , success.
 Belief "pocket(13)" deleted.
 Belief "holding(1)" deleted.
@@ -370,14 +331,14 @@ Belief "pocket(11)" added.
 Belief "holding(3)" added.
 Belief "buying(pen)" added.
 ----------------------------------------------------------------------
-Agent Clock: 29
+Agent Clock: 21
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
 ----------------------------------------------------------------------
-Agent Clock: 30
+Agent Clock: 22
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(3)" deleted.
@@ -388,9 +349,9 @@ Belief "stock(pencil,3)" added.
 Execute: <CapAction: pay(pen,Saler)> , failed.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 31
+Agent Clock: 23
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
 Execute: <CapAction: pay(pen,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
 Belief "holding(2)" deleted.
@@ -406,9 +367,9 @@ Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 32
+Agent Clock: 24
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 Execute: <CapAction: buy(pen)> , success.
 Belief "pocket(10)" deleted.
 Belief "holding(1)" deleted.
@@ -416,14 +377,14 @@ Belief "pocket(8)" added.
 Belief "holding(3)" added.
 Belief "buying(pen)" added.
 ----------------------------------------------------------------------
-Agent Clock: 33
+Agent Clock: 25
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
 ----------------------------------------------------------------------
-Agent Clock: 34
+Agent Clock: 26
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(3)" deleted.
@@ -434,9 +395,9 @@ Belief "stock(pencil,4)" added.
 Execute: <CapAction: pay(pen,Saler)> , failed.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 35
+Agent Clock: 27
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
 Execute: <CapAction: pay(pen,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
 Belief "holding(2)" deleted.
@@ -452,9 +413,9 @@ Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 36
+Agent Clock: 28
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 Execute: <CapAction: buy(pen)> , success.
 Belief "pocket(7)" deleted.
 Belief "holding(1)" deleted.
@@ -462,9 +423,14 @@ Belief "pocket(5)" added.
 Belief "holding(3)" added.
 Belief "buying(pen)" added.
 ----------------------------------------------------------------------
-Agent Clock: 37
+Agent Clock: 29
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Execute: <CapAction: pay(pencil,Saler)> , failed.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+----------------------------------------------------------------------
+Agent Clock: 30
+
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(3)" deleted.
@@ -472,85 +438,83 @@ Belief "stock(pencil,4)" deleted.
 Belief "buying(pencil)" deleted.
 Belief "holding(2)" added.
 Belief "stock(pencil,5)" added.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+Execute: <CapAction: pay(pen,Saler)> , failed.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
+----------------------------------------------------------------------
+Agent Clock: 31
+
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
+Execute: <CapAction: pay(pen,Saler)> , success.
+Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
+Belief "holding(2)" deleted.
+Belief "stock(pen,4)" deleted.
+Belief "buying(pen)" deleted.
+Belief "holding(0)" added.
+Belief "stock(pen,5)" added.
+Execute: <CapAction: buy(pencil)> , success.
+Belief "pocket(5)" deleted.
+Belief "holding(0)" deleted.
+Belief "pocket(4)" added.
+Belief "holding(1)" added.
+Belief "buying(pencil)" added.
+Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
+----------------------------------------------------------------------
+Agent Clock: 32
+
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Execute: <CapAction: buy(pen)> , success.
+Belief "pocket(4)" deleted.
+Belief "holding(1)" deleted.
+Belief "pocket(2)" added.
+Belief "holding(3)" added.
+Belief "buying(pen)" added.
+----------------------------------------------------------------------
+Agent Clock: 33
+
+Execute: <CapAction: pay(pencil,Saler)> , failed.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pen), channel(1)> to Container.
+----------------------------------------------------------------------
+Agent Clock: 34
+
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
+Execute: <CapAction: pay(pencil,Saler)> , success.
+Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
+Belief "holding(3)" deleted.
+Belief "stock(pencil,5)" deleted.
+Belief "buying(pencil)" deleted.
+Belief "holding(2)" added.
+Belief "stock(pencil,6)" added.
+Execute: <CapAction: pay(pen,Saler)> , failed.
+Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
+----------------------------------------------------------------------
+Agent Clock: 35
+
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pen), channel(1)> from Container.
+Execute: <CapAction: pay(pen,Saler)> , success.
+Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
+Belief "holding(2)" deleted.
+Belief "stock(pen,5)" deleted.
+Belief "buying(pen)" deleted.
+Belief "holding(0)" added.
+Belief "stock(pen,6)" added.
+Execute: <CapAction: buy(pencil)> , success.
+Belief "pocket(2)" deleted.
+Belief "holding(0)" deleted.
+Belief "pocket(1)" added.
+Belief "holding(1)" added.
+Belief "buying(pencil)" added.
+----------------------------------------------------------------------
+Agent Clock: 36
+
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+----------------------------------------------------------------------
+Agent Clock: 37
+
+Execute: <CapAction: pay(pencil,Saler)> , failed.
 ----------------------------------------------------------------------
 Agent Clock: 38
 
-Execute: <CapAction: pay(pen,Saler)> , failed.
-Execute: <CapAction: buy(pencil)> , success.
-Belief "pocket(5)" deleted.
-Belief "holding(2)" deleted.
-Belief "pocket(4)" added.
-Belief "holding(3)" added.
-Belief "buying(pencil)" added.
-----------------------------------------------------------------------
-Agent Clock: 39
-
-Execute: <CapAction: pay(pen,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
-----------------------------------------------------------------------
-Agent Clock: 40
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
-Execute: <CapAction: pay(pen,Saler)> , success.
-Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
-Belief "holding(3)" deleted.
-Belief "stock(pen,4)" deleted.
-Belief "buying(pen)" deleted.
-Belief "holding(1)" added.
-Belief "stock(pen,5)" added.
-Execute: <CapAction: pay(pencil,Saler)> , failed.
-Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pen),channel(1)) , (\+ buying(pen) , (pocket(Pocket) , (price(pen,Price) , geq(Pocket,Price))))))" and goal "".
-----------------------------------------------------------------------
-Agent Clock: 41
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
-Execute: <CapAction: pay(pencil,Saler)> , success.
-Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
-Belief "holding(1)" deleted.
-Belief "stock(pencil,5)" deleted.
-Belief "buying(pencil)" deleted.
-Belief "holding(0)" added.
-Belief "stock(pencil,6)" added.
-Execute: <CapAction: buy(pen)> , success.
-Belief "pocket(4)" deleted.
-Belief "holding(0)" deleted.
-Belief "pocket(2)" added.
-Belief "holding(2)" added.
-Belief "buying(pen)" added.
-Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
-----------------------------------------------------------------------
-Agent Clock: 42
-
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pen), channel(1)> to Container.
-Execute: <CapAction: buy(pencil)> , success.
-Belief "pocket(2)" deleted.
-Belief "holding(2)" deleted.
-Belief "pocket(1)" added.
-Belief "holding(3)" added.
-Belief "buying(pencil)" added.
-----------------------------------------------------------------------
-Agent Clock: 43
-
-Execute: <CapAction: pay(pen,Saler)> , failed.
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
-----------------------------------------------------------------------
-Agent Clock: 44
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pen), channel(1)> from Container.
-Execute: <CapAction: pay(pen,Saler)> , success.
-Belief "received(inform,container_1_1,sale(pen),channel(1))" deleted.
-Belief "holding(3)" deleted.
-Belief "stock(pen,5)" deleted.
-Belief "buying(pen)" deleted.
-Belief "holding(1)" added.
-Belief "stock(pen,6)" added.
-Execute: <CapAction: pay(pencil,Saler)> , failed.
-----------------------------------------------------------------------
-Agent Clock: 45
-
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(1)" deleted.
@@ -560,7 +524,7 @@ Belief "holding(0)" added.
 Belief "stock(pencil,7)" added.
 Goal planning rule applied, with guard "(saler(Saler) , (\+ received(inform,Saler,no(pencil),channel(1)) , (\+ buying(pencil) , (pocket(Pocket) , (price(pencil,Price) , geq(Pocket,Price))))))" and goal "".
 ----------------------------------------------------------------------
-Agent Clock: 46
+Agent Clock: 39
 
 Execute: <CapAction: buy(pencil)> , success.
 Belief "pocket(1)" deleted.
@@ -569,17 +533,17 @@ Belief "pocket(0)" added.
 Belief "holding(1)" added.
 Belief "buying(pencil)" added.
 ----------------------------------------------------------------------
-Agent Clock: 47
+Agent Clock: 40
 
-Send Message<query, Sender:container_0_0, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
+Send Message<query, Sender:container_1_2, Receiver:container_1_1, buy(pencil), channel(1)> to Container.
 ----------------------------------------------------------------------
-Agent Clock: 48
+Agent Clock: 41
 
 Execute: <CapAction: pay(pencil,Saler)> , failed.
 ----------------------------------------------------------------------
-Agent Clock: 49
+Agent Clock: 42
 
-Received Message<inform, Sender:container_1_1, Receiver:container_0_0, sale(pencil), channel(1)> from Container.
+Received Message<inform, Sender:container_1_1, Receiver:container_1_2, sale(pencil), channel(1)> from Container.
 Execute: <CapAction: pay(pencil,Saler)> , success.
 Belief "received(inform,container_1_1,sale(pencil),channel(1))" deleted.
 Belief "holding(1)" deleted.
@@ -589,7 +553,7 @@ Belief "holding(0)" added.
 Belief "stock(pencil,8)" added.
 Goal planning rule applied, with guard "((pocket(Pocket) , (holding(Holding) , (sum(Pocket,Holding,Total) , eql(Total,0)))) ; (received(inform,Saler,no(pen),channel(1)) , received(inform,Saler,no(pencil),channel(1))))" and goal "buy.".
 ----------------------------------------------------------------------
-Agent Clock: 50
+Agent Clock: 43
 
 Execute: <CapAction: deleteSaler(Saler)> , success.
 Belief "received(inform,Saler,no(pen),channel(1))" deleted.

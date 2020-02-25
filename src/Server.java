@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.Date;
 
-public class Server {
+public class Server implements Runnable{
     private File logfile;
 
 
@@ -18,6 +18,7 @@ public class Server {
     private Boolean Debug = false;
     private ArrayList<Container> containers;
     private int clock = 0;
+    private int maxClock = -1;
     private HashMap<Container, ArrayList<Message>> messagePool;
     private HashMap<Container, ArrayList<EnvironmentRespond>> envRespondPool;
     private EnvironmentInterface environmentInter;
@@ -25,9 +26,23 @@ public class Server {
     public void addMessage(Message message) {
         this.messageToSend.add(message);
     }
-    private ArrayList<EnvironmentAction> envActions;
-    private ArrayList<EnvironmentRespond> envResponds;
-    private ArrayList<Message> messageToSend;
+    private final ArrayList<EnvironmentAction> envActions;
+    private final ArrayList<EnvironmentRespond> envResponds;
+    private final ArrayList<Message> messageToSend;
+    private boolean terminate = true;
+    public void terminate(){
+        this.terminate = true;
+        for(Container container: containers){
+            container.terminate();
+        }
+    }
+
+    public void restart(){
+        this.terminate = false;
+        for(Container container: containers){
+            container.restart();
+        }
+    }
     public Server(ArrayList<Container> containers, long ID, EnvironmentInterface environmentInter){
         this.envActions = new ArrayList<>();
         this.envResponds = new ArrayList<>();
@@ -45,6 +60,14 @@ public class Server {
         if(environmentInter != null){
             this.environmentInter.setServer(this);
         }
+    }
+
+    public int getMaxClock() {
+        return maxClock;
+    }
+
+    public void setMaxClock(int maxClock) {
+        this.maxClock = maxClock;
     }
 
     public void enableDebug(String logfile)  {
@@ -80,8 +103,12 @@ public class Server {
             container.disableDebug();
         }
     }
-    public void run() throws NoSolutionException, MalformedGoalException, IOException {
-        environmentInter.environment.loop();
+
+    public void oneTick() throws IOException {
+        if(environmentInter != null && environmentInter.environment.state == State.READY){
+            environmentInter.environment.state = State.ACTIVE;
+            new Thread(environmentInter.environment).start();
+        }
         FileWriter fw = null;
         if(this.Debug){
             fw = new FileWriter(this.logfile, true);
@@ -102,16 +129,22 @@ public class Server {
         String buffer = "Active containers: ";
 
         for(Container container: this.containers){
-            container.run();
-            if(this.Debug){
-                buffer += container.getID();
-                buffer += ", ";
+            if(container.getState() == State.READY){
+                container.setState(State.ACTIVE);
+                new Thread(container).start();
+            }else if(container.getState() == State.ACTIVE){
+                if (this.Debug) {
+                    buffer += container.getID();
+                    buffer += ", ";
+                }
             }
         }
         proceedMessage(fw);
-        proceedResponds();
-        forwardActions();
-        receiveRespond();
+        if(environmentInter != null) {
+            proceedResponds();
+            forwardActions();
+            receiveRespond();
+        }
         if(this.Debug){
             fw.write(buffer+"\n");
             fw.flush();
@@ -122,9 +155,24 @@ public class Server {
         }
         this.clock++;
     }
+    @Override
+    public void run(){
+        try {
+            while(!this.terminate){
+                oneTick();
+                if(maxClock!=-1 && clock >= maxClock){
+                    terminate();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void receiveRespond() {
-        this.envResponds.addAll(this.environmentInter.receiveResponds());
+        synchronized (this.envResponds) {
+            this.envResponds.addAll(this.environmentInter.receiveResponds());
+        }
     }
 
     public void addContainer(Container newContainer) throws IOException {
@@ -152,33 +200,46 @@ public class Server {
     }
 
     public ArrayList<Message> forwardMessage(Container container){
-        ArrayList<Message> messages = new ArrayList(this.messagePool.get(container));
-        this.messagePool.get(container).clear();
+        ArrayList<Message> messages;
+        synchronized (this.messagePool.get(container)) {
+            messages = new ArrayList<>(this.messagePool.get(container));
+            this.messagePool.get(container).clear();
+        }
         return messages;
     }
 
     public ArrayList<EnvironmentRespond> forwardResponds(Container container){
-        ArrayList<EnvironmentRespond> responds = new ArrayList(this.envRespondPool.get(container));
-        this.envRespondPool.get(container).clear();
+        ArrayList<EnvironmentRespond> responds;
+        synchronized (this.envRespondPool.get(container)) {
+            responds = new ArrayList<>(this.envRespondPool.get(container));
+            this.envRespondPool.get(container).clear();
+        }
         return responds;
     }
 
     public void forwardActions(){
-        if(this.environmentInter!=null){
-            this.environmentInter.forwardEnvActions(this.envActions);
+        if(this.environmentInter!=null) {
+            synchronized (this.envActions) {
+                this.environmentInter.forwardEnvActions(this.envActions);
+            }
         }
     }
 
 
     private void proceedResponds() {
-        ArrayList<EnvironmentRespond> currentResponds = new ArrayList<>(this.envResponds);
-        this.envResponds.clear();
+        ArrayList<EnvironmentRespond> currentResponds;
+        synchronized (envResponds) {
+            currentResponds = new ArrayList<>(this.envResponds);
+            this.envResponds.clear();
+        }
         for(EnvironmentRespond respond: currentResponds){
             String ContainerID = respond.getAgentID();
             int containerid = Integer.parseInt(ContainerID.split("_")[1]);
             for(Container container : containers){
                 if(container.getID() == containerid){
-                    this.envRespondPool.get(container).add(respond);
+                    synchronized (this.envRespondPool.get(container)) {
+                        this.envRespondPool.get(container).add(respond);
+                    }
                     break;
                 }
             }
@@ -191,8 +252,11 @@ public class Server {
     }
 
     public void proceedMessage(FileWriter fw) throws IOException {
-        ArrayList<Message> receivedMessages = this.messageToSend;
-        this.messageToSend = new ArrayList<>();
+        ArrayList<Message> receivedMessages;
+        synchronized (messageToSend) {
+            receivedMessages = new ArrayList<>(this.messageToSend);
+            this.messageToSend.clear();
+        }
         if(fw!=null){
             for(Message message : receivedMessages){
                 fw.write("Received "+message.toString()+" from Containers.\n");
@@ -204,7 +268,9 @@ public class Server {
                 int containerID = Integer.parseInt(message.getSender().split("_")[1]);
                 for(Container container : this.containers){
                     if(container.getID() != containerID){
-                        this.messagePool.get(container).add(message);
+                        synchronized (this.messagePool.get(container)) {
+                            this.messagePool.get(container).add(message);
+                        }
                         if(fw!=null){
                             fw.write("Distribute " + message.toString() + " to Container"+container.getID()+".\n");
                         }
@@ -215,7 +281,9 @@ public class Server {
                 int containerID = Integer.parseInt(message.getReceiverID().split("_")[1]);
                 for(Container container : this.containers){
                     if(container.getID() == containerID){
-                        this.messagePool.get(container).add(message);
+                        synchronized (this.messagePool.get(container)) {
+                            this.messagePool.get(container).add(message);
+                        }
                         if(this.Debug){
                             fw.write("Send " + message.toString() + " to Container"+container.getID()+".\n");
                         }
@@ -239,13 +307,12 @@ public class Server {
         if(this.environmentInter == null){
             System.out.println("WARNING: No environment associated with current server!");
         }else{
-            this.envActions.add(envAction);
+            synchronized (envActions) {
+                this.envActions.add(envAction);
+            }
         }
     }
 
-    public ArrayList<EnvironmentAction> getEnvActions(){
-        return this.envActions;
-    }
 
     public void linkAgentEntity(String agentID, int entityID){
         if(this.environmentInter == null){
