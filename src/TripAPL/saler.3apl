@@ -58,7 +58,7 @@ Goal Planning Rule Base:
 }
 <- (storage(pencil,0) and storage(pen,0)) |
 {
-    Test: true;
+    true?;
 }
 
 Plan Revision Rule Base:
@@ -71,7 +71,7 @@ Plan Revision Rule Base:
     if(received(query, Buyer, buy(pen), channel(1))){
         deleteOrder(pen);
     }else{
-        Test:true;
+        true ?;
     };
     Send(inform, Buyer, no(pen), channel(1));
 }
@@ -86,7 +86,7 @@ Plan Revision Rule Base:
     if(received(query, Buyer, buy(pencil), channel(1))){
         deleteOrder(pencil);
     }else{
-        Test:true;
+        true ?;
     };
     Send(inform, Buyer, no(pencil), channel(1));
 }

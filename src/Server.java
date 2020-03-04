@@ -35,10 +35,16 @@ public class Server implements Runnable{
         for(Container container: containers){
             container.terminate();
         }
+        if(environmentInter!=null){
+            environmentInter.environment.terminate();
+        }
     }
 
     public void restart(){
         this.terminate = false;
+        if(environmentInter!=null){
+            environmentInter.environment.restart();
+        }
         for(Container container: containers){
             container.restart();
         }
@@ -150,9 +156,9 @@ public class Server implements Runnable{
             fw.flush();
             fw.close();
         }
-        if(this.clock % 10 == 0){
-            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
-        }
+//        if(this.clock % 1000 == 0){
+//            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
+//        }
         this.clock++;
     }
     @Override
@@ -162,6 +168,8 @@ public class Server implements Runnable{
                 oneTick();
                 if(maxClock!=-1 && clock >= maxClock){
                     terminate();
+                }else if(this.environmentInter.environment.terminate){
+                    this.terminate();
                 }
             }
         } catch (Exception e) {
@@ -221,6 +229,7 @@ public class Server implements Runnable{
         if(this.environmentInter!=null) {
             synchronized (this.envActions) {
                 this.environmentInter.forwardEnvActions(this.envActions);
+                this.envActions.clear();
             }
         }
     }
@@ -303,6 +312,12 @@ public class Server implements Runnable{
         }
     }
 
+    public void showEnv(){
+        if(this.environmentInter != null){
+            this.environmentInter.environment.showGUI();
+        }
+    }
+
     public void receiveAction(EnvironmentAction envAction){
         if(this.environmentInter == null){
             System.out.println("WARNING: No environment associated with current server!");
@@ -328,5 +343,23 @@ public class Server implements Runnable{
         }else{
             this.environmentInter.unlink(agentID, entityID);
         }
+    }
+
+    public HashMap<String, ArrayList<String>> CreatableEntity() {
+        if(this.environmentInter == null){
+            System.out.println("WARNING: No environment associated with current server!");
+        }else{
+            return this.environmentInter.environment.CreatableEntity();
+        }
+        return null;
+    }
+
+    public int createEntity(String type, ArrayList<String> parameter) {
+        if(this.environmentInter == null){
+            System.out.println("WARNING: No environment associated with current server!");
+        }else{
+            return this.environmentInter.environment.createEntity(type, parameter);
+        }
+        return -2;
     }
 }

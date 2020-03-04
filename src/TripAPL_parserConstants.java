@@ -61,23 +61,27 @@ public interface TripAPL_parserConstants {
   /** RegularExpression Id. */
   int RPAR = 31;
   /** RegularExpression Id. */
-  int VBAR = 32;
+  int LSQA = 32;
   /** RegularExpression Id. */
-  int QUSMARK = 33;
+  int RSQA = 33;
   /** RegularExpression Id. */
-  int TRUE = 34;
+  int VBAR = 34;
   /** RegularExpression Id. */
-  int NOT = 35;
+  int QUSMARK = 35;
   /** RegularExpression Id. */
-  int IMPLY = 36;
+  int TRUE = 36;
   /** RegularExpression Id. */
-  int GIVES = 37;
+  int NOT = 37;
   /** RegularExpression Id. */
-  int PNOT = 38;
+  int IMPLY = 38;
   /** RegularExpression Id. */
-  int VAL = 39;
+  int GIVES = 39;
   /** RegularExpression Id. */
-  int VAR = 40;
+  int PNOT = 40;
+  /** RegularExpression Id. */
+  int VAL = 41;
+  /** RegularExpression Id. */
+  int VAR = 42;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -116,6 +120,8 @@ public interface TripAPL_parserConstants {
     "\"Test:\"",
     "\"(\"",
     "\")\"",
+    "\"[\"",
+    "\"]\"",
     "\"|\"",
     "\"?\"",
     "\"true\"",
@@ -125,7 +131,6 @@ public interface TripAPL_parserConstants {
     "\"\\\\+\"",
     "<VAL>",
     "<VAR>",
-    "\"Horn Clause:\"",
   };
 
 }

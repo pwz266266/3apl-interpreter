@@ -3,28 +3,37 @@ Belief Base:
     pocket(20).
     holding(0).
     stock(pen,0).
+    enough(Item) :- price(Item, Price), pocket(Pocket), geq(Pocket, Price).
     stock(pencil,0).
 Goal Base:
     query(),
     buy()
 Capability Base:
     {
-        (received(inform, Saler, price(pen, X), channel(1)) and received(inform, Saler, price(pencil, Y), channel(1)))
+        received(inform, Saler, price(pen, X), channel(1)) and received(inform, Saler, price(pencil, Y), channel(1))
     }
     getPrice(Saler)
     {
         not received(inform, Saler, is(saler), channel(1)), not received(inform, Saler, price(pen, X), channel(1)), not received(inform, Saler, price(pencil, Y), channel(1))
-        , price(pen, X), price(pencil, Y), saler(Saler)
+        , price(pen, X), price(pencil, Y), saler(Saler), available(pen), available(pencil)
     }
 
-    {(price(X,A) and (pocket(Pocket) and (holding(Holding) and (sub(Pocket, A, NPocket) and (sum(Holding,A,NHolding) and geq(NPocket, 0))))))}
-    buy(X)
-    {not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(NHolding), buying(X)}
+    {
+        true
+    }
+    notAvailable(Item)
+    {
+        not available(Item), not received(inform, Saler, no(Item), channel(1))
+    }
 
-    {(received(inform, Saler, sale(X), channel(1)) and (holding(Holding) and (price(X, Price) and
-    (sub(Holding, Price, NHolding) and (stock(X,Count) and sum(Count, 1, NCount))))))}
+    {price(X,A) and pocket(Pocket) and holding(Holding) and sub(Pocket, A, NPocket) and sum(Holding,A,NHolding) and geq(NPocket, 0)}
+    buy(X)
+    {not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(NHolding)}
+
+    {received(inform, Saler, sale(X), channel(1)) and holding(Holding) and price(X, Price) and
+    sub(Holding, Price, NHolding) and stock(X,Count) and sum(Count, 1, NCount)}
     pay(X,Saler)
-    {not received(inform, Saler, sale(X), channel(1)), not holding(Holding), not stock(X,Count), not buying(X),holding(NHolding), stock(X,NCount)}
+    {not received(inform, Saler, sale(X), channel(1)), not holding(Holding), not stock(X,Count),holding(NHolding), stock(X,NCount)}
 
     {true}
     deleteSaler(Saler)
@@ -34,9 +43,9 @@ Capability Base:
     deleteDuplicated(Saler)
     {not received(inform, Saler, is(saler),channel(1))}
 
-    {(price(X,A) and (pocket(Pocket) and (holding(Holding) and (sum(Pocket, A, NPocket) and sub(Holding,A,NHolding)))))}
+    {price(X,A) and pocket(Pocket) and holding(Holding) and sum(Pocket, A, NPocket) and sub(Holding,A,NHolding)}
     putBack(X)
-    {not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(NHolding), not buying(X)}
+    {not pocket(Pocket), not holding(Holding), pocket(NPocket), holding(NHolding)}
 Plan Base:
 
 
@@ -49,75 +58,58 @@ Goal Planning Rule Base:
         while(not received(inform, Saler, is(saler), channel(1))){
             Send(query, ams, is(saler), channel(1));
         };
-        Test: received(inform, Saler, is(saler), channel(1));
+        received(inform, Saler, is(saler), channel(1))?;
         Send(query, Saler, price(), channel(1));
         getPrice(Saler);
     }
 
 
-    <- (received(inform, Saler, is(saler),channel(1)) and saler(Saler)) |
+    <- received(inform, Saler, is(saler),channel(1)) and saler(Saler) |
     {
         deleteDuplicated(Saler);
     }
 
 
-    <- (saler(Saler) and (not received(inform, Saler, no(pencil), channel(1)) and (not buying(pencil) and (pocket(Pocket) and (price(pencil, Price) and geq(Pocket, Price)))))) |
+    <- received(inform, Saler, no(Item), channel(1)) |
     {
-        buy(pencil);
-        Send(query, Saler, buy(pencil), channel(1));
-        pay(pencil,Saler);
+        notAvailable(Item);
     }
 
-
-    <- (saler(Saler) and (not received(inform, Saler, no(pen), channel(1)) and (not buying(pen) and (pocket(Pocket) and (price(pen, Price) and geq(Pocket, Price)))))) |
+    <- saler(Saler) and not received(inform, Saler, no(Item), channel(1)) and available(Item) and enough(Item) |
     {
-        buy(pen);
-        Send(query, Saler, buy(pen), channel(1));
-        pay(pen,Saler);
+        buy(Item);
+        Send(query, Saler, buy(Item), channel(1));
+        pay(Item,Saler);
     }
+
 
     {
         buy()
     }
-    <-  ((pocket(Pocket) and (holding(Holding) and (sum(Pocket, Holding, Total) and eql(Total,0)))) or (received(inform, Saler, no(pen), channel(1)) and received(inform, Saler, no(pencil), channel(1)))) |
+    <-  (pocket(Pocket) and holding(Holding) and sum(Pocket, Holding, Total) and eql(Total,0)) or (received(inform, Saler, no(pen), channel(1)) and received(inform, Saler, no(pencil), channel(1))) |
     {
         deleteSaler(Saler);
     }
 
 Plan Revision Rule Base:
+
+
+
 {
-    pay(pen,Saler);
+    pay(Item,Saler);
 }
-<- received(inform, Saler, no(pen), channel(1)) |
+<- (received(inform, Saler, no(Item), channel(1)) or not available(Item) )|
 {
-    putBack(pen);
+    putBack(Item);
 }
 
 
 {
-    pay(pencil,Saler);
+    buy(Item);
+    Send(query, Saler, buy(Item), channel(1));
+    pay(Item,Saler);
 }
-<- received(inform, Saler, no(pencil), channel(1)) |
+<- (price(Item,Price) and (pocket(Pocket) and les(Pocket,Price))) |
 {
-    putBack(pencil);
-}
-
-{
-    buy(pen);
-    Send(query, Saler, buy(pen), channel(1));
-    pay(pen,Saler);
-}
-<- (price(pen,Price) and (pocket(Pocket) and les(Pocket,Price))) |
-{
-    putBack(pen);
-}
-
-{
-    buy(pencil);
-    Send(query, Saler, buy(pencil), channel(1));
-    pay(pencil,Saler);
-}
-<- (price(pencil,Price) and (pocket(Pocket) and les(Pocket,Price))) |
-{
-    putBack(pencil);
+    putBack(Item);
 }

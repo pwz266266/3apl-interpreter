@@ -19,7 +19,7 @@ public abstract class Environment implements Runnable{
         this.terminate = false;
     }
     public void addEntity(ControllableEntity entity){
-        entities.put(entity.thisID, entity);
+        entities.put(entity.getID(), entity);
     }
 
     public Environment() {
@@ -56,4 +56,11 @@ public abstract class Environment implements Runnable{
     }
 
     abstract public void proceedAction(EnvironmentAction action);
+
+    abstract  public void showGUI();
+
+    abstract public HashMap<String, ArrayList<String>> CreatableEntity();
+
+    abstract public int createEntity(String type, ArrayList<String> parameter);
+
 }

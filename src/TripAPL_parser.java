@@ -19,11 +19,15 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     PlanRevisionRuleBase pr = null;
     jj_consume_token(NAME);
     jj_consume_token(COLON);
-    if (jj_2_1(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case VAR:
       t = jj_consume_token(VAR);
-    } else if (jj_2_2(3)) {
+      break;
+    case VAL:
       t = jj_consume_token(VAL);
-    } else {
+      break;
+    default:
+      jj_la1[0] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -55,9 +59,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     ArrayList<Capability> result = new ArrayList<Capability>();
     label_1:
     while (true) {
-      if (jj_2_3(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LBRACE:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[1] = jj_gen;
         break label_1;
       }
       buffer = capability();
@@ -81,17 +88,24 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     nameT = jj_consume_token(VAL);
                                                             name = nameT.image;
     jj_consume_token(LPAR);
-    if (jj_2_4(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case VAL:
+    case VAR:
       t = atom();
                                                                                                      arguments.add(t.toString());
-    } else {
+      break;
+    default:
+      jj_la1[2] = jj_gen;
       ;
     }
     label_2:
     while (true) {
-      if (jj_2_5(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[3] = jj_gen;
         break label_2;
       }
       jj_consume_token(COMMA);
@@ -110,67 +124,81 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     ArrayList<GpredClause> bs = new ArrayList<GpredClause>();
     ArrayList<String> hs = new ArrayList<String>();
     StringBuilder horn;
-    GpredClause bufferG;
     VpredClause bufferV;
-    Literal bufferL;
+    boolean isHorn = false;
     label_3:
     while (true) {
-      if (jj_2_6(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LSQA:
+      case VAL:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[4] = jj_gen;
         break label_3;
       }
-      if (jj_2_12(3)) {
-        bufferG = gpredclause();
-        jj_consume_token(PROLOGEND);
-                                           bs.add(bufferG);
-      } else if (jj_2_13(3)) {
-        jj_consume_token(41);
-                      horn = new StringBuilder();
-        bufferL = literal();
-                                                                         horn.append(bufferL.toString());
+       isHorn=false;
+      bufferV = vpredclause();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case GIVES:
         jj_consume_token(GIVES);
-                                                                                                                    horn.append(" :- ");
-        if (jj_2_7(3)) {
+              horn = new StringBuilder();horn.append(bufferV.toString());isHorn = true; horn.append(" :- ");
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case PNOT:
           jj_consume_token(PNOT);
-                                                                                                                                                   horn.append("\u005c\u005c+ ");
-        } else {
+                                                                                                                        horn.append("\u005c\u005c+ ");
+          break;
+        default:
+          jj_la1[5] = jj_gen;
           ;
         }
-        bufferL = literal();
-                                                                                                                                                                                                horn.append(bufferL.toString());
+        bufferV = vpredclause();
+                                                                                                                                                                         horn.append(bufferV.toString());
         label_4:
         while (true) {
-          if (jj_2_8(3)) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case COMMA:
+          case SEMICOL:
             ;
-          } else {
+            break;
+          default:
+            jj_la1[6] = jj_gen;
             break label_4;
           }
-          if (jj_2_9(3)) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case COMMA:
             jj_consume_token(COMMA);
-                                                                                                                                                                                                                                             horn.append(", ");
-          } else if (jj_2_10(3)) {
+                                                                                                                                                                                                                      horn.append(", ");
+            break;
+          case SEMICOL:
             jj_consume_token(SEMICOL);
-                                                                                                                                                                                                                                                                            horn.append("; ");
-          } else {
+                                                                                                                                                                                                                                                     horn.append("; ");
+            break;
+          default:
+            jj_la1[7] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
-          if (jj_2_11(3)) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case PNOT:
             jj_consume_token(PNOT);
-                                                                                                                                                                                                                                                                                                         horn.append("\u005c\u005c+ ");
-          } else {
+                                                                                                                                                                                                                                                                                  horn.append("\u005c\u005c+ ");
+            break;
+          default:
+            jj_la1[8] = jj_gen;
             ;
           }
-          bufferL = literal();
-                                                                                                                                                                                                                                                                                                                                                      horn.append(bufferL.toString());
+          bufferV = vpredclause();
+                                                                                                                                                                                                                                                                                                                                   horn.append(bufferV.toString());
         }
-        jj_consume_token(PROLOGEND);
-                                                                                                                                                                                                                                                                                                                                                                                                       hs.add(horn.toString());
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
+                                                                                                                                                                                                                                                                                                                                                                        hs.add(horn.toString());
+        break;
+      default:
+        jj_la1[9] = jj_gen;
+        ;
       }
+      if(!isHorn){bs.add(bufferV);}
+      jj_consume_token(PROLOGEND);
     }
      {if (true) return new BeliefBase(hs,bs);}
     throw new Error("Missing return statement in function");
@@ -179,21 +207,28 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   final public GoalBase goals() throws ParseException {
     Goal buffer;
     ArrayList<Goal> result = new ArrayList<Goal>();
-    if (jj_2_15(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+    case VAL:
       buffer = goal();
                       result.add(buffer);
       label_5:
       while (true) {
-        if (jj_2_14(3)) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
           ;
-        } else {
+          break;
+        default:
+          jj_la1[10] = jj_gen;
           break label_5;
         }
         jj_consume_token(COMMA);
         buffer = goal();
                                                                      result.add(buffer);
       }
-    } else {
+      break;
+    default:
+      jj_la1[11] = jj_gen;
       ;
     }
      {if (true) return new GoalBase(result);}
@@ -207,9 +242,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
                             component.add(buffer);
     label_6:
     while (true) {
-      if (jj_2_16(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[12] = jj_gen;
         break label_6;
       }
       jj_consume_token(AND);
@@ -224,11 +262,14 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Goal goal0 = null;
     Query condition;
     SeqPlan plan0;
-    if (jj_2_17(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LBRACE:
       jj_consume_token(LBRACE);
       goal0 = goal();
       jj_consume_token(RBRACE);
-    } else {
+      break;
+    default:
+      jj_la1[13] = jj_gen;
       ;
     }
     jj_consume_token(IMPLY);
@@ -263,9 +304,13 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     GoalPlanningRule g;
     label_7:
     while (true) {
-      if (jj_2_18(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LBRACE:
+      case IMPLY:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[14] = jj_gen;
         break label_7;
       }
       g = g_rule();
@@ -280,9 +325,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     PlanRevisionRule p;
     label_8:
     while (true) {
-      if (jj_2_19(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LBRACE:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[15] = jj_gen;
         break label_8;
       }
       p = p_rule();
@@ -297,9 +345,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     ArrayList<Plan> plans = new ArrayList<Plan>();
     label_9:
     while (true) {
-      if (jj_2_20(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LBRACE:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[16] = jj_gen;
         break label_9;
       }
       buffer = plan();
@@ -326,9 +377,20 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       buffer = basicplan();
                             components.add(buffer);
       jj_consume_token(SEMICOL);
-      if (jj_2_21(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IF:
+      case WHILE:
+      case SEND:
+      case Env:
+      case LPAR:
+      case LSQA:
+      case TRUE:
+      case NOT:
+      case VAL:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[17] = jj_gen;
         break label_10;
       }
     }
@@ -338,110 +400,150 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public BasicPlan basicplan() throws ParseException {
     Query testbuffer;
-    ArrayList<Atom> arguments = new ArrayList<Atom>();
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
     ArrayList<BasicPlan> components = new ArrayList<BasicPlan>();
     BasicPlan buffer;
     VpredClause content;
     VpredClause reply;
-    Atom argbuffer;
+    GpredClause argbuffer;
     Token t;
     SeqPlan ifPlan;
     SeqPlan elsePlan;
-    if (jj_2_27(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case Env:
       jj_consume_token(Env);
       jj_consume_token(LPAR);
-      if (jj_2_23(3)) {
-        argbuffer = atom();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LSQA:
+      case VAL:
+      case VAR:
+        argbuffer = aOrl();
                                         arguments.add(argbuffer);
         label_11:
         while (true) {
-          if (jj_2_22(3)) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case COMMA:
             ;
-          } else {
+            break;
+          default:
+            jj_la1[18] = jj_gen;
             break label_11;
           }
           jj_consume_token(COMMA);
-          argbuffer = atom();
+          argbuffer = aOrl();
                                                                                                 arguments.add(argbuffer);
         }
-      } else {
+        break;
+      default:
+        jj_la1[19] = jj_gen;
         ;
       }
       jj_consume_token(RPAR);
                                                                                                                                        {if (true) return new EnvAction(arguments);}
-    } else if (jj_2_28(3)) {
-      jj_consume_token(TEST);
-      testbuffer = query();
-                                    {if (true) return new TestAction(testbuffer);}
-    } else if (jj_2_29(3)) {
-      jj_consume_token(SEND);
-      jj_consume_token(LPAR);
-      t = jj_consume_token(VAL);
-      jj_consume_token(COMMA);
-      argbuffer = atom();
-      jj_consume_token(COMMA);
-      content = vpredclause();
-      jj_consume_token(COMMA);
-      reply = vpredclause();
-      jj_consume_token(RPAR);
-                                                                                                                {if (true) return new SendAction(t.image, argbuffer.toString(), content, reply);}
-    } else if (jj_2_30(3)) {
-      t = jj_consume_token(VAL);
-      jj_consume_token(LPAR);
-      if (jj_2_25(3)) {
-        argbuffer = atom();
-                                               arguments.add(argbuffer);
-        label_12:
-        while (true) {
-          if (jj_2_24(3)) {
-            ;
-          } else {
-            break label_12;
-          }
-          jj_consume_token(COMMA);
-          argbuffer = atom();
-                                                                                                       arguments.add(argbuffer);
-        }
+      break;
+    default:
+      jj_la1[23] = jj_gen;
+      if (jj_2_1(2147483647)) {
+        testbuffer = query();
+        jj_consume_token(QUSMARK);
+                                                                    {if (true) return new TestAction(testbuffer);}
       } else {
-        ;
-      }
-      jj_consume_token(RPAR);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case SEND:
+          jj_consume_token(SEND);
+          jj_consume_token(LPAR);
+          t = jj_consume_token(VAL);
+          jj_consume_token(COMMA);
+          argbuffer = aOrl();
+          jj_consume_token(COMMA);
+          content = vpredclause();
+          jj_consume_token(COMMA);
+          reply = vpredclause();
+          jj_consume_token(RPAR);
+                                                                                                                {if (true) return new SendAction(t.image, argbuffer.toString(), content, reply);}
+          break;
+        case VAL:
+          t = jj_consume_token(VAL);
+          jj_consume_token(LPAR);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case LSQA:
+          case VAL:
+          case VAR:
+            argbuffer = aOrl();
+                                               arguments.add(argbuffer);
+            label_12:
+            while (true) {
+              switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+              case COMMA:
+                ;
+                break;
+              default:
+                jj_la1[20] = jj_gen;
+                break label_12;
+              }
+              jj_consume_token(COMMA);
+              argbuffer = aOrl();
+                                                                                                       arguments.add(argbuffer);
+            }
+            break;
+          default:
+            jj_la1[21] = jj_gen;
+            ;
+          }
+          jj_consume_token(RPAR);
                                                                                                                                               {if (true) return new CapAction(t.image, arguments);}
-    } else if (jj_2_31(3)) {
-      jj_consume_token(WHILE);
-      jj_consume_token(LPAR);
-      testbuffer = query();
-      jj_consume_token(RPAR);
-      jj_consume_token(LBRACE);
-      label_13:
-      while (true) {
-        buffer = basicplan();
+          break;
+        case WHILE:
+          jj_consume_token(WHILE);
+          jj_consume_token(LPAR);
+          testbuffer = query();
+          jj_consume_token(RPAR);
+          jj_consume_token(LBRACE);
+          label_13:
+          while (true) {
+            buffer = basicplan();
                                                                                   components.add(buffer);
-        jj_consume_token(SEMICOL);
-        if (jj_2_26(3)) {
-          ;
-        } else {
-          break label_13;
+            jj_consume_token(SEMICOL);
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case IF:
+            case WHILE:
+            case SEND:
+            case Env:
+            case LPAR:
+            case LSQA:
+            case TRUE:
+            case NOT:
+            case VAL:
+              ;
+              break;
+            default:
+              jj_la1[22] = jj_gen;
+              break label_13;
+            }
+          }
+          jj_consume_token(RBRACE);
+                                                                                                                                 {if (true) return new WhilePlan(components, testbuffer);}
+          break;
+        case IF:
+          jj_consume_token(IF);
+          jj_consume_token(LPAR);
+          testbuffer = query();
+          jj_consume_token(RPAR);
+          jj_consume_token(LBRACE);
+          ifPlan = seqPlan();
+          jj_consume_token(RBRACE);
+          jj_consume_token(ELSE);
+          jj_consume_token(LBRACE);
+          elsePlan = seqPlan();
+          jj_consume_token(RBRACE);
+                                                                                                                                   {if (true) return new IfPlan(ifPlan, elsePlan, testbuffer);}
+          break;
+        default:
+          jj_la1[24] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
         }
       }
-      jj_consume_token(RBRACE);
-                                                                                                                                 {if (true) return new WhilePlan(components, testbuffer);}
-    } else if (jj_2_32(3)) {
-      jj_consume_token(IF);
-      jj_consume_token(LPAR);
-      testbuffer = query();
-      jj_consume_token(RPAR);
-      jj_consume_token(LBRACE);
-      ifPlan = seqPlan();
-      jj_consume_token(RBRACE);
-      jj_consume_token(ELSE);
-      jj_consume_token(LBRACE);
-      elsePlan = seqPlan();
-      jj_consume_token(RBRACE);
-                                                                                                                                   {if (true) return new IfPlan(ifPlan, elsePlan, testbuffer);}
-    } else {
-      jj_consume_token(-1);
-      throw new ParseException();
     }
     throw new Error("Missing return statement in function");
   }
@@ -453,9 +555,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
                         result.add(buffer);
     label_14:
     while (true) {
-      if (jj_2_33(3)) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
         ;
-      } else {
+        break;
+      default:
+        jj_la1[25] = jj_gen;
         break label_14;
       }
       jj_consume_token(COMMA);
@@ -470,26 +575,52 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Query sub0;
     Query sub1;
     boolean isOr;
-    if (jj_2_36(3)) {
-      sub0 = singlequery();
-                           {if (true) return sub0;}
-    } else if (jj_2_37(3)) {
+    if (jj_2_2(2147483647)) {
+      sub0 = wff();
+      jj_consume_token(AND);
+      sub1 = query();
+                                                                {if (true) return new wffBinary(false, sub0, sub1);}
+    } else if (jj_2_3(2147483647)) {
+      sub0 = wff();
+      jj_consume_token(OR);
+      sub1 = query();
+                                                               {if (true) return new wffBinary(true, sub0, sub1);}
+    } else if (jj_2_4(2147483647)) {
+      sub0 = wff();
+                                     {if (true) return sub0;}
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public Query wff() throws ParseException {
+    Query sub0;
+    Query sub1;
+    boolean isOr;
+    if (jj_2_5(2147483647)) {
       jj_consume_token(LPAR);
-      sub0 = query();
-      if (jj_2_34(3)) {
-        jj_consume_token(OR);
-        sub1 = query();
-        jj_consume_token(RPAR);
-                                                           {if (true) return new wffBinary(true, sub0, sub1);}
-      } else if (jj_2_35(3)) {
-        jj_consume_token(AND);
-        sub1 = query();
-        jj_consume_token(RPAR);
-                                  {if (true) return new wffBinary(false, sub0, sub1);}
-      } else {
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+      sub0 = wff();
+      jj_consume_token(OR);
+      sub1 = query();
+      jj_consume_token(RPAR);
+                                                                                  {if (true) return new wffBinary(true, sub0, sub1);}
+    } else if (jj_2_6(2147483647)) {
+      jj_consume_token(LPAR);
+      sub0 = wff();
+      jj_consume_token(AND);
+      sub1 = query();
+      jj_consume_token(RPAR);
+                                                                                      {if (true) return new wffBinary(false, sub0, sub1);}
+    } else if (jj_2_7(2147483647)) {
+      jj_consume_token(LPAR);
+      sub0 = wff();
+      jj_consume_token(RPAR);
+                                                                  {if (true) return sub0;}
+    } else if (jj_2_8(2147483647)) {
+      sub0 = singlequery();
+                                                      {if (true) return sub0;}
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -499,13 +630,19 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Query singlequery() throws ParseException {
     Query query;
-    if (jj_2_38(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
       query = truequery();
                           {if (true) return query;}
-    } else if (jj_2_39(3)) {
+      break;
+    case LSQA:
+    case NOT:
+    case VAL:
       query = literal();
                                                                 {if (true) return query;}
-    } else {
+      break;
+    default:
+      jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -520,14 +657,19 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Literal literal() throws ParseException {
     VpredClause clause;
-    if (jj_2_40(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+    case VAL:
       clause = vpredclause();
                              {if (true) return new Literal(false, clause);}
-    } else if (jj_2_41(3)) {
+      break;
+    case NOT:
       jj_consume_token(NOT);
       clause = vpredclause();
                                                                                                    {if (true) return new Literal(true, clause);}
-    } else {
+      break;
+    default:
+      jj_la1[27] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -538,27 +680,46 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Token t;
     ArrayList<GpredClause> arguments = new ArrayList();
     GpredClause buffer;
-    t = jj_consume_token(VAL);
-    jj_consume_token(LPAR);
-    if (jj_2_42(3)) {
-      buffer = gsubClause();
-                                             arguments.add(buffer);
-    } else {
-      ;
-    }
-    label_15:
-    while (true) {
-      if (jj_2_43(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+      buffer = list();
+                      {if (true) return buffer;}
+      break;
+    case VAL:
+      t = jj_consume_token(VAL);
+      jj_consume_token(LPAR);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LSQA:
+      case VAL:
+        buffer = gsubClause();
+                                                                                   arguments.add(buffer);
+        break;
+      default:
+        jj_la1[28] = jj_gen;
         ;
-      } else {
-        break label_15;
       }
-      jj_consume_token(COMMA);
-      buffer = gsubClause();
-                                                                                                        arguments.add(buffer);
-    }
-    jj_consume_token(RPAR);
+      label_15:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[29] = jj_gen;
+          break label_15;
+        }
+        jj_consume_token(COMMA);
+        buffer = gsubClause();
+                                                                                                                                              arguments.add(buffer);
+      }
+      jj_consume_token(RPAR);
      {if (true) return new GpredClause(t.image, arguments);}
+      break;
+    default:
+      jj_la1[30] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -566,32 +727,54 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Atom predicate;
     ArrayList<GpredClause> arguments = new ArrayList();
     GpredClause buffer;
-    predicate = val();
-    if (jj_2_46(3)) {
-      jj_consume_token(LPAR);
-      if (jj_2_44(3)) {
-        buffer = gsubClause();
-                                                   arguments.add(buffer);
-      } else {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+      buffer = list();
+                      {if (true) return buffer;}
+      break;
+    case VAL:
+      predicate = val();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAR:
+        jj_consume_token(LPAR);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case LSQA:
+        case VAL:
+          buffer = gsubClause();
+                                                                                         arguments.add(buffer);
+          break;
+        default:
+          jj_la1[31] = jj_gen;
+          ;
+        }
+        label_16:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case COMMA:
+            ;
+            break;
+          default:
+            jj_la1[32] = jj_gen;
+            break label_16;
+          }
+          jj_consume_token(COMMA);
+          buffer = gsubClause();
+                                                                                                                                                    arguments.add(buffer);
+        }
+        jj_consume_token(RPAR);
+                                                                                                                                                                                   {if (true) return new GpredClause(predicate.toString(),arguments);}
+        break;
+      default:
+        jj_la1[33] = jj_gen;
         ;
       }
-      label_16:
-      while (true) {
-        if (jj_2_45(3)) {
-          ;
-        } else {
-          break label_16;
-        }
-        jj_consume_token(COMMA);
-        buffer = gsubClause();
-                                                                                                              arguments.add(buffer);
-      }
-      jj_consume_token(RPAR);
-                                                                                                                                             {if (true) return new GpredClause(predicate.toString(),arguments);}
-    } else {
-      ;
+                                                                                                                                                                                                                                                {if (true) return predicate;}
+      break;
+    default:
+      jj_la1[34] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-                                                                                                                                                                                                          {if (true) return predicate;}
     throw new Error("Missing return statement in function");
   }
 
@@ -599,27 +782,48 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Token t;
     ArrayList<GpredClause> arguments = new ArrayList();
     GpredClause buffer;
-    t = jj_consume_token(VAL);
-    jj_consume_token(LPAR);
-    if (jj_2_47(3)) {
-      buffer = vsubClause();
-                                             arguments.add(buffer);
-    } else {
-      ;
-    }
-    label_17:
-    while (true) {
-      if (jj_2_48(3)) {
+    PrologList prologlist;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+      prologlist = list();
+                          {if (true) return prologlist;}
+      break;
+    case VAL:
+      t = jj_consume_token(VAL);
+      jj_consume_token(LPAR);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LSQA:
+      case VAL:
+      case VAR:
+        buffer = vsubClause();
+                                                                                           arguments.add(buffer);
+        break;
+      default:
+        jj_la1[35] = jj_gen;
         ;
-      } else {
-        break label_17;
       }
-      jj_consume_token(COMMA);
-      buffer = vsubClause();
-                                                                                                        arguments.add(buffer);
-    }
-    jj_consume_token(RPAR);
+      label_17:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[36] = jj_gen;
+          break label_17;
+        }
+        jj_consume_token(COMMA);
+        buffer = vsubClause();
+                                                                                                                                                      arguments.add(buffer);
+      }
+      jj_consume_token(RPAR);
      {if (true) return new VpredClause(t.image, arguments);}
+      break;
+    default:
+      jj_la1[37] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -627,37 +831,65 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     Atom predicate;
     ArrayList<GpredClause> arguments = new ArrayList();
     GpredClause buffer;
-    if (jj_2_52(3)) {
-      predicate = val();
-      if (jj_2_51(3)) {
-        jj_consume_token(LPAR);
-        if (jj_2_49(3)) {
-          buffer = vsubClause();
-                                                    arguments.add(buffer);
-        } else {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+      buffer = list();
+                       {if (true) return buffer;}
+      break;
+    case VAL:
+    case VAR:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case VAL:
+        predicate = val();
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case LPAR:
+          jj_consume_token(LPAR);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case LSQA:
+          case VAL:
+          case VAR:
+            buffer = vsubClause();
+                                                                                           arguments.add(buffer);
+            break;
+          default:
+            jj_la1[38] = jj_gen;
+            ;
+          }
+          label_18:
+          while (true) {
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case COMMA:
+              ;
+              break;
+            default:
+              jj_la1[39] = jj_gen;
+              break label_18;
+            }
+            jj_consume_token(COMMA);
+            buffer = vsubClause();
+                                                                                                                                                      arguments.add(buffer);
+          }
+          jj_consume_token(RPAR);
+                                                                                                                                                                                     {if (true) return new GpredClause(predicate.toString(),arguments);}
+          break;
+        default:
+          jj_la1[40] = jj_gen;
           ;
         }
-        label_18:
-        while (true) {
-          if (jj_2_50(3)) {
-            ;
-          } else {
-            break label_18;
-          }
-          jj_consume_token(COMMA);
-          buffer = vsubClause();
-                                                                                                               arguments.add(buffer);
-        }
-        jj_consume_token(RPAR);
-                                                                                                                                              {if (true) return new GpredClause(predicate.toString(),arguments);}
-      } else {
-        ;
+                                                                                                                                                                                                                                                 {if (true) return predicate;}
+        break;
+      case VAR:
+        predicate = var();
+                                                                                                                                                                                                                                                                                           {if (true) return predicate;}
+        break;
+      default:
+        jj_la1[41] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
-                                                                                                                                                                                                          {if (true) return predicate;}
-    } else if (jj_2_53(3)) {
-      predicate = var();
-                                                                                                                                                                                                                                                    {if (true) return predicate;}
-    } else {
+      break;
+    default:
+      jj_la1[42] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -680,16 +912,83 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   final public Atom atom() throws ParseException {
     Atom a;
-    if (jj_2_54(3)) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case VAR:
       a = var();
                 {if (true) return a;}
-    } else if (jj_2_55(3)) {
+      break;
+    case VAL:
       a = val();
                                          {if (true) return a;}
-    } else {
+      break;
+    default:
+      jj_la1[43] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
+  }
+
+  final public PrologList list() throws ParseException {
+    GpredClause buffer = null;
+    GpredClause finalPart = null;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+    jj_consume_token(LSQA);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LSQA:
+    case VAL:
+    case VAR:
+      buffer = vsubClause();
+                                   arguments.add(buffer);
+      label_19:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMMA:
+          ;
+          break;
+        default:
+          jj_la1[44] = jj_gen;
+          break label_19;
+        }
+        jj_consume_token(COMMA);
+        buffer = vsubClause();
+                                                                                           arguments.add(buffer);
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case VBAR:
+        jj_consume_token(VBAR);
+        finalPart = vsubClause();
+        break;
+      default:
+        jj_la1[45] = jj_gen;
+        ;
+      }
+      break;
+    default:
+      jj_la1[46] = jj_gen;
+      ;
+    }
+    jj_consume_token(RSQA);
+     {if (true) return new PrologList(finalPart, arguments);}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public GpredClause aOrl() throws ParseException {
+    GpredClause x;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case VAL:
+    case VAR:
+      x = atom();
+      break;
+    case LSQA:
+      x = list();
+      break;
+    default:
+      jj_la1[47] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+                               {if (true) return x;}
     throw new Error("Missing return statement in function");
   }
 
@@ -749,859 +1048,321 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     finally { jj_save(7, xla); }
   }
 
-  private boolean jj_2_9(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_9(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(8, xla); }
-  }
-
-  private boolean jj_2_10(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_10(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(9, xla); }
-  }
-
-  private boolean jj_2_11(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_11(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(10, xla); }
-  }
-
-  private boolean jj_2_12(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_12(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(11, xla); }
-  }
-
-  private boolean jj_2_13(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_13(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(12, xla); }
-  }
-
-  private boolean jj_2_14(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_14(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(13, xla); }
-  }
-
-  private boolean jj_2_15(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_15(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(14, xla); }
-  }
-
-  private boolean jj_2_16(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_16(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(15, xla); }
-  }
-
-  private boolean jj_2_17(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_17(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(16, xla); }
-  }
-
-  private boolean jj_2_18(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_18(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(17, xla); }
-  }
-
-  private boolean jj_2_19(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_19(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(18, xla); }
-  }
-
-  private boolean jj_2_20(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_20(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(19, xla); }
-  }
-
-  private boolean jj_2_21(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_21(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(20, xla); }
-  }
-
-  private boolean jj_2_22(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_22(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(21, xla); }
-  }
-
-  private boolean jj_2_23(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_23(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(22, xla); }
-  }
-
-  private boolean jj_2_24(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_24(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(23, xla); }
-  }
-
-  private boolean jj_2_25(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_25(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(24, xla); }
-  }
-
-  private boolean jj_2_26(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_26(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(25, xla); }
-  }
-
-  private boolean jj_2_27(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_27(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(26, xla); }
-  }
-
-  private boolean jj_2_28(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_28(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(27, xla); }
-  }
-
-  private boolean jj_2_29(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_29(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(28, xla); }
-  }
-
-  private boolean jj_2_30(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_30(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(29, xla); }
-  }
-
-  private boolean jj_2_31(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_31(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(30, xla); }
-  }
-
-  private boolean jj_2_32(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_32(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(31, xla); }
-  }
-
-  private boolean jj_2_33(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_33(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(32, xla); }
-  }
-
-  private boolean jj_2_34(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_34(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(33, xla); }
-  }
-
-  private boolean jj_2_35(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_35(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(34, xla); }
-  }
-
-  private boolean jj_2_36(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_36(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(35, xla); }
-  }
-
-  private boolean jj_2_37(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_37(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(36, xla); }
-  }
-
-  private boolean jj_2_38(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_38(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(37, xla); }
-  }
-
-  private boolean jj_2_39(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_39(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(38, xla); }
-  }
-
-  private boolean jj_2_40(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_40(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(39, xla); }
-  }
-
-  private boolean jj_2_41(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_41(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(40, xla); }
-  }
-
-  private boolean jj_2_42(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_42(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(41, xla); }
-  }
-
-  private boolean jj_2_43(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_43(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(42, xla); }
-  }
-
-  private boolean jj_2_44(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_44(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(43, xla); }
-  }
-
-  private boolean jj_2_45(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_45(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(44, xla); }
-  }
-
-  private boolean jj_2_46(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_46(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(45, xla); }
-  }
-
-  private boolean jj_2_47(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_47(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(46, xla); }
-  }
-
-  private boolean jj_2_48(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_48(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(47, xla); }
-  }
-
-  private boolean jj_2_49(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_49(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(48, xla); }
-  }
-
-  private boolean jj_2_50(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_50(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(49, xla); }
-  }
-
-  private boolean jj_2_51(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_51(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(50, xla); }
-  }
-
-  private boolean jj_2_52(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_52(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(51, xla); }
-  }
-
-  private boolean jj_2_53(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_53(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(52, xla); }
-  }
-
-  private boolean jj_2_54(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_54(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(53, xla); }
-  }
-
-  private boolean jj_2_55(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_55(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(54, xla); }
-  }
-
-  private boolean jj_3R_34() {
-    if (jj_scan_token(VAL)) return true;
+  private boolean jj_3_1() {
+    if (jj_3R_20()) return true;
+    if (jj_scan_token(QUSMARK)) return true;
     return false;
   }
 
-  private boolean jj_3_47() {
+  private boolean jj_3R_36() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_37()) {
+    jj_scanpos = xsp;
+    if (jj_3R_38()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_37() {
+    if (jj_3R_39()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
     if (jj_3R_33()) return true;
     return false;
   }
 
-  private boolean jj_3_17() {
-    if (jj_scan_token(LBRACE)) return true;
-    if (jj_3R_23()) return true;
+  private boolean jj_3R_49() {
+    if (jj_3R_52()) return true;
     return false;
   }
 
-  private boolean jj_3R_24() {
+  private boolean jj_3R_53() {
+    if (jj_3R_43()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_51() {
+    if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_17()) jj_scanpos = xsp;
-    if (jj_scan_token(IMPLY)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(VBAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(COMMA)) return true;
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3_10()) return true;
+    if (jj_3R_53()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_54()) { jj_scanpos = xsp; break; }
     }
-    xsp = jj_scanpos;
-    if (jj_3_11()) jj_scanpos = xsp;
-    if (jj_3R_21()) return true;
+    if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_44() {
-    if (jj_3R_32()) return true;
+  private boolean jj_3R_45() {
+    if (jj_scan_token(VBAR)) return true;
+    if (jj_3R_43()) return true;
     return false;
   }
 
-  private boolean jj_3_52() {
-    if (jj_3R_34()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_51()) jj_scanpos = xsp;
+  private boolean jj_3R_40() {
+    if (jj_3R_43()) return true;
     return false;
   }
 
   private boolean jj_3R_33() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_52()) {
+    if (jj_3R_34()) {
     jj_scanpos = xsp;
-    if (jj_3_53()) return true;
+    if (jj_3R_35()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_46() {
-    if (jj_scan_token(LPAR)) return true;
+  private boolean jj_3R_34() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_42() {
+    if (jj_3R_43()) return true;
     Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_44()) jj_scanpos = xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_45()) { jj_scanpos = xsp; break; }
+      if (jj_3R_44()) { jj_scanpos = xsp; break; }
     }
-    if (jj_scan_token(RPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_23() {
-    if (jj_3R_22()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_31() {
-    if (jj_scan_token(VAL)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_47()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_48()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(RPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_42() {
-    if (jj_3R_32()) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  private boolean jj_3_39() {
-    if (jj_3R_21()) return true;
+    if (jj_3R_45()) jj_scanpos = xsp;
     return false;
   }
 
   private boolean jj_3R_32() {
-    if (jj_3R_34()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_46()) jj_scanpos = xsp;
+    if (jj_scan_token(TRUE)) return true;
     return false;
   }
 
-  private boolean jj_3_6() {
+  private boolean jj_3R_48() {
+    if (jj_3R_50()) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_12()) {
-    jj_scanpos = xsp;
-    if (jj_3_13()) return true;
-    }
+    if (jj_3R_51()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3_12() {
+  private boolean jj_3_8() {
     if (jj_3R_22()) return true;
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_scan_token(41)) return true;
-    if (jj_3R_21()) return true;
+  private boolean jj_3R_47() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_48()) {
+    jj_scanpos = xsp;
+    if (jj_3R_49()) return true;
+    }
     return false;
   }
 
-  private boolean jj_3_24() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_20()) return true;
+  private boolean jj_3_7() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(RPAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(AND)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_39() {
+    if (jj_scan_token(LSQA)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_42()) jj_scanpos = xsp;
+    if (jj_scan_token(RSQA)) return true;
     return false;
   }
 
   private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_31()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(OR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_30() {
+    if (jj_3R_32()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_38() {
     if (jj_scan_token(VAL)) return true;
     if (jj_scan_token(LPAR)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_42()) jj_scanpos = xsp;
+    if (jj_3R_40()) jj_scanpos = xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_43()) { jj_scanpos = xsp; break; }
+      if (jj_3R_41()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_22() {
-    if (jj_scan_token(COMMA)) return true;
+  private boolean jj_3R_29() {
+    if (jj_3R_22()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(RPAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(AND)) return true;
     if (jj_3R_20()) return true;
+    if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3R_19() {
-    if (jj_scan_token(LBRACE)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(RBRACE)) return true;
+  private boolean jj_3_4() {
+    if (jj_3R_21()) return true;
     return false;
   }
 
-  private boolean jj_3_40() {
-    if (jj_3R_31()) return true;
+  private boolean jj_3R_26() {
+    if (jj_scan_token(LPAR)) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(OR)) return true;
+    if (jj_3R_20()) return true;
+    if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
   private boolean jj_3R_21() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_40()) {
+    if (jj_3R_26()) {
     jj_scanpos = xsp;
-    if (jj_3_41()) return true;
+    if (jj_3R_27()) {
+    jj_scanpos = xsp;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
     }
-    return false;
-  }
-
-  private boolean jj_3_34() {
-    if (jj_scan_token(OR)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(RPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_33() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_scan_token(VAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_26() {
-    if (jj_3R_27()) return true;
-    if (jj_scan_token(SEMICOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_30() {
-    if (jj_scan_token(TRUE)) return true;
+    }
+    }
     return false;
   }
 
   private boolean jj_3_3() {
-    if (jj_3R_19()) return true;
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(OR)) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_38() {
-    if (jj_3R_30()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_38()) {
-    jj_scanpos = xsp;
-    if (jj_3_39()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_37() {
-    if (jj_scan_token(LPAR)) return true;
-    if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_34()) {
-    jj_scanpos = xsp;
-    if (jj_3_35()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_35() {
+  private boolean jj_3_2() {
+    if (jj_3R_21()) return true;
     if (jj_scan_token(AND)) return true;
-    if (jj_3R_28()) return true;
-    if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3_36() {
-    if (jj_3R_29()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_28() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_25() {
-    if (jj_3R_20()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_24()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_scan_token(PNOT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_23() {
-    if (jj_3R_20()) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_22()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_32() {
-    if (jj_scan_token(IF)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3_31() {
-    if (jj_scan_token(WHILE)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3_30() {
-    if (jj_scan_token(VAL)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_25()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_29() {
-    if (jj_scan_token(SEND)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    if (jj_scan_token(VAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_28() {
-    if (jj_scan_token(TEST)) return true;
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
-  private boolean jj_3_5() {
+  private boolean jj_3R_54() {
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_20()) return true;
+    if (jj_3R_43()) return true;
     return false;
   }
 
-  private boolean jj_3_27() {
-    if (jj_scan_token(Env)) return true;
-    if (jj_scan_token(LPAR)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_23()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_27() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_27()) {
-    jj_scanpos = xsp;
-    if (jj_3_28()) {
-    jj_scanpos = xsp;
-    if (jj_3_29()) {
-    jj_scanpos = xsp;
-    if (jj_3_30()) {
-    jj_scanpos = xsp;
-    if (jj_3_31()) {
-    jj_scanpos = xsp;
-    if (jj_3_32()) return true;
-    }
-    }
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_50() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3_21() {
-    if (jj_3R_27()) return true;
-    if (jj_scan_token(SEMICOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_36() {
-    Token xsp;
-    if (jj_3_21()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_21()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_scan_token(PNOT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_48() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    if (jj_scan_token(LBRACE)) return true;
+  private boolean jj_3R_35() {
+    if (jj_scan_token(NOT)) return true;
     if (jj_3R_36()) return true;
     return false;
   }
 
-  private boolean jj_3_45() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_32()) return true;
+  private boolean jj_3R_52() {
+    if (jj_scan_token(VAR)) return true;
     return false;
   }
 
-  private boolean jj_3_55() {
-    if (jj_3R_34()) return true;
+  private boolean jj_3R_25() {
+    if (jj_3R_21()) return true;
     return false;
   }
 
-  private boolean jj_3_20() {
-    if (jj_3R_26()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
+  private boolean jj_3R_24() {
+    if (jj_3R_21()) return true;
+    if (jj_scan_token(OR)) return true;
     if (jj_3R_20()) return true;
     return false;
   }
 
-  private boolean jj_3_16() {
+  private boolean jj_3R_23() {
+    if (jj_3R_21()) return true;
     if (jj_scan_token(AND)) return true;
-    if (jj_3R_22()) return true;
-    return false;
-  }
-
-  private boolean jj_3_19() {
-    if (jj_3R_25()) return true;
-    return false;
-  }
-
-  private boolean jj_3_43() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_32()) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_scan_token(SEMICOL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_53() {
-    if (jj_3R_35()) return true;
-    return false;
-  }
-
-  private boolean jj_3_18() {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3_54() {
-    if (jj_3R_35()) return true;
+    if (jj_3R_20()) return true;
     return false;
   }
 
   private boolean jj_3R_20() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_54()) {
+    if (jj_3R_23()) {
     jj_scanpos = xsp;
-    if (jj_3_55()) return true;
+    if (jj_3R_24()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) return true;
+    }
     }
     return false;
   }
 
-  private boolean jj_3_49() {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  private boolean jj_3_14() {
+  private boolean jj_3R_41() {
     if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_23()) return true;
+    if (jj_3R_43()) return true;
     return false;
   }
 
-  private boolean jj_3_41() {
-    if (jj_scan_token(NOT)) return true;
-    if (jj_3R_31()) return true;
+  private boolean jj_3R_50() {
+    if (jj_scan_token(VAL)) return true;
     return false;
   }
 
-  private boolean jj_3_51() {
-    if (jj_scan_token(LPAR)) return true;
+  private boolean jj_3R_43() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_49()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_50()) { jj_scanpos = xsp; break; }
+    if (jj_3R_46()) {
+    jj_scanpos = xsp;
+    if (jj_3R_47()) return true;
     }
-    if (jj_scan_token(RPAR)) return true;
     return false;
   }
 
-  private boolean jj_3R_35() {
-    if (jj_scan_token(VAR)) return true;
+  private boolean jj_3R_46() {
+    if (jj_3R_39()) return true;
     return false;
   }
 
-  private boolean jj_3R_25() {
-    if (jj_scan_token(LBRACE)) return true;
-    if (jj_3R_36()) return true;
+  private boolean jj_3R_44() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_43()) return true;
     return false;
   }
 
@@ -1616,7 +1377,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[0];
+  final private int[] jj_la1 = new int[48];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1624,12 +1385,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {};
+      jj_la1_0 = new int[] {0x0,0x10000,0x0,0x2000,0x0,0x0,0x2002000,0x2002000,0x0,0x0,0x2000,0x0,0x40000,0x10000,0x10000,0x10000,0x10000,0x58300000,0x2000,0x0,0x2000,0x0,0x58300000,0x10000000,0x8300000,0x2000,0x0,0x0,0x0,0x2000,0x0,0x0,0x2000,0x40000000,0x0,0x0,0x2000,0x0,0x0,0x2000,0x40000000,0x0,0x0,0x0,0x2000,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {};
+      jj_la1_1 = new int[] {0x600,0x0,0x600,0x0,0x201,0x100,0x0,0x0,0x100,0x80,0x0,0x201,0x0,0x0,0x40,0x0,0x0,0x231,0x0,0x601,0x0,0x601,0x231,0x0,0x200,0x0,0x231,0x221,0x201,0x0,0x201,0x201,0x0,0x0,0x201,0x601,0x0,0x201,0x601,0x0,0x0,0x600,0x601,0x600,0x0,0x4,0x601,0x601,};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[55];
+  final private JJCalls[] jj_2_rtns = new JJCalls[8];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1644,7 +1405,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1659,7 +1420,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1670,7 +1431,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1681,7 +1442,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1691,7 +1452,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1701,7 +1462,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 48; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1813,12 +1574,12 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[42];
+    boolean[] la1tokens = new boolean[43];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < 48; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1830,7 +1591,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
         }
       }
     }
-    for (int i = 0; i < 42; i++) {
+    for (int i = 0; i < 43; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -1857,7 +1618,7 @@ public class TripAPL_parser implements TripAPL_parserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 55; i++) {
+    for (int i = 0; i < 8; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1872,53 +1633,6 @@ public class TripAPL_parser implements TripAPL_parserConstants {
             case 5: jj_3_6(); break;
             case 6: jj_3_7(); break;
             case 7: jj_3_8(); break;
-            case 8: jj_3_9(); break;
-            case 9: jj_3_10(); break;
-            case 10: jj_3_11(); break;
-            case 11: jj_3_12(); break;
-            case 12: jj_3_13(); break;
-            case 13: jj_3_14(); break;
-            case 14: jj_3_15(); break;
-            case 15: jj_3_16(); break;
-            case 16: jj_3_17(); break;
-            case 17: jj_3_18(); break;
-            case 18: jj_3_19(); break;
-            case 19: jj_3_20(); break;
-            case 20: jj_3_21(); break;
-            case 21: jj_3_22(); break;
-            case 22: jj_3_23(); break;
-            case 23: jj_3_24(); break;
-            case 24: jj_3_25(); break;
-            case 25: jj_3_26(); break;
-            case 26: jj_3_27(); break;
-            case 27: jj_3_28(); break;
-            case 28: jj_3_29(); break;
-            case 29: jj_3_30(); break;
-            case 30: jj_3_31(); break;
-            case 31: jj_3_32(); break;
-            case 32: jj_3_33(); break;
-            case 33: jj_3_34(); break;
-            case 34: jj_3_35(); break;
-            case 35: jj_3_36(); break;
-            case 36: jj_3_37(); break;
-            case 37: jj_3_38(); break;
-            case 38: jj_3_39(); break;
-            case 39: jj_3_40(); break;
-            case 40: jj_3_41(); break;
-            case 41: jj_3_42(); break;
-            case 42: jj_3_43(); break;
-            case 43: jj_3_44(); break;
-            case 44: jj_3_45(); break;
-            case 45: jj_3_46(); break;
-            case 46: jj_3_47(); break;
-            case 47: jj_3_48(); break;
-            case 48: jj_3_49(); break;
-            case 49: jj_3_50(); break;
-            case 50: jj_3_51(); break;
-            case 51: jj_3_52(); break;
-            case 52: jj_3_53(); break;
-            case 53: jj_3_54(); break;
-            case 54: jj_3_55(); break;
           }
         }
         p = p.next;

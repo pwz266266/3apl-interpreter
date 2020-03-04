@@ -6,6 +6,7 @@ import java.util.*;
 
 import alice.tuprolog.*;
 import alice.tuprolog.exceptions.MalformedGoalException;
+import alice.tuprolog.exceptions.NoMoreSolutionException;
 import alice.tuprolog.exceptions.NoSolutionException;
 
 
@@ -94,7 +95,7 @@ public class Agent implements Runnable {
         return true;
     }
 
-    public boolean receiveResponds(FileWriter fw) throws IOException {
+    public boolean receiveResponds(FileWriter fw) throws IOException, NoSolutionException, MalformedGoalException {
         ArrayList<EnvironmentRespond> responds = this.container.forwardRespond(this);
         if(responds.size()==0){
             return false;
@@ -289,7 +290,63 @@ class Env{
     }
 }
 
+class PrologList extends VpredClause{
+    private GpredClause finalPart;
+    public PrologList(GpredClause finalPart, ArrayList<GpredClause> arguments) {
+        super(null, arguments);
+        this.finalPart = finalPart;
+    }
 
+    @Override
+    public String toString(){
+        StringBuilder result = new StringBuilder();
+        if(this.arguments.size() == 0){
+            return "[]";
+        }
+        result.append("[");
+        String prefix = "";
+        for(GpredClause x: arguments){
+            result.append(prefix);
+            prefix = ",";
+            result.append(x.toString());
+        }
+        if(finalPart!=null){
+            result.append("|");
+            result.append(finalPart.toString());
+        }
+        result.append("]");
+        return result.toString();
+    }
+
+    @Override
+    public String toString(Env env){
+        StringBuilder result = new StringBuilder();
+        if(this.arguments.size() == 0){
+            return "[]";
+        }
+        result.append("[");
+        String prefix = "";
+        for(GpredClause x: arguments){
+            result.append(prefix);
+            prefix = ",";
+            result.append(x.toString(env));
+        }
+        if(finalPart!=null){
+            result.append("|");
+            result.append(finalPart.toString(env));
+        }
+        result.append("]");
+        return result.toString();
+    }
+
+    public GpredClause applyEnv(Env env){
+        ArrayList<GpredClause> newArguments = new ArrayList<>();
+        for(GpredClause subClause : this.arguments){
+            newArguments.add(subClause.applyEnv(env));
+        }
+        return new PrologList(this.finalPart.applyEnv(env), newArguments);
+    }
+}
 
 class Atom extends GpredClause{
 
@@ -360,9 +417,6 @@ class GpredClause{
         return new VpredClause(this.predicate, newArguments);
     }
 
-    public Struct toProlog(){
-        return new Struct(toString());
-    }
 }
 
 class VpredClause extends GpredClause{
@@ -373,9 +427,6 @@ class VpredClause extends GpredClause{
     public ArrayList<GpredClause> getArguments(){ return this.arguments;}
     public String getPredicate(){ return this.predicate;}
 
-    public Struct toProlog(Env env){
-        return new Struct(toString(env));
-    }
 }
 
 class Literal extends Query{
@@ -396,12 +447,22 @@ class Literal extends Query{
         return isNeg ? "\\+ "+clause.toString(env) : clause.toString(env);
     }
 
-    public void performChange(Env env, Prolog engine, FileWriter fw){
+    public void performChange(Env env, Prolog engine, FileWriter fw) throws MalformedGoalException, NoSolutionException {
         if(isNeg){
-            engine.getTheoryManager().retract(clause.toString(env)+".");
+            SolveInfo info = engine.solve(clause.toString(env)+".");
+            while (info.isSuccess()) {
+                engine.getTheoryManager().retract(info.getSolution()+".");
+                if (engine.hasOpenAlternatives()) {
+                    try {
+                        info = engine.solveNext();
+                    }catch(Exception ignored){ }
+                } else {
+                    break;
+                }
+            }
             if(fw!=null){
                 try{
-                    fw.write("Belief \""+ this.clause.toString(env) +"\" deleted.\n");
+//                    fw.write("Belief \""+ this.clause.toString(env) +"\" deleted.\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -410,7 +471,7 @@ class Literal extends Query{
             engine.addTheory(new Theory(toString(env)+"."));
             if(fw!=null){
                 try{
-                    fw.write("Belief \""+ this.clause.toString(env) +"\" added.\n");
+//                    fw.write("Belief \""+ this.clause.toString(env) +"\" added.\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -456,13 +517,7 @@ class TrueQuery extends Query{
 
 abstract class Query{
     public abstract String toString(Env env);
-    public Struct toProlog(){
-        return new Struct(toString());
-    }
 
-    public Struct toProlog(Env env){
-        return new Struct(toString(env));
-    }
     public SolveInfo performQuery(Env env, Prolog engine) throws MalformedGoalException {
         return engine.solve(toString(env));
     }
@@ -666,7 +721,7 @@ class BeliefBase{
 
     public void initial(Prolog engine){
         for(String hornClause : hornClauses){
-            Theory theory = new Theory(hornClause);
+            Theory theory = new Theory(hornClause+".");
             engine.addTheory(theory);
         }
         for(GpredClause gpredClause : gClauses){
@@ -1024,15 +1079,15 @@ class SeqPlan extends Sequential{
 
 class EnvAction extends BasicPlan{
     static int ID = 1;
-    private ArrayList<Atom> arguments;
+    private ArrayList<GpredClause> arguments;
     private boolean requestSent = false;
     private int thisID = ID++;
-    public EnvAction(ArrayList<Atom> arguments){
+    public EnvAction(ArrayList<GpredClause> arguments){
         this.arguments = arguments;
     }
 
     @Override
-    public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) {
+    public int oneStep(Env env, Prolog engine, FileWriter fw, Container container, Agent agent) throws NoSolutionException, MalformedGoalException {
         if(!requestSent){
             try {
                 if(fw!=null){
@@ -1043,7 +1098,7 @@ class EnvAction extends BasicPlan{
             }
             String actionName = this.arguments.get(0).toString(env);
             ArrayList<String> currentArguments = new ArrayList<>();
-            for(Atom arg: arguments.subList(1,arguments.size())){
+            for(GpredClause arg: arguments.subList(1,arguments.size())){
                 currentArguments.add(arg.toString(env));
             }
             agent.sendActionRequest(new EnvironmentAction("container" + "_" + container.getID() + "_" + agent.getID(),actionName, currentArguments, thisID));
@@ -1070,14 +1125,10 @@ class EnvAction extends BasicPlan{
         StringBuilder result = new StringBuilder(indent);
         result.append("<EnvAction: arguments = (");
         String prefix = "";
-        for(Atom x: arguments){
+        for(GpredClause x: arguments){
             result.append(prefix);
             prefix = ",";
-            if(x.isVar()){
-                result.append(env.getVal(x.toString()));
-            }else{
-                result.append(x.toString());
-            }
+            result.append(x.toString(env));
         }
         result.append(")>");
         return result.toString();
@@ -1088,7 +1139,7 @@ class EnvAction extends BasicPlan{
         StringBuilder result = new StringBuilder(indent);
         result.append("<EnvAction: arguments = (");
         String prefix = "";
-        for(Atom x: arguments){
+        for(GpredClause x: arguments){
             result.append(prefix);
             prefix = ",";
             result.append(x.toString());
@@ -1099,7 +1150,7 @@ class EnvAction extends BasicPlan{
 
     @Override
     public BasicPlan clone() {
-        ArrayList<Atom> newArgs = new ArrayList<>(this.arguments);
+        ArrayList<GpredClause> newArgs = new ArrayList<>(this.arguments);
         return new EnvAction(newArgs);
     }
 }
@@ -1107,9 +1158,9 @@ class EnvAction extends BasicPlan{
 
 class CapAction extends BasicPlan{
     private String predicate;
-    private ArrayList<Atom> arguments;
+    private ArrayList<GpredClause> arguments;
     private Capability cap;
-    public CapAction(String predicate, ArrayList<Atom> arguments){
+    public CapAction(String predicate, ArrayList<GpredClause> arguments){
         this.predicate = predicate;
         this.arguments = arguments;
     }
@@ -1149,7 +1200,7 @@ class CapAction extends BasicPlan{
         StringBuilder result = new StringBuilder(indent);
         result.append("<CapAction: ").append(this.predicate).append("(");
         String prefix = "";
-        for(Atom x: arguments){
+        for(GpredClause x: arguments){
             result.append(prefix);
             prefix = ",";
             result.append(x.toString());
@@ -1168,14 +1219,10 @@ class CapAction extends BasicPlan{
         StringBuilder result = new StringBuilder(indent);
         result.append("<CapAction: "+ this.predicate +"(");
         String prefix = "";
-        for(Atom x: arguments){
+        for(GpredClause x: arguments){
             result.append(prefix);
             prefix = ",";
-            if(x.isVar()){
-                result.append(env.getVal(x.toString()));
-            }else{
-                result.append(x.toString());
-            }
+            result.append(x.toString(env));
         }
         result.append(")>");
         return result.toString();
@@ -1530,13 +1577,18 @@ class Plan{
     private SeqPlan plan;
     private Goal associatedGoal = null;
     private Env insideEnv;
+    private GoalPlanningRule createdBy = null;
+    private String firingCondition = null;
 //    public Plan clone(Env insideEnv){
 //        return new Plan(this.plan.clone(), associatedGoal, insideEnv);
 //    }
-    public Plan(SeqPlan plan, Goal associatedGoal, Env insideEnv){
+
+    public Plan(SeqPlan plan, Goal associatedGoal, Env insideEnv, GoalPlanningRule createdBy, String firingCondition){
         this.plan = plan;
         this.associatedGoal = associatedGoal;
         this.insideEnv = insideEnv;
+        this.createdBy = createdBy;
+        this.firingCondition = firingCondition;
     }
 
     public Plan(SeqPlan plan){
@@ -1552,6 +1604,11 @@ class Plan{
         if(this.associatedGoal != null){
             engine.addTheory(new Theory(this.associatedGoal.toString()));
         }
+        if(this.createdBy != null){
+            this.createdBy.deleteFiredCondition(firingCondition);
+            this.firingCondition = null;
+            this.createdBy = null;
+        }
     }
 
     private ArrayList<CodePosition> match(SeqPlan pattern){
@@ -1559,7 +1616,7 @@ class Plan{
     }
 
 
-    public boolean revisePlan(SeqPlan oldPlan, SeqPlan newPlan, Env env){
+    public boolean revisePlan(SeqPlan oldPlan, SeqPlan newPlan, Query condition, Prolog engine) throws MalformedGoalException, NoSolutionException {
         class CodeCompare implements Comparator<CodePosition> {
             @Override
             public int compare(CodePosition thisPos, CodePosition thatPos) {
@@ -1579,21 +1636,33 @@ class Plan{
             }
         }
         ArrayList<CodePosition> positions = this.match(oldPlan);
-
-        if(!positions.isEmpty()) {
-            boolean flag = false;
-            CodePosition currentPosition = new CodePosition(this.plan.currentPos,false);
-            positions.sort(new CodeCompare());
-            Collections.reverse(positions);
-            this.ModifyEnv(env);
-            for(CodePosition pos: positions){
-                if((new CodeCompare()).compare(currentPosition,pos)>0){
-                    break;
-                }
-                this.plan.replace(pos, oldPlan.components.size(), newPlan);
-                flag = true;
+        Env env = new Env();
+        for(String var: insideEnv.getVarList()) {
+            env.changeVal(var,insideEnv.getVal(var));
+        }
+        SolveInfo info = condition.performQuery(env, engine);
+        if (info.isSuccess()) {
+            List<Var> vars = info.getBindingVars();
+            for (Var var : vars) {
+                String var_n = var.getName();
+                String val_n = var.getTerm().toString();
+                env.changeVal(var_n, val_n);
             }
-            return flag;
+            if(!positions.isEmpty()) {
+                boolean flag = false;
+                CodePosition currentPosition = new CodePosition(this.plan.currentPos,false);
+                positions.sort(new CodeCompare());
+                Collections.reverse(positions);
+                for(CodePosition pos: positions){
+                    if((new CodeCompare()).compare(currentPosition,pos)>0){
+                        break;
+                    }
+                    this.plan.replace(pos, oldPlan.components.size(), newPlan);
+                    this.ModifyEnv(env);
+                    flag = true;
+                }
+                return flag;
+            }
         }
         return false;
     }
@@ -1667,10 +1736,10 @@ class PlanBase{
         return flag ? 1 : 0;
     }
 
-    public boolean revisePlans(SeqPlan oldPlan, SeqPlan newPlan, Env env, FileWriter fw){
+    public boolean revisePlans(SeqPlan oldPlan, SeqPlan newPlan, Query condition, Prolog engine, FileWriter fw) throws NoSolutionException, MalformedGoalException {
         boolean flag = false;
         for(Plan plan : plans){
-            flag = plan.revisePlan(oldPlan, newPlan, env);
+            flag = plan.revisePlan(oldPlan, newPlan, condition, engine);
             if(flag){
 
                 break;
@@ -1695,13 +1764,15 @@ class GoalPlanningRule{
     private Goal goal;
     private Query condition;
     private SeqPlan plan;
-
+    private ArrayList<String> appliedCondition = new ArrayList<>();
     public GoalPlanningRule(Goal goal, Query condition, SeqPlan plan){
         this.goal = goal;
         this.condition = condition;
         this.plan = plan;
     }
-
+    public void deleteFiredCondition(String str){
+        appliedCondition.remove(str);
+    }
     public void binding(CapabilityBase caps){
         this.plan.binding(caps);
     }
@@ -1715,22 +1786,44 @@ class GoalPlanningRule{
 
         Env env = new Env();
         SolveInfo info = condition.performQuery(env,engine);
-        if(result && info.isSuccess()){
-            if(fw != null){
-                try{
-                    fw.write("Goal planning rule applied, with guard \"" +this.condition.toString() + "\" and goal \"" + (this.goal == null ? "" : this.goal.toString())+"\".\n");
-                }catch(Exception e){
-                    System.out.println("Can't write to file.");
-                }
-            }
+        while(result && info.isSuccess()){
+            boolean fired = false;
             List<Var> vars = info.getBindingVars();
             for (Var var : vars){
                 String var_n = var.getName();
                 String val_n = var.getTerm().toString();
                 env.changeVal(var_n, val_n);
             }
-            planBase.addPlan(new Plan(plan.clone(), goal, env));
-            goalBase.blockGoal(this.goal);
+            for(String appliedCon : appliedCondition){
+                if(appliedCon.equals(condition.toString(env))){
+                    fired = true;
+                    break;
+                }
+            }
+
+
+            if(!fired) {
+                if (fw != null) {
+                    try {
+                        fw.write("Goal planning rule applied, with guard \"" + this.condition.toString() + "\" and goal \"" + (this.goal == null ? "" : this.goal.toString()) + "\".\n");
+                    } catch (Exception e) {
+                        System.out.println("Can't write to file.");
+                    }
+                }
+                String firedCondition = condition.toString(env);
+                planBase.addPlan(new Plan(plan.clone(), goal, env, this, firedCondition));
+                goalBase.blockGoal(this.goal);
+                appliedCondition.add(firedCondition);
+                return true;
+            }
+            if (engine.hasOpenAlternatives()) {
+                try {
+                    info = engine.solveNext();
+                    env = new Env();
+                }catch(Exception ignored){}
+            } else {
+                break;
+            }
         }
 //        if(!result){
 //            if(fw != null){
@@ -1752,7 +1845,7 @@ class GoalPlanningRule{
 //                }
 //            }
 //        }
-        return result && info.isSuccess();
+        return false;
     }
     @Override
     public String toString(){
@@ -1827,30 +1920,21 @@ class PlanRevisionRule{
         this.oldPlan.binding(caps);
         this.newPlan.binding(caps);
     }
+
     public boolean execute(PlanBase planBase, Prolog engine, FileWriter fw) throws MalformedGoalException, NoSolutionException {
-        Env env = new Env();
-        SolveInfo info = condition.performQuery(env, engine);
-        if (info.isSuccess()){
-            List<Var> vars = info.getBindingVars();
-            for (Var var : vars){
-                String var_n = var.getName();
-                String val_n = var.getTerm().toString();
-                env.changeVal(var_n, val_n);
-            }
-            Boolean result =  planBase.revisePlans(this.oldPlan,this.newPlan,env, fw);
-            if(result){
-                if(fw != null){
-                    try{
-                        fw.write("Plan revision rule applied, with guard \"" +this.condition.toString() + "\".\n");
-                    }catch(Exception e){
-                        System.out.println("Can't write to file.");
-                    }
+        boolean result =  planBase.revisePlans(this.oldPlan,this.newPlan,condition,engine, fw);
+        if(result){
+            if(fw != null){
+                try{
+                    fw.write("Plan revision rule applied, with guard \"" +this.condition.toString() + "\".\n");
+                }catch(Exception e){
+                    System.out.println("Can't write to file.");
                 }
             }
-            return result;
         }
-        return false;
+        return result;
     }
+
     @Override
     public String toString(){
         return toString("");

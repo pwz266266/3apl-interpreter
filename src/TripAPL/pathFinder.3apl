@@ -1,0 +1,45 @@
+Name: PathFinder
+Belief Base:
+    road(arad,timisoara).
+    road(arad,sibiu).
+    road(arad,zerind).
+    road(zerind,oradea).
+    road(sibiu,fagaras).
+    road(sibiu,rimnicu_vilcea).
+    travel(X,Y) :- road(X,Y).
+    travel(X,Y) :- road(Y,X).
+
+    dFroute(X,Y,R) :- dFroute(X,Y,[X],R).
+    dFroute(X,Y,V, [drive(X,Y)]) :- travel(X,Y).
+    dFroute(X,Y,V, [drive(X,Z)|R]) :- travel(X,Z), \=(Z,Y), \+ member(Z,V), dFroute(Z,Y,[Z|V],R).
+
+    bFroute(X,Y,R) :- bFroute(X,Y,[X],R).
+    bFroute(X,Y,V, [drive(X,Y)]) :- travel(X,Y).
+    bFroute(X,Y,V,N) :- travel(X,Z), \=(Z,Y), \+ member(Z,V), append(drive(X,Z), R, N), bFroute(Z,Y,[Z|V],R).
+
+    append(X, [], [X]).
+    append(X, [Y|Ys], [Y|Zs]) :- append(X, Ys, Zs).
+
+    bfs(X,Y,P) :- bfs_b(Y,[n(X,[])],[],R), reverse(R,P).
+    bfs_b(Y,[n(Y,P)|_],_,P).
+    bfs_b(Y,[n(S,P1)|Ns],C,P) :- findall(n(S1,[A|P1]),s(S,S1,A), \+ member(S1,C),Es), append(Ns,Es,O), bfs_b(Y,O,[S|C],P).
+
+Goal Base:
+    clean()
+Capability Base:
+{bfs(X,Y,R)}
+search(X,Y)
+{found(X,Y,R)}
+
+{append(X,Y,R)}
+append(X,Y)
+{foundAppend(X,Y,R)}
+Plan Base:
+{
+    search(arad,oradea);
+    append(1,[1,2,3,4]);
+}
+
+Goal Planning Rule Base:
+
+Plan Revision Rule Base:

@@ -1,7 +1,7 @@
 
 options
 {
-  LOOKAHEAD= 3;
+  LOOKAHEAD= 1;
 
   CHOICE_AMBIGUITY_CHECK = 2;
   OTHER_AMBIGUITY_CHECK = 1;
@@ -69,6 +69,8 @@ TOKEN :
     | <TEST: "Test:">
     | <LPAR: "(">
     | <RPAR: ")">
+    | <LSQA: "[">
+    | <RSQA: "]">
     | <VBAR: "|">
     | <QUSMARK: "?">
     | <TRUE: "true">
@@ -76,7 +78,7 @@ TOKEN :
     | <IMPLY: "<-">
     | <GIVES: ":-">
     | <PNOT: "\\+">
-    | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (("-")? ((["0" - "9"]|"."))+))>
+    | <VAL: (((["a"-"z"]) (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*) | (("-")? ((["0" - "9"]|"."))+)) | "==" | "\\=">
     | <VAR: ((["A"-"Z"] | "_") (["A"-"Z"] | ["a"-"z"] | "_" | ["0" - "9"])*)>
 }
 
@@ -136,13 +138,15 @@ BeliefBase beliefs():
     ArrayList<GpredClause> bs = new ArrayList<GpredClause>();
     ArrayList<String> hs = new ArrayList<String>();
     StringBuilder horn;
-    GpredClause bufferG;
     VpredClause bufferV;
-    Literal bufferL;
+    boolean isHorn = false;
 }
 {
-     (bufferG = gpredclause() <PROLOGEND> {bs.add(bufferG);} |
-     ("Horn Clause:" {horn = new StringBuilder();}  bufferL = literal() {horn.append(bufferL.toString());} <GIVES> {horn.append(" :- ");} (<PNOT> {horn.append("\\+ ");} )? bufferL = literal(){horn.append(bufferL.toString());} ((<COMMA> {horn.append(", ");}| <SEMICOL>{horn.append("; ");}) (<PNOT>{horn.append("\\+ ");})? bufferL = literal() {horn.append(bufferL.toString());})* <PROLOGEND> {hs.add(horn.toString());}))*
+     ({isHorn=false;} bufferV = vpredclause()
+
+     (<GIVES>{horn = new StringBuilder();horn.append(bufferV.toString());isHorn = true; horn.append(" :- ");}  (<PNOT> {horn.append("\\+ ");} )? bufferV = vpredclause(){horn.append(bufferV.toString());} ((<COMMA> {horn.append(", ");}| <SEMICOL>{horn.append("; ");}) (<PNOT>{horn.append("\\+ ");})? bufferV = vpredclause() {horn.append(bufferV.toString());})* {hs.add(horn.toString());})?
+     {if(!isHorn){bs.add(bufferV);}} <PROLOGEND>
+     )*
     {return new BeliefBase(hs,bs);}
 }
 
@@ -243,22 +247,22 @@ SeqPlan seqPlan():
 BasicPlan basicplan():
 {
     Query testbuffer;
-    ArrayList<Atom> arguments = new ArrayList<Atom>();
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
     ArrayList<BasicPlan> components = new ArrayList<BasicPlan>();
     BasicPlan buffer;
     VpredClause content;
     VpredClause reply;
-    Atom argbuffer;
+    GpredClause argbuffer;
     Token t;
     SeqPlan ifPlan;
     SeqPlan elsePlan;
 
 }
 {
-    (<Env> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new EnvAction(arguments);})
-    | <TEST> (testbuffer = query() {return new TestAction(testbuffer); } )
-    | (<SEND> <LPAR>t = <VAL>"," argbuffer = atom() "," content = vpredclause() "," reply = vpredclause()<RPAR>{return new SendAction(t.image, argbuffer.toString(), content, reply);})
-    | ( t = <VAL> <LPAR> ((argbuffer = atom() {arguments.add(argbuffer);}) (<COMMA>argbuffer = atom() {arguments.add(argbuffer);})*)? <RPAR> {return new CapAction(t.image, arguments);})
+    (<Env> <LPAR> ((argbuffer = aOrl() {arguments.add(argbuffer);}) (<COMMA>argbuffer = aOrl() {arguments.add(argbuffer);})*)? <RPAR> {return new EnvAction(arguments);})
+    | LOOKAHEAD(query() <QUSMARK>) (testbuffer = query() <QUSMARK> {return new TestAction(testbuffer); })
+    | (<SEND> <LPAR>t = <VAL>"," argbuffer = aOrl() "," content = vpredclause() "," reply = vpredclause()<RPAR>{return new SendAction(t.image, argbuffer.toString(), content, reply);})
+    | ( t = <VAL> <LPAR> ((argbuffer = aOrl() {arguments.add(argbuffer);}) (<COMMA>argbuffer = aOrl() {arguments.add(argbuffer);})*)? <RPAR> {return new CapAction(t.image, arguments);})
     | (<WHILE> <LPAR> testbuffer = query() <RPAR> <LBRACE> (buffer = basicplan() {components.add(buffer);} <SEMICOL>)+ <RBRACE> {return new WhilePlan(components, testbuffer);} )
     | (<IF> <LPAR> testbuffer = query() <RPAR> <LBRACE> ifPlan = seqPlan() <RBRACE> <ELSE> <LBRACE> elsePlan = seqPlan() <RBRACE> {return new IfPlan(ifPlan, elsePlan, testbuffer);})
 }
@@ -290,11 +294,23 @@ Query query():
     boolean isOr;
 }
 {
-    (sub0 = singlequery() {return sub0;})
-    | (<LPAR> sub0 = query() ((<OR> sub1 = query() <RPAR> {return new wffBinary(true, sub0, sub1);}) |
-    (<AND> sub1 = query() <RPAR> {return new wffBinary(false, sub0, sub1);})))
+     LOOKAHEAD(wff() <AND>) sub0 = wff() <AND> sub1 = query()  {return new wffBinary(false, sub0, sub1);}
+    | LOOKAHEAD(wff() <OR>) sub0 = wff() <OR> sub1 = query()  {return new wffBinary(true, sub0, sub1);}
+    | LOOKAHEAD(wff()) sub0 = wff() {return sub0;}
 }
 
+Query wff():
+{
+    Query sub0;
+    Query sub1;
+    boolean isOr;
+}
+{
+     LOOKAHEAD(<LPAR> wff() <OR>) <LPAR> sub0 = wff() <OR> sub1 = query() <RPAR> {return new wffBinary(true, sub0, sub1);}
+     | LOOKAHEAD(<LPAR> wff() <AND>) <LPAR> sub0 = wff() <AND> sub1 = query() <RPAR> {return new wffBinary(false, sub0, sub1);}
+     | LOOKAHEAD(<LPAR> wff() <RPAR>) <LPAR> sub0 = wff() <RPAR> {return sub0;}
+     | LOOKAHEAD(singlequery()) sub0 = singlequery() {return sub0;}
+}
 
 Query singlequery():
 {
@@ -329,8 +345,8 @@ GpredClause gpredclause():
     GpredClause buffer;
 }
 {
-    t = <VAL> <LPAR> (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* <RPAR>
-    {return new GpredClause(t.image, arguments);}
+    (buffer = list() {return buffer;}) | (t = <VAL> <LPAR> (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* <RPAR>
+    {return new GpredClause(t.image, arguments);})
 }
 
 GpredClause gsubClause():
@@ -340,7 +356,7 @@ GpredClause gsubClause():
     GpredClause buffer;
 }
 {
-    predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments);} )? {return predicate;}
+    (buffer = list() {return buffer;}) | (predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments);} )? {return predicate;})
 }
 
 VpredClause vpredclause():
@@ -348,10 +364,11 @@ VpredClause vpredclause():
     Token t;
     ArrayList<GpredClause> arguments = new ArrayList();
     GpredClause buffer;
+    PrologList prologlist;
 }
 {
-    t = <VAL> <LPAR> (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})* <RPAR>
-    {return new VpredClause(t.image, arguments);}
+    (prologlist = list() {return prologlist;}) | (t = <VAL> <LPAR> (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})* <RPAR>
+    {return new VpredClause(t.image, arguments);})
 }
 
 GpredClause vsubClause():
@@ -361,7 +378,7 @@ GpredClause vsubClause():
     GpredClause buffer;
 }
 {
-    (predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;})
+     (buffer = list() {return buffer;}) | ((predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;}))
 }
 
 Atom val():
@@ -388,4 +405,24 @@ Atom atom():
 }
 {
     (a = var() {return a;})| (a = val() {return a;})
+}
+
+PrologList list():
+{
+    GpredClause buffer = null;
+    GpredClause finalPart = null;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+}
+{
+    <LSQA> (buffer = vsubClause() {arguments.add(buffer);} (<COMMA> buffer = vsubClause() {arguments.add(buffer);})* (<VBAR> finalPart = vsubClause() )? )? <RSQA>
+    {return new PrologList(finalPart, arguments);}
+}
+
+
+GpredClause aOrl():
+{
+    GpredClause x;
+}
+{
+    (x = atom() | x = list()) {return x;}
 }

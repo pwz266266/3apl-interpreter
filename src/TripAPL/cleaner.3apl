@@ -3,7 +3,8 @@ Name: Cleaner
 Belief Base:
 
 Goal Base:
-    init()
+    init(),
+    clean()
 
 Capability Base:
     {true}
@@ -30,7 +31,7 @@ Goal Planning Rule Base:
     {
         tryToPickUp();
         while(not position(self, X, Y)) {
-            Test: position(self, Xs, Ys);
+            position(self, Xs, Ys)?;
             if (les(X,Xs))
             {
                 Env(move,left);
@@ -55,16 +56,16 @@ Goal Planning Rule Base:
                         }
                         else
                         {
-                            Test: true;
+                            true?;
                         };
                     };
                 };
             };
         };
         Env(pickup);
-        Test: position(bin, Xb, Yb);
+        position(bin, Xb, Yb)?;
         while(not position(self, Xb, Yb)) {
-            Test: position(self, Xs, Ys);
+            position(self, Xs, Ys)?;
             if (les(Xb,Xs))
             {
                 Env(move,left);
@@ -89,7 +90,7 @@ Goal Planning Rule Base:
                         }
                         else
                         {
-                            Test: true;
+                            true?;
                         };
                     };
                 };

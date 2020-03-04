@@ -8,7 +8,7 @@ public class testProlog {
     public static void main(String[] args) throws InvalidTheoryException,
             MalformedGoalException, NoSolutionException, NoMoreSolutionException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 
-//        test0();
+        test0();
 //        Class cls = Class.forName("Environment");
 //        Environment environment = (Environment) cls.getConstructor().newInstance();
     }
@@ -22,8 +22,16 @@ public class testProlog {
         engine.addTheory(new Theory("money(0)."));
         engine.addTheory(new Theory("goods(pen,6)."));
         engine.addTheory(new Theory("goods(pencil,2)."));
+        engine.addTheory(new Theory("[goods(pencil,2), goods(pen,6)]."));
+        engine.addTheory(new Theory("likes(mary,pizza)."));
+        engine.addTheory(new Theory("likes(marco,pizza)."));
+        engine.addTheory(new Theory("likes(Human,pizza) :- italian(Human)."));
+        engine.addTheory(new Theory("italian(marco)."));
+        engine.solve("money(0).");
 //        SolveInfo info = engine.solve("(price(pencil,Price) , goods(pencil,Count), sub(Count,1,NCount)).");
-        SolveInfo info = engine.solve("(geq(12,3)).");
+        Env env = new Env();
+
+        SolveInfo info = engine.solve("findall(Person, likes(Person, pizza), Bag).");
 //                sum(1,2,A).
 //                sub(1,2,B).
 //                div(4,6,C).
