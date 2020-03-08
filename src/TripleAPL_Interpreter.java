@@ -25,25 +25,27 @@ public class TripleAPL_Interpreter extends Application{
         File logdir = new File("./log");
         delete(logdir);
         launch(args);
+
     }
 
 
 
     static void delete(File file) throws IOException {
+        if (file.listFiles() != null) {
+            for (File childFile : file.listFiles()) {
 
-        for (File childFile : Objects.requireNonNull(file.listFiles())) {
-
-            if (childFile.isDirectory()) {
-                delete(childFile);
-            } else {
-                if (!childFile.delete()) {
-                    throw new IOException();
+                if (childFile.isDirectory()) {
+                    delete(childFile);
+                } else {
+                    if (!childFile.delete()) {
+                        throw new IOException();
+                    }
                 }
             }
-        }
 
-        if (!file.delete()) {
-            throw new IOException();
+            if (!file.delete()) {
+                throw new IOException();
+            }
         }
     }
 
@@ -98,18 +100,13 @@ class FirstStage extends Stage{
                 Server server = ServerFactory.createServer(containers);
                 server.showEnv();
 
-                CleanerEnvironment env = new CleanerEnvironment();
+                CleanerEnvironment env = new CleanerEnvironment(200);
                 server.setEnvironment(env);
-                server.linkAgentEntity(agent1.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("0", "0"))));
-                for(int i = 0; i<=10; i++){
-                    server.createEntity("Garbage", new ArrayList<>(Arrays.asList(String.valueOf((int)(Math.random()*200)), String.valueOf((int)(Math.random()*200)))));
-                }
-                for(int i = 0; i<=3; i++){
-                    server.createEntity("Bin", new ArrayList<>(Arrays.asList(String.valueOf((int)(Math.random()*200)), String.valueOf((int)(Math.random()*200)))));
-                }
-                File logdir = new File("./log");
-                logdir.mkdir();
-                server.enableDebug("./log");
+                assert agent1 != null;
+                server.linkAgentEntity(agent1.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("500", "500"))));
+//                File logdir = new File("./log");
+//                logdir.mkdir();
+//                server.enableDebug("./log");
                 server.restart();
                 server.setMaxClock(1000000);
                 server.showEnv();

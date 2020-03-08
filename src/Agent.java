@@ -6,7 +6,6 @@ import java.util.*;
 
 import alice.tuprolog.*;
 import alice.tuprolog.exceptions.MalformedGoalException;
-import alice.tuprolog.exceptions.NoMoreSolutionException;
 import alice.tuprolog.exceptions.NoSolutionException;
 
 
@@ -102,8 +101,15 @@ public class Agent implements Runnable {
         }
         for (EnvironmentRespond respond: responds){
             if(respond.getActionID() == -1){
-                for(Literal postCondition: respond.getPostCondition()){
-                    postCondition.performChange(new Env(), engine, null);
+                for(GpredClause postCondition: respond.getPostCondition()){
+                    engine.addTheory(new Theory("received_env("+postCondition.toString()+")."));
+                    try {
+                        if(fw!=null){
+                            fw.write("Belief received_env("+postCondition.toString()+"). added by send action." + "\n");
+                        }
+                    }catch(Exception e){
+                        System.out.println("Can't write to file!!!");
+                    }
                 }
             }else{
                 this.receivedResponds.add(respond);
@@ -160,7 +166,7 @@ public class Agent implements Runnable {
         boolean flag3 = this.planBase.oneStep(engine,fw, container,this) == 1;
         boolean flag1 = this.goalPlanningRuleBase.execute(goalBase,planBase,engine,fw);
         if(! (flag1 || flag2 || flag3 || received)){
-            this.state = State.SUSPEND;
+//            this.state = State.SUSPEND;
         }
         this.goalBase.checkGoals(engine, fw);
         if(this.Debug){
@@ -293,7 +299,7 @@ class Env{
 class PrologList extends VpredClause{
     private GpredClause finalPart;
     public PrologList(GpredClause finalPart, ArrayList<GpredClause> arguments) {
-        super(null, arguments);
+        super(null, arguments,null);
         this.finalPart = finalPart;
     }
 
@@ -351,7 +357,7 @@ class PrologList extends VpredClause{
 class Atom extends GpredClause{
 
     public Atom(String name){
-        super(name, null);
+        super(name, null,null);
     }
     @Override
     public String toString() {
@@ -371,23 +377,37 @@ class Atom extends GpredClause{
 class GpredClause{
     protected String predicate;
     protected ArrayList<GpredClause> arguments;
+    protected ArrayList<String> operator = null;
+    public GpredClause(String predicate, ArrayList<GpredClause> arguments, ArrayList<String> operator){
+        this.predicate = predicate;
+        this.arguments = arguments;
+        this.operator = operator;
+    }
     public GpredClause(String predicate, ArrayList<GpredClause> arguments){
         this.predicate = predicate;
         this.arguments = arguments;
     }
-
     @Override
     public String toString(){
         StringBuilder result = new StringBuilder();
         if(this.arguments.size() == 0){
             return predicate;
         }
-        result.append(predicate + "(");
+        if(this.predicate!=null){
+            result.append(this.predicate);
+        }
+        result.append("(");
         String prefix = "";
+        int count = 0;
         for(GpredClause x: arguments){
             result.append(prefix);
-            prefix = ",";
+            if(this.operator == null){
+                prefix = ",";
+            }else if(count!=this.operator.size()) {
+                prefix = this.operator.get(count);
+            }
             result.append(x.toString());
+            count++;
         }
         result.append(")");
         return result.toString();
@@ -396,12 +416,21 @@ class GpredClause{
     public String toString(Env env){
         StringBuilder result = new StringBuilder();
         if(arguments.size() != 0){
-            result.append(predicate + "(");
+            if(this.predicate!=null){
+                result.append(this.predicate);
+            }
+            result.append("(");
             String prefix = "";
+            int count = 0;
             for(GpredClause x: arguments){
                 result.append(prefix);
-                prefix = ",";
+                if(this.operator == null){
+                    prefix = ",";
+                }else if(count!=this.operator.size()) {
+                    prefix = this.operator.get(count);
+                }
                 result.append(x.toString(env));
+                count++;
             }
             result.append(")");
             return result.toString();
@@ -414,12 +443,17 @@ class GpredClause{
         for(GpredClause subClause : this.arguments){
             newArguments.add(subClause.applyEnv(env));
         }
-        return new VpredClause(this.predicate, newArguments);
+        ArrayList<String> newOperators = new ArrayList<>(this.operator);
+        return new VpredClause(this.predicate, newArguments, newOperators);
     }
 
 }
 
 class VpredClause extends GpredClause{
+
+    public VpredClause(String predicate, ArrayList<GpredClause> arguments, ArrayList<String> operator){
+        super(predicate, arguments, operator);
+    }
 
     public VpredClause(String predicate, ArrayList<GpredClause> arguments){
         super(predicate, arguments);
@@ -462,7 +496,7 @@ class Literal extends Query{
             }
             if(fw!=null){
                 try{
-//                    fw.write("Belief \""+ this.clause.toString(env) +"\" deleted.\n");
+                    fw.write("Belief \""+ this.clause.toString(env) +"\" deleted.\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -471,7 +505,7 @@ class Literal extends Query{
             engine.addTheory(new Theory(toString(env)+"."));
             if(fw!=null){
                 try{
-//                    fw.write("Belief \""+ this.clause.toString(env) +"\" added.\n");
+                    fw.write("Belief \""+ this.clause.toString(env) +"\" added.\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -823,14 +857,8 @@ class Capability{
                 String val_n = var.getTerm().toString();
                 env.changeVal(var_n, val_n);
             }
-//            if(this.name.equals("pay")){
-//                System.out.println(precondition.toString(env));
-//                System.out.println(env);
-//                for(Literal literal : postcondition){
-//                    System.out.println(literal.toString(env));
-//                }
-//            }
             for(Literal cond :postcondition){
+//                System.out.print(cond.toString(env)+"\n");
                 cond.performChange(env,engine,fw);
             }
         }else{
@@ -1107,8 +1135,15 @@ class EnvAction extends BasicPlan{
             ArrayList<EnvironmentRespond> currentResponds = agent.getReceivedResponds();
             for(EnvironmentRespond respond: currentResponds){
                 if(respond.getActionID() == thisID){
-                    for(Literal postCondition: respond.getPostCondition()){
-                        postCondition.performChange(env,engine,fw);
+                    for(GpredClause postCondition: respond.getPostCondition()){
+                        engine.addTheory(new Theory("received_env("+postCondition.toString()+")."));
+                        try {
+                            if(fw!=null){
+                                fw.write("Belief received_env("+postCondition.toString()+"). added by send action." + "\n");
+                            }
+                        }catch(Exception e){
+                            System.out.println("Can't write to file!!!");
+                        }
                     }
                     agent.getReceivedResponds().remove(respond);
                     requestSent = false;
@@ -1300,7 +1335,7 @@ class TestAction extends BasicPlan{
         if(info.isSuccess()){
             if(fw != null){
                 try{
-                    fw.write("Execute: "+this.toString() + " , success.\n");
+                    fw.write("Execute: "+this.toString(env) + " , success.\n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -1315,7 +1350,7 @@ class TestAction extends BasicPlan{
         }else{
             if(fw != null){
                 try{
-                    fw.write("Execute: "+this.toString("")+" ,failed. \n");
+                    fw.write("Execute: "+this.toString(env)+" ,failed. \n");
                 }catch(Exception e){
                     System.out.println("Can't write to file.");
                 }
@@ -1800,7 +1835,6 @@ class GoalPlanningRule{
                     break;
                 }
             }
-
 
             if(!fired) {
                 if (fw != null) {

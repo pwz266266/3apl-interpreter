@@ -312,6 +312,8 @@ Query wff():
      | LOOKAHEAD(singlequery()) sub0 = singlequery() {return sub0;}
 }
 
+
+
 Query singlequery():
 {
     Query query;
@@ -340,45 +342,58 @@ Literal literal():
 
 GpredClause gpredclause():
 {
-    Token t;
-    ArrayList<GpredClause> arguments = new ArrayList();
+    String operator;
+    Token t = null;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+    ArrayList<String> operators = new ArrayList<String>();
     GpredClause buffer;
 }
 {
-    (buffer = list() {return buffer;}) | (t = <VAL> <LPAR> (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* <RPAR>
-    {return new GpredClause(t.image, arguments);})
+    (buffer = list() {return buffer;}) | LOOKAHEAD((<VAL> | <VAR>)? <LPAR>) ( (t = <VAL> | t = <VAR>)? <LPAR> (buffer = gsubClause() {arguments.add(buffer);} )? ( ((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);}
+    buffer = gsubClause() {arguments.add(buffer);})* <RPAR>
+    {if(t==null){return new GpredClause(null, arguments,operators);}else{return new GpredClause(t.image, arguments,operators);}})
+    | ((t = <VAL> | t = <VAR>) {return new VpredClause(t.image, arguments,operators);})
 }
 
 GpredClause gsubClause():
 {
     Atom predicate;
-    ArrayList<GpredClause> arguments = new ArrayList();
+    String operator;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+    ArrayList<String> operators = new ArrayList<String>();
     GpredClause buffer;
 }
 {
-    (buffer = list() {return buffer;}) | (predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments);} )? {return predicate;})
+    (buffer = list() {return buffer;}) | (predicate = val() ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);} buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(predicate.toString(),arguments,operators);} )? {return predicate;})
+    | ("(" (buffer = gsubClause() {arguments.add(buffer);} )? (((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);} buffer = gsubClause() {arguments.add(buffer);})* ")" {return new GpredClause(null,arguments,operators);} )
 }
 
 VpredClause vpredclause():
 {
-    Token t;
-    ArrayList<GpredClause> arguments = new ArrayList();
+    Token t = null;
+    String operator;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+    ArrayList<String> operators = new ArrayList<String>();
     GpredClause buffer;
     PrologList prologlist;
 }
 {
-    (prologlist = list() {return prologlist;}) | (t = <VAL> <LPAR> (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})* <RPAR>
-    {return new VpredClause(t.image, arguments);})
+    (prologlist = list() {return prologlist;}) | LOOKAHEAD((<VAL> | <VAR>)? <LPAR>)  ( (t = <VAL>)? <LPAR> (buffer = vsubClause() {arguments.add(buffer);} )? (((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);} buffer = vsubClause() {arguments.add(buffer);})* <RPAR>
+    {if(t==null){return new VpredClause(null, arguments,operators);}else{return new VpredClause(t.image, arguments,operators);}})
+    | ((t = <VAL> | t = <VAR>) {return new VpredClause(t.image, arguments,operators);})
 }
 
 GpredClause vsubClause():
 {
     Atom predicate;
-    ArrayList<GpredClause> arguments = new ArrayList();
+    String operator;
+    ArrayList<GpredClause> arguments = new ArrayList<GpredClause>();
+    ArrayList<String> operators = new ArrayList<String>();
     GpredClause buffer;
 }
 {
-     (buffer = list() {return buffer;}) | ((predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (<COMMA> buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;}))
+     (buffer = list() {return buffer;}) | (predicate = val() ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);} buffer = vsubClause() {arguments.add(buffer);})*  ")"{return new GpredClause(predicate.toString(),arguments);})? {return predicate;}) | (predicate = var() {return predicate;})
+    | ("(" (buffer = vsubClause() {arguments.add(buffer);} )? (((<COMMA> {operator = ", ";}) | (<SEMICOL> {operator = "; ";})) (<PNOT> {operator+="\\+ ";})? {operators.add(operator);} buffer = vsubClause() {arguments.add(buffer);})* ")" {return new VpredClause(null,arguments,operators);} )
 }
 
 Atom val():

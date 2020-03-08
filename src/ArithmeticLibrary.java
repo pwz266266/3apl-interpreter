@@ -268,4 +268,15 @@ public class ArithmeticLibrary extends Library {
         }
         return false;
     }
+
+    public boolean abs_2(Term arg0, Term arg1){
+        if(arg0.isGround()){
+            float n0 = (Number.createNumber(arg0.getTerm().toString())).floatValue();
+            if(((Number)arg0.getTerm()).isInteger()){
+                return arg1.unify(getEngine(),new Int((int) (Math.abs(n0))));
+            }
+            return arg1.unify(getEngine(),new Float((float) Math.abs(n0)));
+        }
+        return false;
+    }
 }

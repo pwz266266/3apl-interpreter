@@ -3,11 +3,11 @@ import java.util.ArrayList;
 public class EnvironmentRespond {
     private String agentID;
     private int actionID;
-    private ArrayList<Literal> postCondition;
+    private ArrayList<GpredClause> postCondition;
     private boolean success;
     private int entityID;
 
-    public EnvironmentRespond(String agentID, ArrayList<Literal> postCondition, boolean success, int actionID, int entityID){
+    public EnvironmentRespond(String agentID, ArrayList<GpredClause> postCondition, boolean success, int actionID, int entityID){
         this.actionID = actionID;
         this.agentID = agentID;
         this.postCondition = postCondition;
@@ -24,7 +24,7 @@ public class EnvironmentRespond {
         return actionID;
     }
 
-    public ArrayList<Literal> getPostCondition() {
+    public ArrayList<GpredClause> getPostCondition() {
         return postCondition;
     }
 

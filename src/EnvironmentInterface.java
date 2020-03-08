@@ -7,6 +7,13 @@ public class EnvironmentInterface {
     HashMap<String, Integer> agentMap = new HashMap<>();
     HashMap<Integer, String> entityMap = new HashMap<>();
 
+    public int getEntity(String agentID){
+        return agentMap.get(agentID);
+    }
+
+    public String getAgent(int entityID){
+        return this.entityMap.get(entityID);
+    }
 
     public EnvironmentInterface(Environment env, Server server){
         this.environment = env;

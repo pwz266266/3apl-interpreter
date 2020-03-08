@@ -1,14 +1,68 @@
 Name: Cleaner
 
 Belief Base:
+    takeBins(bins(A)) :- findall(position(X,Y,attribute(Type,Task)), (received_env(position(X,Y,bin,attribute(Type,Task))),grt(Task,0)), A).
+    takeStations(stations(A)) :- findall(position(X,Y,Atr), received_env(position(X,Y,station,Atr)), A).
+    takeRecharges(recharges(A)) :- findall(position(X,Y,Atr), received_env(position(X,Y,recharge,Atr)), A).
+    takeSelf(self(X,Y,A)) :- received_env(position(X,Y,self,A)).
+
+    maximum(X,Y,X) :- geq(X,Y).
+    maximum(X,Y,Y) :- grt(Y,X).
+
+    minimum(X,Y,Y) :- geq(X,Y).
+    minimum(X,Y,X) :- grt(Y,X).
+
+    maxDist((X1,Y1,Dist1),(X2,Y2,Dist2),(X1,Y1,Dist1)) :- geq(Dist1,Dist2).
+    maxDist((X1,Y1,Dist1),(X2,Y2,Dist2),(X2,Y2,Dist2)) :- grt(Dist2,Dist1).
+
+    minDist((X1,Y1,Dist1),(X2,Y2,Dist2),(X2,Y2,Dist2)) :- geq(Dist1,Dist2).
+    minDist((X1,Y1,Dist1),(X2,Y2,Dist2),(X1,Y1,Dist1)) :- grt(Dist2,Dist1).
+
+    dist(X1,X2,Y1,Y2,Dist) :- sub(X1,X2,X3), sub(Y1,Y2,Y3), abs(X3,X), abs(Y3,Y), maximum(X,Y,Dist).
+
+    getScore(position(X,Y,attribute(Type)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(SCarry, 0.0, Carry), \=(Dist,0), div(Carry,Dist,Score), grt(Score,0).
+    getScore(position(X,Y,attribute(Type,Task)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(Task,0.0,Task1),\=(SCarry,200),sub(200.0,SCarry,Left), minimum(Left,Task1,Take), div(Take,Dist,Score).
+
+    getScores(Result) :- bins(A), stations(B), append(A,B,List), scoresHelper(List,Result).
+    scoresHelper([],[]).
+    scoresHelper([A|List], [(X,Y,Score)|Result]) :- getScore(A,score(X,Y,Score)), scoresHelper(List,Result).
+    scoresHelper([A|List], Result):- \+ getScore(A,B), scoresHelper(List,Result).
+
+    rechargeDist(X,Y,[],[]).
+    rechargeDist(X,Y,[position(X1,Y1,Atr)|List],[(X1,Y1,Dist)|Result]) :- dist(X1,Y1,X,Y,Dist), rechargeDist(X,Y,List, Result).
+    rechargeDist(Result) :- self(X,Y,Atr), recharges(List), rechargeDist(X,Y,List, Result).
+
+    mini([(X,Y,Min)], X, Y, Min).
+    mini([(X1,Y1,Dist1),(X2,Y2,Dist2)|Rest],X3,Y3,Dist3) :- mini([(X2,Y2,Dist2)|Rest],X4,Y4,Dist4), minDist((X1,Y1,Dist1),(X4,Y4,Dist4),(X3,Y3,Dist3)).
+
+    maxi([(X,Y,Max)], X, Y, Max).
+    maxi([(X1,Y1,Dist1),(X2,Y2,Dist2)|Rest],X3,Y3,Dist3) :- maxi([(X2,Y2,Dist2)|Rest],X4,Y4,Dist4), maxDist((X1,Y1,Dist1),(X4,Y4,Dist4),(X3,Y3,Dist3)).
+
+    maxScore(X,Y,Max) :- getScores(Result), maxi(Result,X,Y,Max).
+    minRecharge(X,Y,Min) :- rechargeDist(Result), mini(Result, X, Y, Min).
+
+    goto(X,Y,left):- self(Xs,Ys,Atr), grt(Xs,X), eql(Ys,Y).
+    goto(X,Y,right):- self(Xs,Ys,Atr), grt(X,Xs), eql(Ys,Y).
+    goto(X,Y,up):- self(Xs,Ys,Atr), grt(Y,Ys), eql(Xs,X).
+    goto(X,Y,down):- self(Xs,Ys,Atr), grt(Ys,Y), eql(Xs,X).
+    goto(X,Y,upleft):- self(Xs,Ys,Atr), grt(Y,Ys), grt(Xs,X).
+    goto(X,Y,upright):- self(Xs,Ys,Atr), grt(Y,Ys), grt(X,Xs).
+    goto(X,Y,downleft):- self(Xs,Ys,Atr), grt(Ys,Y), grt(Xs,X).
+    goto(X,Y,downright):- self(Xs,Ys,Atr), grt(Ys,Y), grt(X,Xs).
+
+
 
 Goal Base:
     init(),
     clean()
 
 Capability Base:
+    {takeBins(bins(A)) and takeStations(stations(B)) and takeRecharges(recharges(C)) and takeSelf(self(X,Y,Atr))}
+    saveView()
+    {not received_env(E), not bins(Pa), not stations(Pb), not recharges(Pc), not self(Px,Py,Patr), bins(A), stations(B), recharges(C), self(X,Y,Atr)}
+
     {true}
-    tryToPickUp()
+    start()
     {moving()}
 
     {true}
@@ -24,79 +78,53 @@ Goal Planning Rule Base:
     <- true |
     {
         Env(init);
+        saveView();
     }
 
 
-    <- (position(garbage,X,Y) and not moving()) |
+    <- not moving() and maxScore(X,Y,Max) |
     {
-        tryToPickUp();
-        while(not position(self, X, Y)) {
-            position(self, Xs, Ys)?;
-            if (les(X,Xs))
-            {
-                Env(move,left);
-            }
-            else
-            {
-                if (grt(X,Xs))
-                {
-                    Env(move,right);
-                }
-                else
-                {
-                    if (les(Y,Ys))
-                    {
-                        Env(move,down);
-                    }
-                    else
-                    {
-                        if (grt(Y,Ys))
-                        {
-                            Env(move,up);
-                        }
-                        else
-                        {
-                            true?;
-                        };
-                    };
-                };
-            };
+        start();
+        while(goto(X,Y,Direction)) {
+            Env(move, Direction);
+            saveView();
         };
-        Env(pickup);
-        position(bin, Xb, Yb)?;
-        while(not position(self, Xb, Yb)) {
-            position(self, Xs, Ys)?;
-            if (les(Xb,Xs))
-            {
-                Env(move,left);
-            }
-            else
-            {
-                if (grt(Xb,Xs))
-                {
-                    Env(move,right);
-                }
-                else
-                {
-                    if (les(Yb,Ys))
-                    {
-                        Env(move,down);
-                    }
-                    else
-                    {
-                        if (grt(Yb,Ys))
-                        {
-                            Env(move,up);
-                        }
-                        else
-                        {
-                            true?;
-                        };
-                    };
-                };
-            };
+        if(bins(A) and member(position(X,Y,Atr),A)){
+            Env(pickup,200);
+        }else{
+            Env(throw);
         };
-        Env(throw);
+        saveView();
         finish();
     }
+
+
+
+    <- not moving() and not maxScore(X,Y,Max) |
+    {
+        start();
+        Env(move, upleft);
+        saveView();
+        finish();
+    }
+
 Plan Revision Rule Base:
+{
+    while(goto(X,Y,Direction)) {
+        Env(move, Direction);
+        saveView();
+    };
+    if(bins(A) and member(position(X,Y,Atr),A)){
+        Env(pickup,200);
+    }else{
+        Env(throw);
+    };
+}
+<- self(Xs,Ys,attribute(A,B,Battery)) and minRecharge(Xr,Yr,D) and geq(D,Battery) |
+{
+    while(goto(Xr,Yr,Direction)) {
+        Env(move, Direction);
+        saveView();
+    };
+    Env(recharge);
+}

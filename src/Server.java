@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.Date;
 
+import static java.lang.Thread.sleep;
+
 public class Server implements Runnable{
     private File logfile;
 
@@ -156,9 +158,9 @@ public class Server implements Runnable{
             fw.flush();
             fw.close();
         }
-//        if(this.clock % 1000 == 0){
-//            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
-//        }
+        if(this.clock % 1000 == 0){
+            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
+        }
         this.clock++;
     }
     @Override
@@ -166,6 +168,7 @@ public class Server implements Runnable{
         try {
             while(!this.terminate){
                 oneTick();
+                sleep(1);
                 if(maxClock!=-1 && clock >= maxClock){
                     terminate();
                 }else if(this.environmentInter.environment.terminate){
@@ -307,8 +310,10 @@ public class Server implements Runnable{
             this.environmentInter = null;
         }else if(this.environmentInter == null){
             this.environmentInter = new EnvironmentInterface(env, this);
+            env.setEnvInter(environmentInter);
         }else{
             this.environmentInter.reset(env);
+            env.setEnvInter(environmentInter);
         }
     }
 

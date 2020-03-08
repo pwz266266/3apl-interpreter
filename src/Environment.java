@@ -6,8 +6,13 @@ public abstract class Environment implements Runnable{
     final ArrayList<EnvironmentAction> requestBuffer = new ArrayList<>();
     ArrayList<EnvironmentAction> handlingRequest = new ArrayList<>();
     final ArrayList<EnvironmentRespond> respondList = new ArrayList<>();
+    EnvironmentInterface envInter;
     State state = State.READY;
     boolean terminate = true;
+
+    public void setEnvInter(EnvironmentInterface envInter){
+        this.envInter = envInter;
+    }
 
     public void terminate(){
         state = State.FINISHED;
@@ -21,11 +26,6 @@ public abstract class Environment implements Runnable{
     public void addEntity(ControllableEntity entity){
         entities.put(entity.getID(), entity);
     }
-
-    public Environment() {
-        System.out.println("Create an environment!!!");
-    }
-
 
     public void receiveRequest(EnvironmentAction envAction){
         synchronized (requestBuffer) {
