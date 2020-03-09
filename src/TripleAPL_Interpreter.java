@@ -100,7 +100,7 @@ class FirstStage extends Stage{
                 Server server = ServerFactory.createServer(containers);
                 server.showEnv();
 
-                CleanerEnvironment env = new CleanerEnvironment(200);
+                CleanerEnvironment env = new CleanerEnvironment(1000);
                 server.setEnvironment(env);
                 assert agent1 != null;
                 server.linkAgentEntity(agent1.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("500", "500"))));

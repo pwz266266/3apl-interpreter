@@ -50,7 +50,12 @@ public class testProlog {
                 "    rechargeDist(Result) :- self(X,Y,Atr), recharges(List), rechargeDist(X,Y,List, Result).\n" +
                 "\n" +
                 "    mini([(X,Y,Min)], X, Y, Min).\n" +
-                "    mini([(X1,Y1,Dist1),(X2,Y2,Dist2)|Rest],X3,Y3,Dist3) :- mini([(X2,Y2,Dist2)|Rest],X4,Y4,Dist4), minDist((X1,Y1,Dist1),(X4,Y4,Dist4),(X3,Y3,Dist3)).\n" +
+                "    mini([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- mini(Rest,X3,Y3,Dist3), geq(Dist1,Dist3).\n" +
+                "    mini([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- mini(Rest,X3,Y3,Dist3), les(Dist1,Dist3).\n" +
+                "\n" +
+                "    maxi([(X,Y,Max)], X, Y, Max).\n" +
+                "    maxi([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- maxi(Rest,X3,Y3,Dist3), leq(Dist1,Dist3).\n" +
+                "    maxi([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- maxi(Rest,X3,Y3,Dist3), grt(Dist1,Dist3).\n" +
                 "\n" +
                 "    maxi([(X,Y,Max)], X, Y, Max).\n" +
                 "    maxi([(X1,Y1,Dist1),(X2,Y2,Dist2)|Rest],X3,Y3,Dist3) :- maxi([(X2,Y2,Dist2)|Rest],X4,Y4,Dist4), maxDist((X1,Y1,Dist1),(X4,Y4,Dist4),(X3,Y3,Dist3)).\n" +
@@ -78,7 +83,7 @@ public class testProlog {
 //        SolveInfo info = engine.solve("(price(pencil,Price) , goods(pencil,Count), sub(Count,1,NCount)).");
         Env env = new Env();
 //        SolveInfo info = engine.solve("findall(price(Item,Price), price(Item, Price), Bag).");
-        SolveInfo info = engine.solve("minRecharge(X,Y,Min).");
+        SolveInfo info = engine.solve("maxScore(X,Y,Max).");
 //                sum(1,2,A).
 //                sub(1,2,B).
 //                div(4,6,C).

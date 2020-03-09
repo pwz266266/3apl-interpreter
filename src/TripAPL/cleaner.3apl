@@ -20,8 +20,8 @@ Belief Base:
 
     dist(X1,X2,Y1,Y2,Dist) :- sub(X1,X2,X3), sub(Y1,Y2,Y3), abs(X3,X), abs(Y3,Y), maximum(X,Y,Dist).
 
-    getScore(position(X,Y,attribute(Type)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(SCarry, 0.0, Carry), \=(Dist,0), div(Carry,Dist,Score), grt(Score,0).
-    getScore(position(X,Y,attribute(Type,Task)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(Task,0.0,Task1),\=(SCarry,200),sub(200.0,SCarry,Left), minimum(Left,Task1,Take), div(Take,Dist,Score).
+    getScore(position(X,Y,attribute(Type)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(SCarry, 0.0, Carry), \=(Dist,0), root(Dist,0.5,DDist) ,div(Carry,DDist,Score), grt(Score,0).
+    getScore(position(X,Y,attribute(Type,Task)), score(X,Y,Score)) :- (self(Xs,Ys,attribute(none, SCarry, SBattery)) ; self(Xs,Ys,attribute(Type, SCarry, SBattery))),dist(X,Xs,Y,Ys,Dist), sum(Task,0.0,Task1),\=(SCarry,200),sub(200.0,SCarry,Left), minimum(Left,Task1,Take), root(Dist,0.5,DDist), div(Take,DDist,Score).
 
     getScores(Result) :- bins(A), stations(B), append(A,B,List), scoresHelper(List,Result).
     scoresHelper([],[]).
@@ -81,6 +81,13 @@ Goal Planning Rule Base:
         saveView();
     }
 
+    <- not moving() and self(Xs,Ys,attribute(A,B,Battery)) and (not maxScore(X,Y,Max) or (not minRecharge(Xr,Yr,D) and leq(Battery, 150))) |
+    {
+        start();
+        Env(move, upleft);
+        saveView();
+        finish();
+    }
 
     <- not moving() and maxScore(X,Y,Max) |
     {
@@ -94,16 +101,6 @@ Goal Planning Rule Base:
         }else{
             Env(throw);
         };
-        saveView();
-        finish();
-    }
-
-
-
-    <- not moving() and not maxScore(X,Y,Max) |
-    {
-        start();
-        Env(move, upleft);
         saveView();
         finish();
     }
