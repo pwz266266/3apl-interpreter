@@ -7,7 +7,9 @@ public class TripAPL_parser implements TripAPL_parserConstants {
   static public Agent compile(String filename) throws FileNotFoundException, ParseException {
     return new TripAPL_parser(new FileInputStream(filename)).Program(ID++);
   }
-
+  static public Agent compile(File file) throws FileNotFoundException, ParseException {
+    return new TripAPL_parser(new FileInputStream(file)).Program(ID++);
+  }
   final public Agent Program(int id) throws ParseException {
     Token t;
     String name;

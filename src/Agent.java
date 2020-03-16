@@ -862,10 +862,12 @@ class Capability{
                 cond.performChange(env,engine,fw);
             }
         }else{
-            try{
-                fw.write(", failed.\n");
-            }catch(Exception e){
-                System.out.println("Can't write to file.");
+            if(fw!=null) {
+                try {
+                    fw.write(", failed.\n");
+                } catch (Exception e) {
+                    System.out.println("Can't write to file.");
+                }
             }
         }
         return info.isSuccess();
@@ -1147,6 +1149,7 @@ class EnvAction extends BasicPlan{
                     }
                     agent.getReceivedResponds().remove(respond);
                     requestSent = false;
+                    thisID = ID++;
                     return respond.isSuccess() ? 1 : -1;
                 }
             }
@@ -1210,10 +1213,12 @@ class CapAction extends BasicPlan{
             }
         }
         if(this.cap == null){
-            try{
-                fw.write(", Capability "+this.predicate+ " doesn't exist, check for typo!\n");
-            }catch(Exception e){
-                System.out.println("Can't write to file.");
+            if(fw!=null) {
+                try {
+                    fw.write(", Capability " + this.predicate + " doesn't exist, check for typo!\n");
+                } catch (Exception e) {
+                    System.out.println("Can't write to file.");
+                }
             }
             return -2;
         }

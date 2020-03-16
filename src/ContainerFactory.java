@@ -5,4 +5,8 @@ public class ContainerFactory {
     static public Container createContainer(ArrayList<Agent> agents){
         return new Container(agents, ID++);
     }
+
+    static public Container createContainer(){
+        return new Container(new ArrayList<>(), ID++);
+    }
 }

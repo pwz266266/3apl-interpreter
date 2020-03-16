@@ -15,6 +15,17 @@ public class EnvironmentInterface {
         return this.entityMap.get(entityID);
     }
 
+    public void removeAgent(Agent agent){
+        ArrayList<Integer> entityList = new ArrayList<>();
+        agentMap.remove(agent.getFullID());
+        for(Integer buffer : entityMap.keySet()){
+            if(entityMap.get(buffer).equals(agent.getFullID())){
+                entityList.add(buffer);
+            }
+        }
+        environment.removeEntities(entityList);
+    }
+
     public EnvironmentInterface(Environment env, Server server){
         this.environment = env;
         this.server = server;
@@ -56,5 +67,9 @@ public class EnvironmentInterface {
             }
         }
         return responds;
+    }
+
+    public void updateEnvironmentInfo(int tick, String message){
+        this.server.AddToEnvInfoArea(tick,message);
     }
 }

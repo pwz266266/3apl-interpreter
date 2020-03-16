@@ -1,13 +1,9 @@
-import alice.tuprolog.exceptions.MalformedGoalException;
-import alice.tuprolog.exceptions.NoSolutionException;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
-
+import java.lang.reflect.InvocationTargetException;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,10 +17,10 @@ import javafx.stage.Stage;
 public class TripleAPL_Interpreter extends Application{
     private static Server server;
     private Stage stage;
-    public static void main(String args[]) throws ParseException, IOException {
-        File logdir = new File("./log");
-        delete(logdir);
-        launch(args);
+    public static void main() throws ParseException, IOException {
+//        File logdir = new File("./log");
+//        delete(logdir);
+        launch();
 
     }
 
@@ -50,10 +46,21 @@ public class TripleAPL_Interpreter extends Application{
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
-        new FirstStage();
-    }
+    public void start(Stage theStage) throws Exception {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("./Menu.fxml"));
+                Parent root = loader.load();
+                GUIController controller = loader.getController();
+                theStage.setTitle("3apl Interpreter");
+                theStage.setScene(new Scene(root));
+                theStage.setOnHidden(e -> controller.shutdown());
+                theStage.show();
+            }catch(Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
 }
+
 
 
 class FirstStage extends Stage{
@@ -75,8 +82,12 @@ class FirstStage extends Stage{
                 String cleanerFile = "./src/TripAPL/cleaner.3apl";
                 String pathFinder = "./src/TripAPL/pathFinder.3apl";
                 Agent agent1 = null;
+//                Agent agent2 = null;
+//                Agent agent3 = null;
                 try {
                     agent1 = TripAPL_parser.compile(cleanerFile);
+//                    agent2 = TripAPL_parser.compile(cleanerFile);
+//                    agent3 = TripAPL_parser.compile(cleanerFile);
                 } catch (FileNotFoundException | ParseException e) {
                     e.printStackTrace();
                 }
@@ -87,6 +98,8 @@ class FirstStage extends Stage{
 //        ArrayList<Agent> agents2 = new ArrayList<>();
 
                 agents1.add(agent1);
+//                agents1.add(agent2);
+//                agents1.add(agent3);
 //        agents2.add(agent2);
 //        agents2.add(agent3);
 
@@ -99,11 +112,28 @@ class FirstStage extends Stage{
 
                 Server server = ServerFactory.createServer(containers);
                 server.showEnv();
-
-                CleanerEnvironment env = new CleanerEnvironment(1000);
+                Class cls = null;
+                Environment env = null;
+                try {
+                    cls = Class.forName("CleanerEnvironment");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    env = (Environment) cls.getConstructor(int.class).newInstance(1000);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
                 server.setEnvironment(env);
-                assert agent1 != null;
                 server.linkAgentEntity(agent1.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("500", "500"))));
+//                server.linkAgentEntity(agent2.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("499", "500"))));
+//                server.linkAgentEntity(agent3.getFullID(),server.createEntity("Cleaner (Controllable)", new ArrayList<>(Arrays.asList("500", "499"))));
 //                File logdir = new File("./log");
 //                logdir.mkdir();
 //                server.enableDebug("./log");

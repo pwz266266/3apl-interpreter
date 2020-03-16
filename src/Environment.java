@@ -14,6 +14,12 @@ public abstract class Environment implements Runnable{
         this.envInter = envInter;
     }
 
+    public void removeEntities(ArrayList<Integer> entities){
+        for(Integer buffer : entities){
+            this.entities.remove(buffer);
+        }
+    }
+
     public void terminate(){
         state = State.FINISHED;
         this.terminate = true;

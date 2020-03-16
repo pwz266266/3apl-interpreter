@@ -1,5 +1,6 @@
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -13,6 +14,7 @@ import static java.lang.Thread.sleep;
 
 public class CleanerEnvironment extends Environment {
     ArrayList<ArrayList<Cell>> map;
+    private HashMap<Integer,Rectangle> agents = new HashMap<>();
     private ArrayList<ArrayList<Rectangle>> rectangles;
     private ArrayList<ArrayList<Circle>> circles;
     private ArrayList<Bin> binList = new ArrayList<>();
@@ -21,6 +23,12 @@ public class CleanerEnvironment extends Environment {
     private Scene scene = new Scene(group);
     private int score = 0;
     private int size;
+    private Slider bar;
+    public CleanerEnvironment(){
+        super();
+        this.size = 1000;
+        init(size);
+    }
     public CleanerEnvironment(int size){
         super();
         this.size = size;
@@ -43,19 +51,15 @@ public class CleanerEnvironment extends Environment {
             rectangles.add(rectangleBuffer);
             circles.add(circleBuffer);
             for(int j=0; j<61; j++){
-                Rectangle rect = new Rectangle(i*15,j*15,14,14);
+                Rectangle rect = new Rectangle(i*11,j*11,10,10);
                 rect.setVisible(false);
-                Circle cir = new Circle(i*15+8,j*15+8,7);
+                Circle cir = new Circle(i*11+6,j*11+6,5);
                 cir.setVisible(false);
                 rectangleBuffer.add(rect);
                 circleBuffer.add(cir);
             }
-            Rectangle agent = new Rectangle(30 * 15, 30 * 15, 10, 10);
-            agent.setVisible(true);
-            agent.setFill(Color.BROWN);
             this.group.getChildren().addAll(rectangleBuffer);
             this.group.getChildren().addAll(circleBuffer);
-            this.group.getChildren().add(agent);
         }
         map = new ArrayList<>(size);
         for(int i=0; i<size; i++){
@@ -92,10 +96,10 @@ public class CleanerEnvironment extends Environment {
     }
 
     private void oneTick() {
+        int prevScore = score;
         generateTasks();
         startHandling();
         if(! handlingRequest.isEmpty()){
-            System.out.println("Environment tick "+clock);
             clock ++;
         }
         for(EnvironmentAction action: handlingRequest){
@@ -106,6 +110,10 @@ public class CleanerEnvironment extends Environment {
         if(clock>=10000){
             this.terminate();
         }
+        if(score != prevScore){
+            this.envInter.updateEnvironmentInfo(clock,"Current Score: "+score);
+        }
+        updateGUI();
     }
     @Override
     public void run() {
@@ -124,6 +132,70 @@ public class CleanerEnvironment extends Environment {
             EnvironmentRespond respond = entities.get(entityID).passiveSensing(envInter.getAgent(entityID));
             if(respond!=null) {
                 this.respondList.add(respond);
+            }
+        }
+    }
+
+    public void updateGUI(){
+        Cleaner entity = (Cleaner)entities.get((int)bar.getValue());
+        int eX = entity.getX();
+        int eY = entity.getY();
+        int UpLimit = eY + 30;
+        int DownLimit = eY - 30;
+        int LeftLimit = eX - 30;
+        int RightLimit = eX + 30;
+        for(int i = LeftLimit; i <= RightLimit; i++){
+            for(int j = DownLimit; j <= UpLimit; j++){
+                int drawI = i - eX + 30;
+                int drawJ = j - eY + 30;
+                if(i >= size || j >= size || i < 0 || j < 0){
+                    rectangles.get(drawI).get(drawJ).setVisible(false);
+                    circles.get(drawI).get(drawJ).setVisible(false);
+                }else {
+                    Cell cell = map.get(i).get(j);
+                    if (cell != null) {
+                        switch (cell.getCellType()) {
+                            case STATION:
+                                Station station = (Station) cell;
+                                if (station.getType() == TrashType.RECYCLING) {
+                                    rectangles.get(drawI).get(drawJ).setFill(Color.GREEN);
+                                } else {
+                                    rectangles.get(drawI).get(drawJ).setFill(Color.BLACK);
+                                }
+                                circles.get(drawI).get(drawJ).setVisible(false);
+                                rectangles.get(drawI).get(drawJ).setVisible(true);
+                                break;
+                            case BIN:
+                                Bin bin = (Bin) cell;
+                                if (bin.getType() == TrashType.RECYCLING) {
+                                    circles.get(drawI).get(drawJ).setFill(Color.GREEN);
+                                } else {
+                                    circles.get(drawI).get(drawJ).setFill(Color.BLACK);
+                                }
+                                circles.get(drawI).get(drawJ).setVisible(true);
+                                rectangles.get(drawI).get(drawJ).setVisible(false);
+                                break;
+                            case RECHARGE:
+                                circles.get(drawI).get(drawJ).setFill(Color.RED);
+                                circles.get(drawI).get(drawJ).setVisible(true);
+                                rectangles.get(drawI).get(drawJ).setVisible(false);
+                                break;
+                        }
+                    } else {
+                        rectangles.get(drawI).get(drawJ).setVisible(false);
+                        circles.get(drawI).get(drawJ).setVisible(false);
+                    }
+                }
+            }
+        }
+        for(int i = 0; i<entities.size(); i++){
+            Cleaner buffer = (Cleaner) entities.get(i);
+            if(buffer.getX() >= LeftLimit && buffer.getX() <= RightLimit && buffer.getY() >= DownLimit && buffer.getY() <= UpLimit){
+                agents.get(buffer.getID()).setX((buffer.getX() - eX + 30)*11+2);
+                agents.get(buffer.getID()).setY((buffer.getY() - eY + 30)*11+2);
+                agents.get(buffer.getID()).setVisible(true);
+            }else{
+                agents.get(buffer.getID()).setVisible(false);
             }
         }
     }
@@ -155,12 +227,7 @@ public class CleanerEnvironment extends Environment {
 
         for(int i = LeftLimit; i <= RightLimit; i++){
             for(int j = DownLimit; j <= UpLimit; j++){
-                int drawI = i - eX + 30;
-                int drawJ = j - eY + 30;
-                if(i >= size || j >= size || i < 0 || j < 0){
-                    rectangles.get(drawI).get(drawJ).setVisible(false);
-                    circles.get(drawI).get(drawJ).setVisible(false);
-                }else {
+                if(!(i >= size || j >= size || i < 0 || j < 0)){
                     Cell cell = map.get(i).get(j);
                     if (cell != null) {
                         switch (cell.getCellType()) {
@@ -175,14 +242,6 @@ public class CleanerEnvironment extends Environment {
                                 pos.add(new Atom("station"));
                                 pos.add(attribute);
                                 postCondition.add(new VpredClause("position", pos));
-
-                                if (station.getType() == TrashType.RECYCLING) {
-                                    rectangles.get(drawI).get(drawJ).setFill(Color.GREEN);
-                                } else {
-                                    rectangles.get(drawI).get(drawJ).setFill(Color.BLACK);
-                                }
-                                circles.get(drawI).get(drawJ).setVisible(false);
-                                rectangles.get(drawI).get(drawJ).setVisible(true);
                                 break;
                             case BIN:
                                 Bin bin = (Bin) cell;
@@ -196,13 +255,6 @@ public class CleanerEnvironment extends Environment {
                                 pos.add(new Atom("bin"));
                                 pos.add(attribute);
                                 postCondition.add(new VpredClause("position", pos));
-                                if (bin.getType() == TrashType.RECYCLING) {
-                                    circles.get(drawI).get(drawJ).setFill(Color.GREEN);
-                                } else {
-                                    circles.get(drawI).get(drawJ).setFill(Color.BLACK);
-                                }
-                                circles.get(drawI).get(drawJ).setVisible(true);
-                                rectangles.get(drawI).get(drawJ).setVisible(false);
                                 break;
                             case RECHARGE:
                                 pos = new ArrayList<>();
@@ -213,14 +265,8 @@ public class CleanerEnvironment extends Environment {
                                 pos.add(new Atom("recharge"));
                                 pos.add(attribute);
                                 postCondition.add(new VpredClause("position", pos));
-                                circles.get(drawI).get(drawJ).setFill(Color.RED);
-                                circles.get(drawI).get(drawJ).setVisible(true);
-                                rectangles.get(drawI).get(drawJ).setVisible(false);
                                 break;
                         }
-                    } else {
-                        rectangles.get(drawI).get(drawJ).setVisible(false);
-                        circles.get(drawI).get(drawJ).setVisible(false);
                     }
                 }
             }
@@ -295,15 +341,19 @@ public class CleanerEnvironment extends Environment {
         EnvironmentRespond respond = new EnvironmentRespond(action.getAgentID(),postcondition,success,action.getActionID(), entity.getID());
 
         respondList.add(respond);
-        System.out.println("Score: "+this.score);
-
     }
 
     @Override
     public void showGUI() {
+        bar = new Slider(0,entities.size()-1,0);
+        bar.setLayoutY(60*11);
+        bar.setShowTickLabels(true);
+        bar.setShowTickMarks(true);
+        bar.setBlockIncrement(1);
+        group.getChildren().add(bar);
         Stage stage = new Stage();
-        stage.setHeight(61*15);
-        stage.setWidth(61*15);
+        stage.setHeight(66*11);
+        stage.setWidth(61*11);
         stage.setScene(scene);
         stage.show();
     }
@@ -323,6 +373,10 @@ public class CleanerEnvironment extends Environment {
         if ("Cleaner (Controllable)".equals(type)) {
             Cleaner newCleaner = new Cleaner(Integer.parseInt(parameter.get(0)), Integer.parseInt(parameter.get(1)));
             this.entities.put(newCleaner.getID(), newCleaner);
+            Rectangle rect = new Rectangle(7,7,Color.BROWN);
+            rect.setVisible(false);
+            group.getChildren().add(rect);
+            agents.put(newCleaner.getID(), rect);
             return newCleaner.getID();
         }
         return -1;
@@ -385,7 +439,7 @@ class RechargePoint extends Cell{
 
 
 class Cleaner implements ControllableEntity {
-    static int ID = 1;
+    static int ID = 0;
     private int thisID = Cleaner.ID++;
     private TrashType type = null;
     final static public int capacity = 200;
@@ -446,7 +500,6 @@ class Cleaner implements ControllableEntity {
     }
 
     public boolean move(String direction){
-        System.out.println(battery);
         if(this.battery==0){
             return false;
         }

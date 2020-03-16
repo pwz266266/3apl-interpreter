@@ -50,12 +50,12 @@ public class testProlog {
                 "    rechargeDist(Result) :- self(X,Y,Atr), recharges(List), rechargeDist(X,Y,List, Result).\n" +
                 "\n" +
                 "    mini([(X,Y,Min)], X, Y, Min).\n" +
-                "    mini([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- mini(Rest,X3,Y3,Dist3), geq(Dist1,Dist3).\n" +
-                "    mini([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- mini(Rest,X3,Y3,Dist3), les(Dist1,Dist3).\n" +
+                "    mini([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- mini(Rest,X3,Y3,Dist3), geq(Dist1,Dist3), ! .\n" +
+                "    mini([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- mini(Rest,X3,Y3,Dist3), les(Dist1,Dist3), ! .\n" +
                 "\n" +
                 "    maxi([(X,Y,Max)], X, Y, Max).\n" +
-                "    maxi([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- maxi(Rest,X3,Y3,Dist3), leq(Dist1,Dist3).\n" +
-                "    maxi([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- maxi(Rest,X3,Y3,Dist3), grt(Dist1,Dist3).\n" +
+                "    maxi([(X1,Y1,Dist1)|Rest],X3,Y3,Dist3) :- maxi(Rest,X3,Y3,Dist3), leq(Dist1,Dist3), ! .\n" +
+                "    maxi([(X1,Y1,Dist1)|Rest],X1,Y1,Dist1) :- maxi(Rest,X3,Y3,Dist3), grt(Dist1,Dist3), ! .\n" +
                 "\n" +
                 "    maxi([(X,Y,Max)], X, Y, Max).\n" +
                 "    maxi([(X1,Y1,Dist1),(X2,Y2,Dist2)|Rest],X3,Y3,Dist3) :- maxi([(X2,Y2,Dist2)|Rest],X4,Y4,Dist4), maxDist((X1,Y1,Dist1),(X4,Y4,Dist4),(X3,Y3,Dist3)).\n" +
@@ -72,9 +72,9 @@ public class testProlog {
                 "    goto(X,Y,downleft):- self(Xs,Ys,Atr), grt(Ys,Y), grt(Xs,X).\n" +
                 "    goto(X,Y,downright):- self(Xs,Ys,Atr), grt(Ys,Y), grt(X,Xs).\n"));
 
-        engine.addTheory(new Theory("stations([position(530,710,attribute(recycling)),position(560,680,attribute(waste)),position(560,730,attribute(recycling)),position(575,490,attribute(waste)),position(590,550,attribute(recycling)),position(590,680,attribute(waste)),position(600,480,attribute(waste)),position(605,675,attribute(waste)),position(620,440,attribute(waste)),position(635,610,attribute(waste)),position(640,685,attribute(recycling)),position(650,545,attribute(recycling)),position(660,565,attribute(recycling)),position(680,590,attribute(waste)),position(690,515,attribute(waste)),position(705,695,attribute(waste)),position(710,510,attribute(waste)),position(725,580,attribute(recycling)),position(735,460,attribute(recycling)),position(735,625,attribute(recycling)),position(740,735,attribute(waste)),position(750,645,attribute(recycling)),position(755,440,attribute(waste)),position(770,640,attribute(recycling)),position(800,695,attribute(recycling))]).\n"));
+        engine.addTheory(new Theory("stations([])."));
         engine.addTheory(new Theory("self(680,590,attribute(none,0,459)).\n\n"));
-        engine.addTheory(new Theory("bins([position(535,720,attribute(waste,34)),position(540,565,attribute(waste,64)),position(545,620,attribute(recycling,42)),position(550,655,attribute(recycling,93)),position(555,515,attribute(recycling,53)),position(555,730,attribute(recycling,75)),position(560,650,attribute(waste,8)),position(570,545,attribute(recycling,6)),position(575,505,attribute(recycling,44)),position(580,530,attribute(recycling,40)),position(595,680,attribute(recycling,95)),position(605,605,attribute(waste,84)),position(610,540,attribute(recycling,62)),position(625,640,attribute(waste,44)),position(630,545,attribute(waste,51)),position(645,600,attribute(recycling,91)),position(650,640,attribute(waste,38)),position(650,740,attribute(waste,91)),position(655,535,attribute(waste,52)),position(670,485,attribute(recycling,93)),position(680,540,attribute(recycling,19)),position(685,495,attribute(waste,57)),position(690,680,attribute(recycling,75)),position(695,635,attribute(waste,23)),position(700,615,attribute(recycling,69)),position(710,605,attribute(recycling,94)),position(710,685,attribute(waste,99)),position(710,720,attribute(recycling,74)),position(715,465,attribute(waste,58)),position(720,585,attribute(waste,92)),position(720,705,attribute(waste,58)),position(725,535,attribute(waste,60)),position(725,610,attribute(recycling,66)),position(730,725,attribute(waste,27)),position(740,590,attribute(recycling,91)),position(745,460,attribute(recycling,50)),position(745,710,attribute(waste,72)),position(755,645,attribute(recycling,56)),position(765,445,attribute(waste,53)),position(770,545,attribute(recycling,49)),position(775,540,attribute(recycling,38)),position(780,555,attribute(recycling,40)),position(780,735,attribute(waste,36)),position(785,560,attribute(waste,85)),position(785,565,attribute(recycling,62)),position(785,665,attribute(recycling,57)),position(790,485,attribute(recycling,49)),position(795,485,attribute(recycling,88)),position(795,700,attribute(recycling,87)),position(805,445,attribute(recycling,13)),position(810,530,attribute(recycling,37)),position(810,630,attribute(waste,7)),position(810,640,attribute(recycling,53)),position(810,700,attribute(recycling,37)),position(815,535,attribute(recycling,30)),position(815,540,attribute(recycling,88)),position(815,695,attribute(recycling,23)),position(820,545,attribute(waste,99)),position(820,595,attribute(waste,30))]).\n"));
+        engine.addTheory(new Theory("bins([position(545,620,attribute(recycling,42)),position(550,655,attribute(recycling,93))])."));
         engine.addTheory(new Theory("recharges([position(575,630,attribute),position(630,600,attribute),position(655,685,attribute),position(660,710,attribute),position(700,655,attribute),position(795,565,attribute),position(815,460,attribute)]).\n"));
 //        engine.addTheory(new Theory("likes(marco,pizza)."));
 //        engine.addTheory(new Theory("likes(Human,pizza) :- italian(Human)."));
@@ -83,7 +83,7 @@ public class testProlog {
 //        SolveInfo info = engine.solve("(price(pencil,Price) , goods(pencil,Count), sub(Count,1,NCount)).");
         Env env = new Env();
 //        SolveInfo info = engine.solve("findall(price(Item,Price), price(Item, Price), Bag).");
-        SolveInfo info = engine.solve("maxScore(X,Y,Max).");
+        SolveInfo info = engine.solve("maxi([(1,2,3),(2,3,1),(4,1,5),(1,2,3),(3,4,5)], X, Y, Max).");
 //                sum(1,2,A).
 //                sub(1,2,B).
 //                div(4,6,C).

@@ -38,4 +38,21 @@ public class EnvironmentAction {
     public int getEntityID(){
         return this.entityID;
     }
+
+    private String getStringArgs(){
+        StringBuilder result = new StringBuilder("(");
+        String prefix = "";
+        for(String arg:this.arguments){
+            result.append(prefix);
+            result.append(arg);
+            prefix = ", ";
+        }
+        result.append(")");
+        return result.toString();
+    }
+
+    @Override
+    public String toString(){
+        return "EnvAction< Action ID: "+actionID+", Agent ID: "+agentID+", "+actionName+getStringArgs()+">";
+    }
 }

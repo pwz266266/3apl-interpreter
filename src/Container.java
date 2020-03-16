@@ -179,6 +179,15 @@ public class Container implements Runnable{
         }
     }
 
+    public void removeAgent(Agent agent){
+        this.agents.remove(agent);
+        this.MessagePool.remove(agent);
+        this.envRespondPool.remove(agent);
+        if(this.server!=null){
+            server.removeAgent(agent);
+        }
+    }
+
     public void sendMessage(Message message) {
         this.server.addMessage(message);
     }
@@ -192,6 +201,7 @@ public class Container implements Runnable{
         for (Message message : receivedMessage) {
             if (message.getReceiverID().equals("ams")) {
                 if (message.getPerformative() == Performative.INFORM) {
+                    this.server.AddToAgentMessageArea(message);
                     this.engine.addTheory(new Theory(message.receive()));
                 } else if (message.getPerformative() == Performative.QUERY) {
                     SolveInfo info = this.engine.solve("received(inform,Sender," + message.getBody().toString() + "," + message.getReply() + ").");
@@ -210,6 +220,7 @@ public class Container implements Runnable{
                             for (Agent agent : this.agents) {
                                 if (agent.getID() == agentID) {
                                     synchronized (this.MessagePool.get(agent)) {
+                                        this.server.AddToAgentMessageArea(replyMessage);
                                         this.MessagePool.get(agent).add(replyMessage);
                                     }
                                     if (fw != null) {
@@ -244,6 +255,7 @@ public class Container implements Runnable{
                         fw.write("Send " + message.toString() + " to Agent" + agent.getID() + ".\n");
                     }
                     synchronized (this.MessagePool.get(agent)) {
+                        this.server.AddToAgentMessageArea(message);
                         this.MessagePool.get(agent).add(message);
                     }
                 }

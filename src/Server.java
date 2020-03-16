@@ -1,5 +1,7 @@
 import alice.tuprolog.exceptions.MalformedGoalException;
 import alice.tuprolog.exceptions.NoSolutionException;
+import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,12 +28,20 @@ public class Server implements Runnable{
     private EnvironmentInterface environmentInter;
     private ArrayList<Agent> agents = new ArrayList<>();
     public void addMessage(Message message) {
-        this.messageToSend.add(message);
+        synchronized (messageToSend) {
+            this.messageToSend.add(message);
+        }
     }
     private final ArrayList<EnvironmentAction> envActions;
     private final ArrayList<EnvironmentRespond> envResponds;
     private final ArrayList<Message> messageToSend;
     private boolean terminate = true;
+    private TextArea agentMessageArea = null;
+    private TextArea envMessageArea = null;
+    private TextArea envInfoArea = null;
+    private final StringBuilder agentMesBuffer = new StringBuilder();
+    private final StringBuilder envMesBuffer = new StringBuilder();
+    private final StringBuilder envInfoBuffer = new StringBuilder();
     public void terminate(){
         this.terminate = true;
         for(Container container: containers){
@@ -40,6 +50,59 @@ public class Server implements Runnable{
         if(environmentInter!=null){
             environmentInter.environment.terminate();
         }
+    }
+
+    public void updateTextArea(){
+        if(envInfoArea!=null){
+            this.envInfoArea.appendText(envInfoBuffer.toString());
+            envInfoBuffer.delete(0,envInfoBuffer.length());
+            this.agentMessageArea.appendText(agentMesBuffer.toString());
+            agentMesBuffer.delete(0,agentMesBuffer.length());
+            this.envMessageArea.appendText(envMesBuffer.toString());
+            envMesBuffer.delete(0,envMesBuffer.length());
+        }
+    }
+
+    public void AddToEnvInfoArea(int clock, String message) {
+        if (envInfoArea != null) {
+            synchronized (envInfoBuffer) {
+                this.envInfoBuffer.append("Environment tick " + clock + ": " + message + "\n");
+            }
+        }
+    }
+    public void AddToAgentMessageArea(Message message) {
+        if (agentMessageArea != null) {
+            synchronized (agentMesBuffer) {
+                this.agentMesBuffer.append("Server tick " + clock + ": " + message.toString() + "\n");
+            }
+        }
+    }
+
+    public void AddToEnvMessageArea(EnvironmentRespond message) {
+        if (envMessageArea != null) {
+            synchronized (envMesBuffer) {
+                this.envMesBuffer.append("Server tick " + clock + ": " + message.toString() + "\n");
+            }
+        }
+    }
+
+    public void AddToEnvMessageArea(EnvironmentAction message) {
+        if (envMessageArea != null) {
+            synchronized (envMesBuffer) {
+                this.envMesBuffer.append("Server tick " + clock + ": " + message.toString() + "\n");
+            }
+        }
+    }
+    public void setAgentMessageArea(TextArea agentMessageArea) {
+        this.agentMessageArea = agentMessageArea;
+    }
+
+    public void setEnvMessageArea(TextArea envMessageArea){
+        this.envMessageArea = envMessageArea;
+    }
+
+    public void setEnvInfoArea(TextArea envInfoArea){
+        this.envInfoArea = envInfoArea;
     }
 
     public void restart(){
@@ -68,6 +131,10 @@ public class Server implements Runnable{
         if(environmentInter != null){
             this.environmentInter.setServer(this);
         }
+    }
+
+    public boolean hasEnv(){
+        return environmentInter!=null;
     }
 
     public int getMaxClock() {
@@ -112,10 +179,16 @@ public class Server implements Runnable{
         }
     }
 
+
     public void oneTick() throws IOException {
         if(environmentInter != null && environmentInter.environment.state == State.READY){
             environmentInter.environment.state = State.ACTIVE;
             new Thread(environmentInter.environment).start();
+        }
+        synchronized (messageToSend) {
+            for (Message message : this.messageToSend) {
+                AddToAgentMessageArea(message);
+            }
         }
         FileWriter fw = null;
         if(this.Debug){
@@ -158,20 +231,27 @@ public class Server implements Runnable{
             fw.flush();
             fw.close();
         }
-        if(this.clock % 1000 == 0){
-            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
-        }
+//        if(this.clock % 1000 == 0){
+//            System.out.println("Server"+this.getID()+" reaches clock " +this.clock+".");
+//        }
+
         this.clock++;
     }
     @Override
     public void run(){
+//        if(!this.Debug){
+//            this.enableDebug("./log");
+//        }
         try {
             while(!this.terminate){
                 oneTick();
                 sleep(1);
+                if(clock%1000==0){
+                    updateTextArea();
+                }
                 if(maxClock!=-1 && clock >= maxClock){
                     terminate();
-                }else if(this.environmentInter.environment.terminate){
+                }else if(this.environmentInter!=null && this.environmentInter.environment.terminate){
                     this.terminate();
                 }
             }
@@ -190,6 +270,7 @@ public class Server implements Runnable{
         this.containers.add(newContainer);
         this.agents.addAll(newContainer.getAgents());
         messagePool.put(newContainer, new ArrayList<>());
+        envRespondPool.put(newContainer, new ArrayList<>());
         newContainer.setServer(this);
         if(this.Debug){
             FileWriter fw = new FileWriter(this.logfile, true);
@@ -206,8 +287,24 @@ public class Server implements Runnable{
         }
     }
 
+    public void removeContainer(Container container){
+        containers.remove(container);
+        messagePool.remove(container);
+        envRespondPool.remove(container);
+        for(Agent agent: container.getAgents()){
+            removeAgent(agent);
+        }
+    }
+
     public void addAgent(Agent agent){
         this.agents.add(agent);
+    }
+
+    public void removeAgent(Agent agent){
+        this.agents.remove(agent);
+        if(this.environmentInter!=null){
+            this.environmentInter.removeAgent(agent);
+        }
     }
 
     public ArrayList<Message> forwardMessage(Container container){
@@ -245,6 +342,7 @@ public class Server implements Runnable{
             this.envResponds.clear();
         }
         for(EnvironmentRespond respond: currentResponds){
+            AddToEnvMessageArea(respond);
             String ContainerID = respond.getAgentID();
             int containerid = Integer.parseInt(ContainerID.split("_")[1]);
             for(Container container : containers){
@@ -328,6 +426,7 @@ public class Server implements Runnable{
             System.out.println("WARNING: No environment associated with current server!");
         }else{
             synchronized (envActions) {
+                AddToEnvMessageArea(envAction);
                 this.envActions.add(envAction);
             }
         }

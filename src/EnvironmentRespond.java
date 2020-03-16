@@ -39,4 +39,9 @@ public class EnvironmentRespond {
     public int getEntityID() {
         return entityID;
     }
+
+    @Override
+    public String toString(){
+        return "EnvRespond< Agent: "+agentID +", Entity: "+entityID+", Action ID: "+actionID+", "+(success?"Success>":"Failed>");
+    }
 }

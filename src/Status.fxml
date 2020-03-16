@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="StatusController">
+   <children>
+      <Text layoutX="40.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Agent Messages" wrappingWidth="194.13671875">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
+      <Text layoutX="850.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Envrionment Info" wrappingWidth="182.13671875">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
+      <Text layoutX="441.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Envrionment Actions" wrappingWidth="210.13671875">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
+      <ScrollPane layoutX="40.0" layoutY="68.0" prefHeight="550.0" prefWidth="358.0">
+         <content>
+            <TextArea fx:id="agentMessages" prefHeight="550.0" prefWidth="359.0" />
+         </content>
+      </ScrollPane>
+      <ScrollPane layoutX="441.0" layoutY="68.0" prefHeight="550.0" prefWidth="358.0">
+         <content>
+            <TextArea fx:id="envActions" prefHeight="550.0" prefWidth="359.0" />
+         </content>
+      </ScrollPane>
+      <ScrollPane layoutX="850.0" layoutY="68.0" prefHeight="550.0" prefWidth="358.0">
+         <content>
+            <TextArea fx:id="envInfo" prefHeight="550.0" prefWidth="359.0" />
+         </content>
+      </ScrollPane>
+   </children>
+</Pane>
